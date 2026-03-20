@@ -3812,7 +3812,14 @@ document.getElementById('import-btn').addEventListener('click', openPasteDialog)
       names.forEach(function(name) {
         var key = st.path.concat([name]).join('/');
         var agg = aggForPeriod(RD[dk], key, fromYM, toYM);
-        if (!agg) return;
+        // データなし(agg=null)でも子階層が存在する場合は表示してドリルダウン可能にする
+        if (!agg) {
+          var childCnt = getSLKeys(st.level + 1, st.path.concat([name])).length;
+          if (childCnt === 0) return;
+          agg = {sales:0,gross:0,labor:0,adv:0,opProfit:0,customers:0,cnt:0,
+                 grossRate:null,laborRate:null,opProfitRate:null,
+                 manageable:null,manageableRate:null,invTurnover:null,laborDist:null};
+        }
         rows.push({ name:name, agg:agg });
       });
       if (rows.length === 0 && RD[dk]) {
