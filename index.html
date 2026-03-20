@@ -1980,7 +1980,6 @@ body.public-mode .private-only { display: none !important; }
   </div>
 </div>
 
-<script src="data.js"></script>
 <script src="rialt_data.js"></script>
 <script>
 'use strict';
@@ -1988,6 +1987,13 @@ body.public-mode .private-only { display: none !important; }
   // ── PUBLIC MODE ────────────────────────────────────────────────
   var PUBLIC_MODE = location.search.indexOf('public') !== -1;
   if (PUBLIC_MODE) document.body.classList.add('public-mode');
+
+  // data.js は PUBLIC_MODE 以外のときだけ動的ロード
+  if (!PUBLIC_MODE) {
+    var _ds = document.createElement('script');
+    _ds.src = 'data.js';
+    document.head.appendChild(_ds);
+  }
 
   // ── RIALT テーマ ──────────────────────────────────────────────
   var _RIALT_THEME_KEY = 'rialt_theme_v1';
