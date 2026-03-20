@@ -1988,6 +1988,13 @@ body.public-mode .private-only { display: none !important; }
   var PUBLIC_MODE = location.search.indexOf('public') !== -1;
   if (PUBLIC_MODE) document.body.classList.add('public-mode');
 
+  // config.js を動的ロード（APIキー等の設定）
+  (function() {
+    var _cs = document.createElement('script');
+    _cs.src = 'config.js';
+    document.head.appendChild(_cs);
+  })();
+
   // data.js は PUBLIC_MODE 以外のときだけ動的ロード
   if (!PUBLIC_MODE) {
     var _ds = document.createElement('script');
@@ -4112,7 +4119,7 @@ document.getElementById('import-btn').addEventListener('click', openPasteDialog)
 
   // ===== AI分析 (Gemini) =====
   var GEMINI_KEY_LS = 'gemini_api_key_v1';
-  function getGeminiKey() { try { return localStorage.getItem(GEMINI_KEY_LS) || ''; } catch(e){ return ''; } }
+  function getGeminiKey() { try { return localStorage.getItem(GEMINI_KEY_LS) || (window.GEMINI_API_KEY || ''); } catch(e){ return window.GEMINI_API_KEY || ''; } }
   function setGeminiKey(k) { try { localStorage.setItem(GEMINI_KEY_LS, k); } catch(e){} }
 
   var AI_BENCHMARKS = {
@@ -4364,7 +4371,7 @@ document.getElementById('import-btn').addEventListener('click', openPasteDialog)
       if(c){ renderAIResult(c.text,c.ts); return; }
     }
     var apiKey=getGeminiKey();
-    if(!apiKey){ if(area) area.innerHTML='<div class="ai-error">⚠️ Gemini APIキーが設定されていません。設定（⚙）> GEMINI KEY に入力してください。</div>'; return; }
+    if(!apiKey){ if(area) area.innerHTML='<div class="ai-error">⚠️ Gemini APIキーが設定されていません。管理者にお問い合わせください。</div>'; return; }
     var prompt=buildAIPrompt(currentMonthYM); if(!prompt) return;
     if(area) area.innerHTML='<div class="ai-loading">⏳ Gemini が分析中です...</div>';
     var runBtn=document.getElementById('ai-run-btn'), refBtn=document.getElementById('ai-refresh-btn');
@@ -4505,7 +4512,7 @@ document.getElementById('import-btn').addEventListener('click', openPasteDialog)
     if(!plDetailState){ if(area) area.innerHTML='<div class="ai-error">対象を選択してPL明細を表示してください。</div>'; return; }
     if(!forceRefresh){ var c=loadPLAICache(); if(c){ renderPLAIResult(c.text,c.ts); return; } }
     var apiKey=getGeminiKey();
-    if(!apiKey){ if(area) area.innerHTML='<div class="ai-error">⚠️ Gemini APIキーが未設定です。設定（⚙）から設定してください。</div>'; return; }
+    if(!apiKey){ if(area) area.innerHTML='<div class="ai-error">⚠️ Gemini APIキーが未設定です。管理者にお問い合わせください。</div>'; return; }
     var prompt=buildPLAIPrompt(); if(!prompt) return;
     if(area) area.innerHTML='<div class="ai-loading">⏳ Gemini が分析中です...</div>';
     var runBtn=document.getElementById('ai-pl-run-btn'), refBtn=document.getElementById('ai-pl-refresh-btn');
