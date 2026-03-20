@@ -1,0 +1,25 @@
+# 社内限定データ（GitHub Pages にアップしない）
+data.js
+
+# Python スクリプト（パッチ作業用・一時ファイル）
+*.py
+_chk.js
+_t.js
+
+# 作業中の一時ファイル
+check.txt
+headers_dump.txt
+patch_result.txt
+pl_header.txt
+pl_hierarchy.txt
+pl_monthly.txt
+pl_rialt.txt
+pl_rialt2.txt
+pl_structure.txt
+
+# ツール設定（コミット不要）
+.serena/
+
+# OS
+.DS_Store
+Thumbs.db
