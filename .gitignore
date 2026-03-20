@@ -17,6 +17,9 @@ pl_rialt.txt
 pl_rialt2.txt
 pl_structure.txt
 
+# 大容量ファイル（GitHubの100MB制限超え）
+data/rialt/pl.txt
+
 # ツール設定（コミット不要）
 .serena/
 
