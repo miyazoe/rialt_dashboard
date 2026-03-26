@@ -7340,6 +7340,14 @@ document.getElementById('import-btn').addEventListener('click', openPasteDialog)
     if (v == null || isNaN(Number(v))) return '—';
     return Number(v).toFixed(dec != null ? dec : 1) + '%';
   }
+  function fmtN(v) {
+    if (v == null || isNaN(Number(v))) return '—';
+    return Math.round(Number(v)).toLocaleString() + '人';
+  }
+  function fmtYen(v) {
+    if (v == null || isNaN(Number(v))) return '—';
+    return '¥' + Math.round(Number(v)).toLocaleString();
+  }
   function nv(v) { return (v != null && !isNaN(Number(v))) ? Number(v) : null; }
   function achColor(r) {
     if (r == null) return '#6b7280';
@@ -7550,7 +7558,6 @@ document.getElementById('import-btn').addEventListener('click', openPasteDialog)
         lcC:  row.lc_rt==null?'#6b7280':row.lc_rt<=30 ?'#059669':row.lc_rt<=40?'#d97706':'#dc2626'
       };
     }
-
     function trRy(row, isAgg) {
       if (!row) return '';
       var nm = isAgg ? (row.fac.label||row.fac.pl) : row.fac.pl;
@@ -7573,7 +7580,6 @@ document.getElementById('import-btn').addEventListener('click', openPasteDialog)
         + numCell(row.rvp_a!=null?fmtYen(row.rvp_a):'—', row.rvp_b!=null?fmtYen(row.rvp_b):null)
         + '</tr>';
     }
-
     function trGf(row, isAgg) {
       if (!row) return '';
       var nm = isAgg ? (row.fac.label||row.fac.pl) : row.fac.pl;
@@ -7595,7 +7601,6 @@ document.getElementById('import-btn').addEventListener('click', openPasteDialog)
         + numCell(row.spd_a!=null?fmtYen(row.spd_a):'—', row.spd_b!=null?fmtYen(row.spd_b):null)
         + '</tr>';
     }
-
     var ryHdr = '<thead><tr>'
       + '<th class="resort-th-fac">施設</th>'
       + '<th class="resort-th-num">売上<span class="resort-th-sub">実績/予算</span></th>'
@@ -7610,7 +7615,6 @@ document.getElementById('import-btn').addEventListener('click', openPasteDialog)
       + '<th class="resort-th-num">ADR<span class="resort-th-sub">実/予</span></th>'
       + '<th class="resort-th-num">RevPAR<span class="resort-th-sub">実/予</span></th>'
       + '</tr></thead>';
-
     var gfHdr = '<thead><tr>'
       + '<th class="resort-th-fac">施設</th>'
       + '<th class="resort-th-num">売上<span class="resort-th-sub">実績/予算</span></th>'
@@ -7624,21 +7628,17 @@ document.getElementById('import-btn').addEventListener('click', openPasteDialog)
       + '<th class="resort-th-num">来場者数<span class="resort-th-sub">実/予</span></th>'
       + '<th class="resort-th-num">客単価<span class="resort-th-sub">実/予</span></th>'
       + '</tr></thead>';
-
     var html = '<div class="resort-period-label">' + periodLabel + '</div>';
-
     html += '<div class="resort-section-label">▶ 旅館事業</div>'
       + '<div class="resort-l1-table-wrap"><table class="resort-table">'+ryHdr+'<tbody>';
     ryRows.forEach(function(r) { html += trRy(r, false); });
     if (!ryAgg.noData) html += trRy(ryAgg, true);
     html += '</tbody></table></div>';
-
     html += '<div class="resort-section-label">▶ ゴルフ事業</div>'
       + '<div class="resort-l1-table-wrap"><table class="resort-table">'+gfHdr+'<tbody>';
     gfRows.forEach(function(r) { html += trGf(r, false); });
     if (!gfAgg.noData) html += trGf(gfAgg, true);
     html += '</tbody></table></div>';
-
     if (!tgrRow.noData) {
       var tc = achColor(tgrRow.rate);
       var tyC = tgrRow.yoy==null?'#6b7280':tgrRow.yoy>=100?'#059669':'#dc2626';
@@ -7652,7 +7652,6 @@ document.getElementById('import-btn').addEventListener('click', openPasteDialog)
         + '<span class="resort-tgr-item">人件費 <b>'+fmtM(tgrRow.lc_a)+'</b><small>'+fmtM(tgrRow.lc_b)+'</small></span>'
         + '</div>';
     }
-
     document.getElementById('resort-l1-table').innerHTML = html;
     document.querySelectorAll('.resort-fac-row[data-fac]').forEach(function(row) {
       row.addEventListener('click', function() {
@@ -7899,26 +7898,15 @@ document.getElementById('import-btn').addEventListener('click', openPasteDialog)
   }
   function _fetchGas(month, onOk, onErr) {
     var cb = '_rGas_' + Date.now(), script = document.createElement('script'), done = false;
-    var t0 = Date.now();
-    console.log('[GAS] fetch start', month, 'cb='+cb);
     function fin(data, err) {
       if (done) return; done = true; delete window[cb];
       try { document.head.removeChild(script); } catch(e) {}
-      var elapsed = ((Date.now()-t0)/1000).toFixed(1);
-      if (err) {
-        console.error('[GAS] failed:', err, 'elapsed:', elapsed+'s');
-        onErr(err);
-      } else {
-        console.log('[GAS] success elapsed:', elapsed+'s', 'keys:', data ? Object.keys(data) : 'null');
-        _saveGasToLS(month, data); _gasCache[month] = data; onOk(data);
-      }
+      if (err) { onErr(err); } else { _saveGasToLS(month, data); _gasCache[month] = data; onOk(data); }
     }
-    script.onerror = function(e) { console.error('[GAS] script.onerror', e); fin(null, 'script-error'); };
-    window[cb] = function(data) { console.log('[GAS] callback received'); fin(data, null); };
-    setTimeout(function() { fin(null, 'timeout-90s'); }, 90000);
-    var url = GAS_URL + '?month=' + month + '&callback=' + cb;
-    console.log('[GAS] url:', url);
-    script.src = url;
+    script.onerror = function() { fin(null, 'err'); };
+    window[cb] = function(data) { fin(data, null); };
+    setTimeout(function() { fin(null, 'timeout'); }, 60000);
+    script.src = GAS_URL + '?month=' + month + '&callback=' + cb;
     document.head.appendChild(script);
   }
 
