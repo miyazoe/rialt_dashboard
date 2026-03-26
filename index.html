@@ -1231,6 +1231,136 @@ body {
 
 /* ===== PUBLIC MODE ===== */
 body.public-mode .private-only { display: none !important; }
+/* ===== RESORT TAB ===== */
+#outer-resort {
+  padding: 16px 20px;
+  background: #0d1117;
+  min-height: calc(100vh - 80px);
+  color: #cdd9e5;
+}
+.resort-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+.resort-back-btn {
+  background: #161b22;
+  border: 1px solid #30363d;
+  color: #79c0ff;
+  padding: 5px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 12px;
+}
+.resort-back-btn:hover { background: #1f2937; }
+.resort-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: #79c0ff;
+  letter-spacing: 0.05em;
+}
+.resort-month-sel {
+  background: #161b22;
+  border: 1px solid #30363d;
+  color: #cdd9e5;
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-size: 12px;
+  margin-left: auto;
+}
+.resort-status {
+  font-size: 11px;
+  color: #6b7280;
+}
+/* Layer1 table */
+.resort-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+.resort-table th {
+  text-align: right;
+  padding: 6px 10px;
+  border-bottom: 1px solid #21262d;
+  color: #6b7280;
+  font-weight: 600;
+  font-size: 11px;
+  white-space: nowrap;
+}
+.resort-table th:first-child,
+.resort-table th:nth-child(2) { text-align: left; }
+.resort-table td {
+  padding: 9px 10px;
+  border-bottom: 1px solid #161b22;
+  white-space: nowrap;
+  text-align: right;
+}
+.resort-table td:first-child,
+.resort-table td:nth-child(2) { text-align: left; }
+.resort-row { cursor: pointer; transition: background 0.15s; }
+.resort-row:hover { background: #161b22; }
+.resort-fac-name { font-weight: 600; color: #cdd9e5; }
+.resort-type { font-size: 10px; color: #6b7280; padding: 4px 8px; }
+.resort-num { color: #8b949e; }
+.resort-rate { font-size: 13px; }
+.resort-th-rate { color: #79c0ff !important; }
+/* Layer2 */
+.resort-kpi-row {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+.resort-kpi-card {
+  background: #161b22;
+  border: 1px solid #21262d;
+  border-radius: 8px;
+  padding: 12px 18px;
+  min-width: 120px;
+}
+.resort-kpi-label {
+  font-size: 10px;
+  color: #6b7280;
+  margin-bottom: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+.resort-kpi-value {
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 1;
+}
+.resort-kpi-sub {
+  font-size: 10px;
+  color: #6b7280;
+  margin-top: 4px;
+}
+.resort-chart-wrap {
+  background: #0d1117;
+  border: 1px solid #21262d;
+  border-radius: 8px;
+  padding: 12px;
+  margin-bottom: 12px;
+  position: relative;
+  height: 240px;
+}
+.resort-chart-wrap canvas {
+  width: 100% !important;
+  height: 100% !important;
+  display: block;
+}
+.resort-breakdown {
+  display: flex;
+  gap: 20px;
+  font-size: 12px;
+  color: #8b949e;
+  padding: 8px 4px;
+}
+.resort-bd-item { display: flex; gap: 4px; align-items: center; }
+.resort-kpi-empty { color: #6b7280; font-size: 12px; padding: 8px; }
+
 </style>
 </head>
 <body>
@@ -1266,6 +1396,7 @@ body.public-mode .private-only { display: none !important; }
 <div class="outer-tab-nav">
   <button class="outer-tab-btn active" data-outer="rialt">RIALT</button>
   <button class="outer-tab-btn private-only" data-outer="top-report">TOP報告</button>
+  <button class="outer-tab-btn" data-outer="resort">リゾート</button>
 </div>
 
 <!-- PASTE DIALOG -->
@@ -1851,6 +1982,30 @@ body.public-mode .private-only { display: none !important; }
 
 </div>
 </div><!-- end outer-top-report -->
+<!-- RESORT CONTENT -->
+<div class="outer-content" id="outer-resort">
+  <div class="resort-header">
+    <button class="resort-back-btn" id="resort-back-btn" style="display:none">← 施設一覧</button>
+    <span class="resort-title" id="resort-title">月次PLランキング</span>
+    <select class="resort-month-sel" id="resort-month-sel"></select>
+    <span class="resort-status" id="resort-status"></span>
+  </div>
+
+  <!-- Layer 1: 月次PLランキング -->
+  <div id="resort-l1">
+    <div id="resort-l1-table"></div>
+  </div>
+
+  <!-- Layer 2: 日別ドリルダウン -->
+  <div id="resort-l2" style="display:none">
+    <div class="resort-kpi-row" id="resort-l2-kpi"></div>
+    <div class="resort-chart-wrap">
+      <canvas id="resort-daily-chart"></canvas>
+    </div>
+    <div id="resort-breakdown"></div>
+  </div>
+</div>
+
 
 <!-- SETTINGS MODAL -->
 <div class="modal-overlay" id="modal-overlay">
@@ -1980,6 +2135,7 @@ body.public-mode .private-only { display: none !important; }
   </div>
 </div>
 
+<script src="resort_table.js"></script>
 <script src="rialt_data.js"></script>
 <script>
 'use strict';
@@ -2987,6 +3143,9 @@ document.getElementById('import-btn').addEventListener('click', openPasteDialog)
         if (window._rialtRenderTrend) window._rialtRenderTrend();
         if (window._rialtRenderCost) window._rialtRenderCost();
       }, 50);
+    }
+    if (id === 'resort') {
+      setTimeout(function() { if (window._resortInit) window._resortInit(); }, 50);
     }
   }
   document.querySelectorAll('.outer-tab-btn').forEach(function(btn) {
@@ -7121,6 +7280,335 @@ document.getElementById('import-btn').addEventListener('click', openPasteDialog)
   });
 })();
 })();
+
+// ===== RESORT MODULE =====
+(function() {
+  'use strict';
+  var RESORT_GAS_URL = 'https://script.google.com/a/macros/retail-ai.jp/s/AKfycbwggw9i2KD2JzxcXSSFayAxAYMT1HUJ5MpLklrY-NRJjiT8hdhNSnhx4Dn8MQbuNiemSg/exec';
+
+  // 実施設マスタ（合計行・本社・PJ除く）
+  var RESORT_FACS = [
+    { pl: '宮若虎の湯',  gas: '宮若虎の湯',   type: 'ryokan' },
+    { pl: '古民家煉り',  gas: '古民家煉り',   type: 'ryokan' },
+    { pl: 'Tsmart',      gas: 'Tsmart',        type: 'ryokan' },
+    { pl: '九重久織亭',  gas: '九重久織亭',   type: 'ryokan' },
+    { pl: '九重虎の湯',  gas: '九重虎乃湯',   type: 'ryokan' },
+    { pl: '仙石原久の葉', gas: '仙石原久の葉', type: 'ryokan' },
+    { pl: '小塚久の葉',  gas: '小塚久の葉',   type: 'ryokan' },
+    { pl: '大分コース',  gas: '大分コース',   type: 'golf' },
+    { pl: '若宮コース',  gas: '若宮コース',   type: 'golf' },
+    { pl: '阿蘇コース',  gas: '阿蘇コース',   type: 'golf' },
+  ];
+
+  var _inited = false;
+  var _currentMonth = null;
+  var _gasCache = {};
+
+  // ── ヘルパー ──────────────────────────────────
+  function fmtM(v) {
+    if (v == null || isNaN(Number(v))) return '—';
+    return Math.round(Number(v) / 10000).toLocaleString() + '万';
+  }
+  function achieveColor(rate) {
+    if (rate == null || isNaN(rate)) return '#6b7280';
+    if (rate >= 100) return '#3fb950';
+    if (rate >= 90)  return '#e3b341';
+    return '#f85149';
+  }
+  function getPlRow(plName, month) {
+    if (!window.RESORT_TABLE) return null;
+    return (window.RESORT_TABLE.rows || []).find(function(r) {
+      return r.facility === plName && r.month === month;
+    }) || null;
+  }
+  function getAvailableMonths() {
+    if (!window.RESORT_TABLE) return [];
+    var seen = {}, months = [];
+    (window.RESORT_TABLE.rows || []).forEach(function(r) {
+      if (!seen[r.month]) { seen[r.month] = true; months.push(r.month); }
+    });
+    return months.sort().reverse();
+  }
+  function monthLabel(m) {
+    return m ? m.replace(/-0?/, '年') + '月' : '';
+  }
+
+  // ── 初期化 ──────────────────────────────────
+  function initResort() {
+    if (_inited) return;
+    _inited = true;
+
+    var months = getAvailableMonths();
+    var sel = document.getElementById('resort-month-sel');
+    months.forEach(function(m) {
+      var opt = document.createElement('option');
+      opt.value = m; opt.textContent = monthLabel(m);
+      sel.appendChild(opt);
+    });
+    _currentMonth = months[0] || '2026-02';
+    sel.value = _currentMonth;
+
+    sel.addEventListener('change', function() {
+      _currentMonth = sel.value;
+      showLayer1();
+    });
+    document.getElementById('resort-back-btn').addEventListener('click', function() {
+      showLayer1();
+    });
+    showLayer1();
+  }
+
+  // ── Layer1 ──────────────────────────────────
+  function showLayer1() {
+    document.getElementById('resort-l1').style.display = '';
+    document.getElementById('resort-l2').style.display = 'none';
+    document.getElementById('resort-back-btn').style.display = 'none';
+    document.getElementById('resort-title').textContent = '月次PLランキング';
+    renderLayer1(_currentMonth);
+  }
+  function renderLayer1(month) {
+    var rows = RESORT_FACS.map(function(fac) {
+      var d = getPlRow(fac.pl, month);
+      if (!d) return { fac: fac, rev_b: null, rev_a: null, rate: null, op_a: null, op_rate: null };
+      var rev_b = Number(d['売上高合計_予算']) || 0;
+      var rev_a = Number(d['売上高合計_実績']) || 0;
+      var op_a  = Number(d['営業利益_実績']);
+      var op_b  = Number(d['営業利益_予算']);
+      var rate  = rev_b > 0 ? Math.round(rev_a / rev_b * 1000) / 10 : null;
+      var op_rate = rev_a > 0 ? Math.round(op_a / rev_a * 1000) / 10 : null;
+      return { fac: fac, rev_b: rev_b, rev_a: rev_a, rate: rate, op_a: op_a, op_b: op_b, op_rate: op_rate };
+    });
+    rows.sort(function(a, b) {
+      if (a.rate == null && b.rate == null) return 0;
+      if (a.rate == null) return 1;
+      if (b.rate == null) return -1;
+      return a.rate - b.rate; // ワースト順
+    });
+
+    var html = '<table class="resort-table"><thead><tr>'
+      + '<th>施設</th><th>種別</th>'
+      + '<th>売上予算</th><th>売上実績</th><th class="resort-th-rate">達成率</th>'
+      + '<th>営業利益</th><th>利益率</th>'
+      + '</tr></thead><tbody>';
+    rows.forEach(function(r) {
+      var rateColor = achieveColor(r.rate);
+      var rateStr   = r.rate != null ? r.rate.toFixed(1) + '%' : '—';
+      var opRateStr = r.op_rate != null ? r.op_rate.toFixed(1) + '%' : '—';
+      var opColor   = r.op_rate != null && r.op_rate < 0 ? '#f85149' : '#3fb950';
+      html += '<tr class="resort-row" data-fac="' + r.fac.pl + '">'
+        + '<td class="resort-fac-name">' + r.fac.pl + '</td>'
+        + '<td class="resort-type">' + (r.fac.type === 'ryokan' ? '旅館' : 'ゴルフ') + '</td>'
+        + '<td class="resort-num">' + fmtM(r.rev_b) + '</td>'
+        + '<td class="resort-num">' + fmtM(r.rev_a) + '</td>'
+        + '<td class="resort-rate" style="color:' + rateColor + ';font-weight:700">' + rateStr + '</td>'
+        + '<td class="resort-num">' + fmtM(r.op_a) + '</td>'
+        + '<td class="resort-rate" style="color:' + opColor + '">' + opRateStr + '</td>'
+        + '</tr>';
+    });
+    html += '</tbody></table>';
+    document.getElementById('resort-l1-table').innerHTML = html;
+
+    document.querySelectorAll('.resort-row').forEach(function(row) {
+      row.addEventListener('click', function() {
+        var fac = RESORT_FACS.find(function(f) { return f.pl === row.dataset.fac; });
+        if (fac) showLayer2(fac);
+      });
+    });
+  }
+
+  // ── Layer2 ──────────────────────────────────
+  function showLayer2(facObj) {
+    document.getElementById('resort-l1').style.display = 'none';
+    document.getElementById('resort-l2').style.display = '';
+    document.getElementById('resort-back-btn').style.display = '';
+    document.getElementById('resort-title').textContent = facObj.pl + '　' + monthLabel(_currentMonth);
+    renderLayer2(facObj, _currentMonth);
+  }
+  function renderLayer2(facObj, month) {
+    var d = getPlRow(facObj.pl, month);
+    var kpiEl = document.getElementById('resort-l2-kpi');
+    if (d) {
+      var rev_b = Number(d['売上高合計_予算']) || 0;
+      var rev_a = Number(d['売上高合計_実績']) || 0;
+      var op_a  = Number(d['営業利益_実績']);
+      var op_b  = Number(d['営業利益_予算']);
+      var rate  = rev_b > 0 ? (rev_a / rev_b * 100) : null;
+      var op_rate = rev_a > 0 ? (op_a / rev_a * 100) : null;
+      kpiEl.innerHTML =
+        kpiCard('売上', fmtM(rev_a), '予算 ' + fmtM(rev_b), achieveColor(rate))
+        + kpiCard('達成率', rate != null ? rate.toFixed(1) + '%' : '—', '', achieveColor(rate))
+        + kpiCard('営業利益', fmtM(op_a), '予算 ' + fmtM(op_b), op_a < 0 ? '#f85149' : '#3fb950')
+        + kpiCard('利益率', op_rate != null ? op_rate.toFixed(1) + '%' : '—', '',
+            op_rate == null ? '#6b7280' : op_rate < 0 ? '#f85149' : '#3fb950');
+    } else {
+      kpiEl.innerHTML = '<div class="resort-kpi-empty">PLデータなし（' + facObj.pl + '/' + month + '）</div>';
+    }
+
+    document.getElementById('resort-status').textContent = '日別データ読込中…';
+    document.getElementById('resort-breakdown').innerHTML = '';
+    clearChart();
+
+    loadGasData(month, function(gasData) {
+      document.getElementById('resort-status').textContent = '';
+      var list = (gasData && gasData[facObj.type === 'ryokan' ? 'ryokan' : 'golf']) || [];
+      var fac = list.find(function(f) { return f.facility === facObj.gas; });
+      renderDailyChart(fac ? (fac.daily || []) : [], facObj.type);
+    }, function(err) {
+      document.getElementById('resort-status').textContent = '日別データ取得失敗';
+      renderDailyChart([], facObj.type);
+    });
+  }
+  function kpiCard(label, value, sub, color) {
+    return '<div class="resort-kpi-card">'
+      + '<div class="resort-kpi-label">' + label + '</div>'
+      + '<div class="resort-kpi-value" style="color:' + color + '">' + value + '</div>'
+      + (sub ? '<div class="resort-kpi-sub">' + sub + '</div>' : '')
+      + '</div>';
+  }
+
+  // ── GAS JSONP ────────────────────────────────
+  function loadGasData(month, onOk, onErr) {
+    if (_gasCache[month]) { onOk(_gasCache[month]); return; }
+    var cbName = '_rGas_' + Date.now();
+    var script = document.createElement('script');
+    var done = false;
+    function finish(data, err) {
+      if (done) return; done = true;
+      delete window[cbName];
+      try { document.head.removeChild(script); } catch(e) {}
+      if (err) onErr(err); else { _gasCache[month] = data; onOk(data); }
+    }
+    script.onerror = function() { finish(null, 'script error'); };
+    window[cbName] = function(data) { finish(data, null); };
+    setTimeout(function() { finish(null, 'timeout'); }, 30000);
+    script.src = RESORT_GAS_URL + '?month=' + month + '&callback=' + cbName;
+    document.head.appendChild(script);
+  }
+
+  // ── 日別チャート ──────────────────────────────
+  function clearChart() {
+    var canvas = document.getElementById('resort-daily-chart');
+    if (!canvas) return;
+    var ctx = canvas.getContext('2d');
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+  }
+  function renderDailyChart(daily, type) {
+    var wrap = document.querySelector('.resort-chart-wrap');
+    var canvas = document.getElementById('resort-daily-chart');
+    if (!canvas || !wrap) return;
+    var W = wrap.clientWidth - 24;
+    var H = 216;
+    canvas.width = W; canvas.height = H;
+    var ctx = canvas.getContext('2d');
+    ctx.clearRect(0, 0, W, H);
+
+    if (!daily || daily.length === 0) {
+      ctx.fillStyle = '#4b6a80'; ctx.font = '13px sans-serif';
+      ctx.textAlign = 'center'; ctx.fillText('日別データなし', W / 2, H / 2);
+      return;
+    }
+
+    var budget  = daily.map(function(d) { return Number(d.revenue_budget)  || 0; });
+    var booking = daily.map(function(d) { return Number(d.revenue_booking) || 0; });
+    var actual  = daily.map(function(d) { return Number(d.revenue_actual)  || 0; });
+    var all = budget.concat(booking).concat(actual);
+    var maxVal = Math.max.apply(null, all) * 1.12 || 1;
+    var n = daily.length;
+    var pL = 54, pR = 10, pT = 28, pB = 36;
+    var cW = W - pL - pR, cH = H - pT - pB;
+    function tx(i)  { return pL + (i + 0.5) / n * cW; }
+    function ty(v)  { return pT + (1 - v / maxVal) * cH; }
+
+    // 今日のインデックス（当月想定）
+    var today = new Date().getDate();
+    var todayIdx = -1;
+    daily.forEach(function(d, i) { if (parseInt(d.date.slice(-2)) === today) todayIdx = i; });
+
+    // グリッド
+    ctx.strokeStyle = '#1a2535'; ctx.lineWidth = 1;
+    for (var gi = 0; gi <= 4; gi++) {
+      var gy = pT + gi / 4 * cH;
+      ctx.beginPath(); ctx.moveTo(pL, gy); ctx.lineTo(W - pR, gy); ctx.stroke();
+      ctx.fillStyle = '#4b6a80'; ctx.font = '9px sans-serif'; ctx.textAlign = 'right';
+      ctx.fillText(Math.round(maxVal * (1 - gi / 4) / 10000) + '万', pL - 4, gy + 3);
+    }
+
+    // 今日縦線
+    if (todayIdx >= 0) {
+      ctx.save(); ctx.strokeStyle = '#ffffff18'; ctx.lineWidth = 1;
+      ctx.setLineDash([3, 3]);
+      ctx.beginPath(); ctx.moveTo(tx(todayIdx), pT); ctx.lineTo(tx(todayIdx), pT + cH); ctx.stroke();
+      ctx.restore();
+    }
+
+    // 折れ線
+    var lines = [
+      { vals: budget,  color: '#2d4a6b', label: '予算', dash: [4, 3] },
+      { vals: booking, color: '#e3b341', label: '予約', dash: [] },
+      { vals: actual,  color: '#3fb950', label: '実績', dash: [] },
+    ];
+    lines.forEach(function(line) {
+      ctx.save();
+      ctx.strokeStyle = line.color; ctx.lineWidth = 2;
+      if (line.dash.length) ctx.setLineDash(line.dash);
+      ctx.beginPath();
+      var started = false;
+      line.vals.forEach(function(v, i) {
+        // 実績は今日以降の0をスキップ
+        if (line.label === '実績' && v === 0 && i > todayIdx && todayIdx >= 0) return;
+        if (!started) { ctx.moveTo(tx(i), ty(v)); started = true; }
+        else ctx.lineTo(tx(i), ty(v));
+      });
+      ctx.stroke(); ctx.restore();
+    });
+
+    // X軸ラベル（5日おき）
+    ctx.fillStyle = '#4b6a80'; ctx.font = '9px sans-serif'; ctx.textAlign = 'center';
+    for (var i = 0; i < n; i += 5) {
+      ctx.fillText(daily[i].date.slice(-2), tx(i), H - pB + 14);
+    }
+
+    // 凡例
+    var lx = pL + 4, ly = 12;
+    lines.forEach(function(line, idx) {
+      ctx.save(); ctx.strokeStyle = line.color; ctx.lineWidth = 2;
+      if (line.dash.length) ctx.setLineDash(line.dash);
+      ctx.beginPath(); ctx.moveTo(lx + idx * 72, ly); ctx.lineTo(lx + idx * 72 + 18, ly); ctx.stroke();
+      ctx.restore();
+      ctx.fillStyle = line.color; ctx.font = '10px sans-serif'; ctx.textAlign = 'left';
+      ctx.fillText(line.label, lx + idx * 72 + 22, ly + 4);
+    });
+
+    // 売上内訳（旅館）
+    var bdEl = document.getElementById('resort-breakdown');
+    if (type === 'ryokan') {
+      var sumStay = daily.reduce(function(s, d) { return s + (Number(d.stay)  || 0); }, 0);
+      var sumFood = daily.reduce(function(s, d) { return s + (Number(d.food)  || 0); }, 0);
+      var sumShop = daily.reduce(function(s, d) { return s + (Number(d.shop)  || 0); }, 0);
+      var tot = sumStay + sumFood + sumShop;
+      if (tot > 0) {
+        var pct = function(v) { return '(' + Math.round(v / tot * 100) + '%)'; };
+        bdEl.innerHTML = '<div class="resort-breakdown">'
+          + '<span class="resort-bd-item"><span style="color:#58a6ff">泊</span>&nbsp;' + fmtM(sumStay) + '&nbsp;' + pct(sumStay) + '</span>'
+          + '<span class="resort-bd-item"><span style="color:#f0883e">食</span>&nbsp;' + fmtM(sumFood) + '&nbsp;' + pct(sumFood) + '</span>'
+          + '<span class="resort-bd-item"><span style="color:#bc8cff">売店</span>&nbsp;' + fmtM(sumShop) + '&nbsp;' + pct(sumShop) + '</span>'
+          + '</div>';
+      }
+    } else if (type === 'golf') {
+      var sumGrp = daily.reduce(function(s, d) { return s + (Number(d.groups_actual)   || 0); }, 0);
+      var sumVis = daily.reduce(function(s, d) { return s + (Number(d.visitors_actual) || 0); }, 0);
+      bdEl.innerHTML = '<div class="resort-breakdown">'
+        + '<span class="resort-bd-item"><span style="color:#79c0ff">組数</span>&nbsp;' + sumGrp + '組</span>'
+        + '<span class="resort-bd-item"><span style="color:#3fb950">来場者</span>&nbsp;' + sumVis + '名</span>'
+        + '</div>';
+    }
+  }
+
+  window._resortInit = function() {
+    if (!_inited) initResort();
+  };
+})();
+
 </script>
   <div id="sl-tip"></div>
 </body>
