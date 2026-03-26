@@ -69,7 +69,8 @@ function doGet(e) {
       }
     });
 
-    return jsonResponse(result);
+    const cb = (e.parameter.callback || '').replace(/[^a-zA-Z0-9_]/g, '');
+    return cb ? jsonpResponse(result, cb) : jsonResponse(result);
 
   } catch (outerErr) {
     return jsonResponse({ error: outerErr.message });
@@ -269,9 +270,17 @@ function pushError(result, facility, msg) {
   });
 }
 
-/** JSON レスポンスを返す（CORS対応） */
+/** JSON レスポンスを返す */
 function jsonResponse(obj) {
   return ContentService
     .createTextOutput(JSON.stringify(obj, null, 2))
     .setMimeType(ContentService.MimeType.JSON);
+}
+
+/** JSONP レスポンスを返す（組織内アクセス制限下でのCORS回避用） */
+function jsonpResponse(obj, callback) {
+  const json = JSON.stringify(obj, null, 2);
+  return ContentService
+    .createTextOutput(callback + '(' + json + ');')
+    .setMimeType(ContentService.MimeType.JAVASCRIPT);
 }
