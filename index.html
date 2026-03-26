@@ -1275,6 +1275,19 @@ body.public-mode .private-only { display: none !important; }
   border-bottom: 1px solid #e5e7eb; padding: 6px 10px;
   letter-spacing: 0.03em;
 }
+.resort-tgr-hdr td {
+  background: #dbeafe !important; color: #1d4ed8 !important;
+  border-top-color: #93c5fd !important;
+}
+.resort-tgr-data-row td {
+  background: #eff6ff !important; font-weight: 700;
+  border-top: 1px solid #bfdbfe; border-bottom: 2px solid #93c5fd;
+}
+  font-size: 11px; font-weight: 700; color: #374151;
+  background: #f1f5f9; border-top: 2px solid #e5e7eb;
+  border-bottom: 1px solid #e5e7eb; padding: 6px 10px;
+  letter-spacing: 0.03em;
+}
 .resort-section-label {
   font-size: 11px; font-weight: 700; color: #374151;
   padding: 10px 0 4px; letter-spacing: 0.03em;
@@ -7529,7 +7542,7 @@ document.getElementById('import-btn').addEventListener('click', openPasteDialog)
     var ryRows = sortW(ryFacs.map(function(f) { return calcRow(f, ym, mode); }));
     var gfRows = sortW(gfFacs.map(function(f) { return calcRow(f, ym, mode); }));
     var ryAgg  = calcRow({ pl: '旅館事業合計', type: 'ryokan', label: '旅館合計' }, ym, mode);
-    var gfAgg  = calcRow({ pl: 'ゴルフ事業合計', type: 'golf',   label: 'ゴルフ合計' }, ym, mode);
+    var gfAgg  = calcRow({ pl: 'ゴルフ事業合計', type: 'golf', label: 'ゴルフ合計' }, ym, mode);
     var tgrRow = calcRow({ pl: 'TGR全体', type: 'total', label: 'TGR 全体' }, ym, mode);
     var p = ym.split('-'), yr = +p[0], mo = +p[1];
     var fy = mo >= 7 ? yr : yr - 1;
@@ -7541,6 +7554,7 @@ document.getElementById('import-btn').addEventListener('click', openPasteDialog)
       return '<td class="resort-num"' + st + '><b>' + (a != null ? a : '—') + '</b>'
         + (b != null ? '<span class="resort-sub">' + b + '</span>' : '') + '</td>';
     }
+    function dashCell() { return '<td class="resort-num">—</td>'; }
     function rateCell(v, color) {
       return '<td class="resort-rate-cell" style="color:' + (color||'#6b7280') + '">' + fmtPct(v) + '</td>';
     }
@@ -7565,6 +7579,7 @@ document.getElementById('import-btn').addEventListener('click', openPasteDialog)
         lcC:  row.lc_rt==null?'#6b7280':row.lc_rt<=30 ?'#059669':row.lc_rt<=40?'#d97706':'#dc2626'
       };
     }
+    // Unified row (14 cols)
     function trRow(row, isAgg) {
       if (!row) return '';
       var nm = isAgg ? (row.fac.label||row.fac.pl) : row.fac.pl;
@@ -7589,6 +7604,23 @@ document.getElementById('import-btn').addEventListener('click', openPasteDialog)
         + numCell(row.spd_a!=null?fmtYen(row.spd_a):'—', row.spd_b!=null?fmtYen(row.spd_b):null)
         + '</tr>';
     }
+    // TGR 全体 row (numeric columns only, no occ/ADR/RevPAR/pax/spd)
+    function trTgr(row) {
+      if (!row || row.noData) return '';
+      var c = rowColors(row);
+      return '<tr class="resort-tgr-data-row">'
+        + '<td class="resort-fac-name resort-agg-name">TGR 全体</td>'
+        + numCell(fmtM(row.rev_a), fmtM(row.rev_b))
+        + rateCell(row.rate, c.ac)
+        + barCell(c.bw, c.ac)
+        + pctCell(row.yoy, c.yoyC)
+        + pctCell(row.gp_rt, c.gpC)
+        + numCell(row.op_a!=null?fmtM(row.op_a):'—', fmtM(row.op_b), c.opC)
+        + pctCell(row.op_rt, c.orC)
+        + numCell(row.lc_a!=null?fmtM(row.lc_a):'—', fmtM(row.lc_b), c.lcC)
+        + dashCell() + dashCell() + dashCell() + dashCell() + dashCell()
+        + '</tr>';
+    }
     var hdr = '<thead><tr>'
       + '<th class="resort-th-fac">施設</th>'
       + '<th class="resort-th-num">売上<span class="resort-th-sub">実績/予算</span></th>'
@@ -7607,26 +7639,20 @@ document.getElementById('import-btn').addEventListener('click', openPasteDialog)
       + '</tr></thead>';
     var html = '<div class="resort-period-label">' + periodLabel + '</div>';
     html += '<div class="resort-l1-table-wrap"><table class="resort-table">' + hdr + '<tbody>';
+    // 旅館事業 section
     html += '<tr class="resort-section-hdr"><td colspan="14">▶ 旅館事業</td></tr>';
     ryRows.forEach(function(r) { html += trRow(r, false); });
     if (!ryAgg.noData) html += trRow(ryAgg, true);
+    // ゴルフ事業 section
     html += '<tr class="resort-section-hdr"><td colspan="14">▶ ゴルフ事業</td></tr>';
     gfRows.forEach(function(r) { html += trRow(r, false); });
     if (!gfAgg.noData) html += trRow(gfAgg, true);
-    html += '</tbody></table></div>';
+    // TGR 全体 section
     if (!tgrRow.noData) {
-      var tc = achColor(tgrRow.rate);
-      var tyC = tgrRow.yoy==null?'#6b7280':tgrRow.yoy>=100?'#059669':'#dc2626';
-      var toC = tgrRow.op_a==null?'#6b7280':tgrRow.op_a>=0?'#059669':'#dc2626';
-      html += '<div class="resort-tgr-band">'
-        + '<span class="resort-tgr-label">TGR 全体</span>'
-        + '<span class="resort-tgr-item">売上 <b>'+fmtM(tgrRow.rev_a)+'</b><small>'+fmtM(tgrRow.rev_b)+'</small></span>'
-        + '<span class="resort-tgr-item" style="color:'+tc+'">達成率 <b>'+fmtPct(tgrRow.rate)+'</b></span>'
-        + '<span class="resort-tgr-item" style="color:'+tyC+'">前年比 <b>'+fmtPct(tgrRow.yoy)+'</b></span>'
-        + '<span class="resort-tgr-item" style="color:'+toC+'">営業利益 <b>'+fmtM(tgrRow.op_a)+'</b><small>'+fmtM(tgrRow.op_b)+'</small></span>'
-        + '<span class="resort-tgr-item">人件費 <b>'+fmtM(tgrRow.lc_a)+'</b><small>'+fmtM(tgrRow.lc_b)+'</small></span>'
-        + '</div>';
+      html += '<tr class="resort-section-hdr resort-tgr-hdr"><td colspan="14">TGR 全体</td></tr>';
+      html += trTgr(tgrRow);
     }
+    html += '</tbody></table></div>';
     document.getElementById('resort-l1-table').innerHTML = html;
     document.querySelectorAll('.resort-fac-row[data-fac]').forEach(function(row) {
       row.addEventListener('click', function() {
