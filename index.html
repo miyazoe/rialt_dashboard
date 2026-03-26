@@ -1260,6 +1260,10 @@ body.public-mode .private-only { display: none !important; }
   font-size: 12px; margin-left: auto; font-family: inherit; background: #fff; color: #374151;
 }
 .resort-status { font-size: 11px; color: #9ca3af; }
+.resort-gas-fetch-btn { background:#eff6ff; border:1px solid #bfdbfe; border-radius:5px; padding:4px 10px; font-size:11px; cursor:pointer; color:#1d4ed8; font-family:inherit; }
+.resort-gas-fetch-btn:hover { background:#dbeafe; }
+.resort-gas-fetch-btn:disabled { opacity:0.5; cursor:not-allowed; }
+.resort-gas-cache-info { font-size:10px; color:#9ca3af; }
 .resort-body { padding: 12px 16px; overflow-y: auto; flex: 1; min-height: 0; }
 .resort-period-label {
   font-size: 11px; color: #2563eb; margin-bottom: 8px;
@@ -1999,6 +2003,10 @@ body.public-mode .private-only { display: none !important; }
         <button class="resort-l2-tab" data-tab="pl">PL明細</button>
       </div>
       <div id="resort-tab-daily">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+          <button class="resort-gas-fetch-btn" id="resort-gas-fetch-btn">📡 日別データを取得</button>
+          <span class="resort-gas-cache-info" id="resort-gas-cache-info"></span>
+        </div>
         <div class="resort-chart-wrap"><canvas id="resort-daily-chart"></canvas></div>
         <div id="resort-breakdown"></div>
       </div>
@@ -7426,6 +7434,27 @@ document.getElementById('import-btn').addEventListener('click', openPasteDialog)
       });
     });
     document.getElementById('resort-back-btn').addEventListener('click', showL1);
+    document.getElementById('resort-gas-fetch-btn').addEventListener('click', function() {
+      if (!_currentFac || !_currentMonth) return;
+      var btn = document.getElementById('resort-gas-fetch-btn');
+      var cacheInfo = document.getElementById('resort-gas-cache-info');
+      btn.disabled = true; btn.textContent = '取得中…';
+      if (cacheInfo) cacheInfo.textContent = 'GASに接続中（数十秒かかります）';
+      var ym = _currentMonth;
+      delete _gasCache[ym];
+      try { localStorage.removeItem(_gasLsKey(ym)); } catch(e) {}
+      _fetchGas(ym, function(gasData) {
+        btn.disabled = false; btn.textContent = '📡 日別データを取得';
+        var ts = _gasTs(ym);
+        if (cacheInfo) cacheInfo.textContent = ts ? '最終取得: ' + ts : '取得完了';
+        var list = (gasData && gasData[_currentFac.type === 'ryokan' ? 'ryokan' : 'golf']) || [];
+        var fac = list.find(function(f) { return f.facility === _currentFac.gas; });
+        setTimeout(function() { renderDailyChart(fac ? (fac.daily || []) : [], _currentFac.type); }, 60);
+      }, function() {
+        btn.disabled = false; btn.textContent = '📡 日別データを取得';
+        if (cacheInfo) cacheInfo.textContent = '取得失敗（GAS接続エラー）';
+      });
+    });
     showL1();
   }
 
@@ -7561,16 +7590,26 @@ document.getElementById('import-btn').addEventListener('click', openPasteDialog)
     renderPlTable(facObj.pl, ym);
     setTimeout(function() { renderMonthChart(facObj); }, 50);
 
-    document.getElementById('resort-status').textContent = '日別データ読込中…';
     document.getElementById('resort-breakdown').innerHTML = '';
     clearCanvas('resort-daily-chart');
-    loadGas(ym, function(gasData) {
+    var _cacheInfo = document.getElementById('resort-gas-cache-info');
+    var _ts = _gasTs(ym);
+    if (_ts) {
+      if (_cacheInfo) _cacheInfo.textContent = '最終取得: ' + _ts;
       document.getElementById('resort-status').textContent = '';
+    } else {
+      if (_cacheInfo) _cacheInfo.textContent = 'キャッシュなし — 「日別データを取得」を押してください';
+      document.getElementById('resort-status').textContent = '';
+    }
+    loadGas(ym, function(gasData) {
+      var ts2 = _gasTs(ym);
+      if (_cacheInfo && ts2) _cacheInfo.textContent = '最終取得: ' + ts2;
       var list = (gasData && gasData[facObj.type === 'ryokan' ? 'ryokan' : 'golf']) || [];
       var fac = list.find(function(f) { return f.facility === facObj.gas; });
       setTimeout(function() { renderDailyChart(fac ? (fac.daily || []) : [], facObj.type); }, 60);
     }, function() {
-      document.getElementById('resort-status').textContent = '日別データ取得失敗';
+      document.getElementById('resort-status').textContent = '';
+      if (_cacheInfo && !_ts) _cacheInfo.textContent = '取得失敗—「日別データを取得」を押してください';
       setTimeout(function() { renderDailyChart([], facObj.type); }, 60);
     });
   }
@@ -7723,17 +7762,40 @@ document.getElementById('import-btn').addEventListener('click', openPasteDialog)
   }
 
   // ── GAS ──────────────────────────────────────────────────────────
+  function _gasLsKey(month) { return 'resort_gas_v1_' + month; }
+  function _saveGasToLS(month, data) {
+    try { localStorage.setItem(_gasLsKey(month), JSON.stringify({ ts: Date.now(), data: data })); } catch(e) {}
+  }
+  function _loadGasFromLS(month) {
+    try {
+      var s = localStorage.getItem(_gasLsKey(month));
+      if (!s) return null;
+      var p = JSON.parse(s);
+      return (p && p.data) ? p : null;
+    } catch(e) { return null; }
+  }
+  function _gasTs(month) {
+    var p = _loadGasFromLS(month);
+    if (!p) return null;
+    var d = new Date(p.ts);
+    return (d.getMonth()+1) + '/' + d.getDate() + ' ' + d.getHours() + ':' + String(d.getMinutes()).padStart(2,'0');
+  }
   function loadGas(month, onOk, onErr) {
     if (_gasCache[month]) { onOk(_gasCache[month]); return; }
+    var ls = _loadGasFromLS(month);
+    if (ls) { _gasCache[month] = ls.data; onOk(ls.data); return; }
+    _fetchGas(month, onOk, onErr);
+  }
+  function _fetchGas(month, onOk, onErr) {
     var cb = '_rGas_' + Date.now(), script = document.createElement('script'), done = false;
     function fin(data, err) {
       if (done) return; done = true; delete window[cb];
       try { document.head.removeChild(script); } catch(e) {}
-      if (err) onErr(err); else { _gasCache[month] = data; onOk(data); }
+      if (err) { onErr(err); } else { _saveGasToLS(month, data); _gasCache[month] = data; onOk(data); }
     }
     script.onerror = function() { fin(null, 'err'); };
     window[cb] = function(data) { fin(data, null); };
-    setTimeout(function() { fin(null, 'timeout'); }, 30000);
+    setTimeout(function() { fin(null, 'timeout'); }, 60000);
     script.src = GAS_URL + '?month=' + month + '&callback=' + cb;
     document.head.appendChild(script);
   }
