@@ -182,6 +182,32 @@ window.RIALT_DATA = {
 | 2026-03-17 | ドリルダウン: 合計行・全て行追加・全てからの戻り対応 | — |
 | 2026-03-17 | スキャンライン（横縞）削除 | — |
 | 2026-03-19 | 単月分析ワースト: 在庫メトリック追加（期末在庫・昨対比・回転率） | — |
+| 2026-03-20 | 公開モード（`?public`）実装 — TOP報告・設定・P1/P2・インポート・検索を非表示、data.js動的ロード | — |
+| 2026-03-20 | GitHub Pages デプロイ（trial-dx/rialt_dashboard）— `?public` URLで外部公開 | — |
+| 2026-03-20 | config.js 追加 — Gemini APIキーをファイルで管理、getGeminiKey()でlocalStorage→config.jsの順にフォールバック | — |
+| 2026-03-23 | SLドリルダウン修正 — データなし階層（不在等）も子が存在すれば表示・ドリル可能に | — |
+| 2026-03-24 | リゾートタブ用データ基盤構築 — TGR xlsx解析・フラットテーブル生成（旅館169列/ゴルフ169列）| — |
+| 2026-03-24 | generate_resort_table.py — ADR/RevPAR削除・内訳保持（役員報酬・給与手当・広告宣伝費等）・見込み除外・旅館/ゴルフCSV分割 | — |
+| 2026-03-25 | generate_resort_table.py バグ修正 — parse_pl の施設列オフセット修正（start=2）、九重久織亭 欠落・全施設1列ズレを解消 | — |
+| 2026-03-25 | settings.local.json / ~/.claude/settings.json — bypassPermissions + skipDangerousModePermissionPrompt 設定（グローバル適用） | — |
+
+---
+
+## 公開モード仕様（実装済み）
+
+| 項目 | 内容 |
+|---|---|
+| URL | `https://trial-dx.github.io/rialt_dashboard/index.html?public` |
+| フル版 | `index.html`（社内・自分用、全機能有効） |
+| 公開版 | `index.html?public`（RIALT+Tab2のみ、下記を非表示） |
+
+**公開版で非表示にするもの**（`.private-only` CSS クラス）:
+- TOP報告タブボタン、data.js のロード、インポートボタン（`↓`）
+- P1/P2ボタン、設定ボタン（⚙）、検索ボックス
+
+**Gemini APIキー管理**:
+- `config.js` にキーをハードコード → GitHub にアップ（URLは非公開）
+- `getGeminiKey()`: `localStorage` → `window.GEMINI_API_KEY`（config.js）の順にフォールバック
 
 ---
 
@@ -189,57 +215,200 @@ window.RIALT_DATA = {
 
 > 追加予定の機能・画面はここに記載し、完了したら変更ログへ移動する。
 
-### 🔲 公開モード（`?public` URLパラメータ）
-
----
+### リゾートタブ（進行中）
 
 #### 目的
-RIALTタブを GitHub Pages で外部公開するが、TOP報告・設定・インポート機能は社内限定で隠したい。
-自分は `index.html`（フル版）でそのまま使い続ける。
+- TGR（リゾート事業）の月次PLデータをダッシュボード化
+- `?resort` URL で表示 → 別メンバーに共有
 
-#### 公開方法
-- **GitHub Pages**（静的ホスティング）
-- URL例：`https://xxx.github.io/dashboard/index.html?public`
+#### URL別表示制御（設計済み・未実装）
 
-#### 実装方式：案A（URLパラメータ切替）
+| URL | 表示内容 |
+|---|---|
+| `index.html` | 通常版（全タブ表示） |
+| `index.html?public` | RIALTタブのみ（既存） |
+| `index.html?resort` | リゾートタブのみ（新規・未実装） |
+
+#### 外タブ追加位置（設計済み・未実装）
+```
+[TOP報告] [RIALT] [リゾート]  ← 新規追加予定
+```
+
+#### データ構造（完成済み）
+
+**ソースファイル**: `data/tgr/` 内の xlsx
+- `2024.xlsx` — 2024年7月〜2025年6月（年次、月別シート12枚）
+- `YYYYMM.xlsx` — 2025年7月以降（月次個別ファイル）
+
+**生成スクリプト**: `tools/generate_resort_table.py`
+- 出力: `resort_table.js`（`window.RESORT_TABLE`）+ `data/tgr/_table.json`
+
+**CSV（確認・分析用）**:
+- `data/tgr/ryokan.csv` — 旅館系施設（バグ修正後再生成が必要）
+- `data/tgr/golf.csv` — ゴルフ系施設（バグ修正後再生成が必要）
+- ※ ryokan.csv/golf.csv を閉じてから `py -3.12 tools/generate_resort_table.py` で再生成すること
+
+**施設分類**:
+```
+旅館: 九重久織亭, 九重虎の湯, 宮若虎の湯, 小塚久の葉, 仙石原久の葉,
+      古民家煉り, 九重PJ, Tsmart, 旅館事業合計, 本社旅館
+ゴルフ: 若宮コース, 大分コース, 阿蘇コース, ゴルフ事業合計, 本社ゴルフ
+```
+
+**カラム構成（169列）**:
+```
+year, month, facility, source
++ PL全項目_実績/予算（内訳含む・ADR/RevPAR/見込みは除外）
+  売上内訳: 飲食売上高, 旅館売上高, 売店売上高
+  人件費内訳: 役員報酬, 給与手当, 法定福利費 ...等
+  運営費・固定費内訳: 広告宣伝費, 水道光熱費 ...等
+```
+
+**カバレッジ（確認済み）**: 全20ヶ月・主要4指標でOK
+```
+2024-07〜2025-06: annual (2024.xlsx)
+2025-07〜2026-02, 2026-11: monthly (個別xlsx)
+```
+
+#### CFO視点での必要KPI定義（確定）
+
+| 分類 | 指標 | 取得方法 |
+|---|---|---|
+| 収益性 | 売上高・粗利・営業利益・利益率 | PLデータ（全期間OK） |
+| 旅館KPI | 販売客室数・客室稼働率（OCC） | 全体PLシート行4-5（要Excel保存） |
+| ゴルフKPI | ラウンド数・稼働率 | 全体PLシート行4-5（直値、取得済み） |
+| 計算KPI | ADR = 宿泊売上 ÷ 販売客室数 | ダッシュボード側で計算 |
+| 計算KPI | RevPAR = ADR × OCC | ダッシュボード側で計算 |
+| 予算管理 | 全指標_予算 | 対予算シート（全期間OK） |
+
+#### データ欠けの原因と対処（確定）
+
+**原因**: 月次xlsx（202507〜）の旅館KPI行は数式参照のみで保存されていない
+→ `data_only=True` でopenpyxlが読むと全てNULL
+
+**対処**: 各xlsxをExcelで開いてCtrl+S上書き保存 → 計算値がセルに保存される
+
+**対象ファイル（8ファイル）**:
+```
+202507.xlsx, 202508.xlsx, 202509.xlsx, 202510.xlsx,
+202512.xlsx, 202601.xlsx, 202602.xlsx, 202611.xlsx
+```
+
+#### generate_resort_table.py 修正方針（確定）
+
+1. **parse_pl を修正**: KPI行（販売客室数・客室稼働率）を取得対象に追加
+   - 全体PLシートのindex 2-11（旅館）・index 12-15（ゴルフ）両方から取得
+2. **ADR・RevPAR**: ソースデータから除外（スクリプト内で計算して追加）
+   - `ADR_実績 = 宿泊売上高_実績 / 販売客室数_実績`
+   - `RevPAR_実績 = ADR_実績 × 客室稼働率_実績`
+3. **ゴルフKPI**: 「販売客室数」→「ラウンド数」に名称変更して区別
+
+#### CFO視点 管理方針（確定）
+
+**管理アプローチ：例外管理（Management by Exception）**
+- 月次PLで問題施設を特定 → 日別売上にドリルダウンして問題の所在を特定
+- 日別コストデータは存在しない（施設別スプレッドシートは売上・稼働のみ）
+- 旅館/ゴルフは準固定費構造 → **売上変動 ≒ 利益変動** が成立するため日別売上で代替可
+
+#### 2層アーキテクチャ（設計確定）
 
 ```
-index.html             → フル版（社内・自分用）
-index.html?public      → 公開版（RIALTのみ）
+Layer 1：月次P&Lランキング（問題施設の特定）
+  ├─ 全施設 × 当月の予算達成率
+  ├─ 営業利益率の推移（12ヶ月）
+  └─ ワーストN施設を赤ハイライト → クリックでLayer2へ
+
+Layer 2：施設ドリルダウン（問題の所在特定）
+  ├─ 月次P&L詳細（売上・費用内訳・利益率 vs 予算）  ← xlsx由来
+  ├─ 日別売上チャート（予算/予約/実績の3本線）       ← GAS由来
+  ├─ 売上内訳（泊/食/売店）                          ← GAS由来
+  └─ 稼働率トレンド（OCC / 組数）                    ← GAS由来
+       → 「単価問題か稼働問題か」を切り分け可能
 ```
 
-#### 公開モード時に非表示にするもの
+#### データソース対応表
 
-| 要素 | 詳細 |
+| データ | ソース | 粒度 | 状態 |
+|---|---|---|---|
+| 月次P&L（売上〜営業利益） | TGR月次xlsx | 月次・施設別 | 取得済み（ryokan.csv/golf.csv） |
+| 日別売上・稼働率 | 施設別スプレッドシート（GAS） | 日次・施設別 | GAS設計中 |
+| 予約ペース（着地予測） | 施設別スプレッドシート（GAS） | 日次・施設別 | GAS設計中 |
+| 日別コスト | 存在しない | — | 対象外 |
+
+#### 施設別スプレッドシートID（全11施設）
+
+| 施設名 | タイプ | スプレッドシートID |
+|---|---|---|
+| 宮若虎の湯 | 旅館 泊+食 | 1TpeXg8S3j3tDY8ifqYAfg_xDW7VGdw-_WtP3lCrT5Ck |
+| 古民家煉り | 旅館 泊のみ | 1FOfNps2-dP0wIrBkJulj-Wn4vdTxftvv8ctVf-y0qEM |
+| Tsmart | 旅館 泊+食 | 1HVpaoPG-riSu0RrtBTgsIeba_7YaDlfzmVLv6qmMCCE |
+| 九重久織亭 | 旅館 泊+食 | 1AXKvdoFsD7tUmeP-CUuq1Squ-vyZRkubz9k5bhV2e00 |
+| 九重虎乃湯(ロッジ) | 旅館 泊+食 | 1cbkvN09SbMiIO0n0urOUjjjCK-HIm7s7V0AMPedMlwI |
+| 仙石原久の葉 | 旅館 泊+食 | 1KyL_p0S8Hw0JjRIXJcz5MqjC_Ey9SRnmeC60hhDdk8g |
+| 小塚久の葉 | 旅館 泊+食 | 13PMcODCT0OeQC3rue8YMFNsFRNiM_LsIE0rYufd8_DI |
+| 阿蘇ホテル | 旅館 泊+食 | 1Mp5NlAW-5qHZk4zNLzrBetyfwC6gi0jhauqKIsm5WZk |
+| 大分コース | ゴルフ | 1tY4RPS92mYe_FCxaPy5Evqd6khnX7yhSipmOOxQiAWc |
+| 若宮コース | ゴルフ | 1xrqIuDqTcw_0DgmXWIhbwzsoKHdjFSKGoEsWwIuiLOk |
+| 阿蘇コース | ゴルフ | 1u3dNX-qv87m8XI9RI47fbQurYKjMXpvy2ket7RRCmlg |
+
+#### 列構成（確認済み）
+
+**旅館型（8施設）— 列A〜M**
+
+| 列 | 内容 |
 |---|---|
-| TOP報告タブ | 外タブ「TOP報告」ボタン自体を非表示 |
-| data.js の読み込み | `<script src="data.js">` をスキップ（中身を見せない） |
-| インポートボタン（`↓`） | data.js 書き込み機能 |
-| P1 / P2 ボタン | NotebookLM プロンプトコピー |
-| 設定ボタン（⚙） | フォントサイズ・件数・インターバル設定モーダル |
-| 検索ボックス | TOP報告向け機能のため非表示 |
+| A | 日付 |
+| B | 曜日 |
+| C/D/E | 総売上（予算/予約/実績） |
+| F/G/H/I/J | 売上内訳（泊/食/売店/ドリンク/追加食事） ※古民家煉りはF=泊, H=売店のみ |
+| K/L/M | 部屋数（予算/予約/実績） |
 
-#### 公開モード時に表示するもの
+**ゴルフ型（3施設）— 列A〜N前後**
 
-| 要素 | 詳細 |
+| 列 | 内容 |
 |---|---|
-| RIALTタブ | すべての内タブ（ダッシュボード・ドリルダウン・単月分析・PL明細） |
-| テーマ切替 | A/B/C テーマボタン |
-| Gemini AIパネル | APIキーはユーザー自身が入力（localStorage保存） |
+| A | 日付 |
+| B | 曜日 |
+| C/D/E | 総売上（予算/予約/実績） |
+| F/G/H | 組数（予算/予約/実績） |
+| I/J/K | 来場者数（予算/予約/実績） |
+| L/M | 稼働率・組単価 |
 
-#### 実装方針
+#### GAS Web App 設計
 
-1. ページロード時に `location.search` で `?public` を検出し `window.PUBLIC_MODE = true` をセット
-2. `data.js` の `<script>` タグに `data-private` 属性を付与し、PUBLIC_MODE 時はロードしない
-   - ただし `<script src>` は静的ロードのため、JS で動的ロードに変更する必要あり
-   - `document.createElement('script')` で動的に append する方式に切替
-3. CSS で `.private-only { display:none }` を PUBLIC_MODE 時に適用
-4. 起動時デフォルトタブを RIALT タブに変更（PUBLIC_MODE 時）
+**エンドポイント設計:**
+- GET ?month=2025-07 → 全11施設の当月日別データをJSONで返す
+- レスポンス: { "month": "2025-07", "ryokan": [...], "golf": [...] }
 
-#### 制約
-- data.js は GitHub Pages に **アップしない**（`.gitignore` に追加）
-- rialt_data.js はアップする（公開データ）
-- テーマ設定は公開ユーザーも localStorage で保持できる
+**GASスクリプト構成:**
+1. 施設マスタ（ID + タイプ）
+2. doGet(e) — monthパラメータ受取・全施設集約
+3. parseRyokan(sheet) — 旅館型パーサー（A-M列）
+4. parseGolf(sheet) — ゴルフ型パーサー
+5. getSheetByMonth(ss, month) — YYYY.M 形式でシート特定
+6. CORS対応（ContentService JSON）
+
+#### 次のステップ
+
+**Phase 1: データパイプライン完成**
+1. [ ] GASスクリプト作成（全施設集約エンドポイント）
+2. [ ] GASをWebアプリとしてデプロイ（アクセス権: 全員）
+3. [ ] 動作確認（?month=2025-07 で正しいJSONが返るか）
+
+**Phase 2: Layer1 — 月次PLランキング実装**
+4. [ ] index.html に ?resort URL制御追加（タブ骨格）
+5. [ ] リゾートタブ Layer1 UI（施設別予算達成率テーブル + 12ヶ月推移チャート）
+6. [ ] TGR月次データをresort_table.jsに変換・ロード
+
+**Phase 3: Layer2 — 日別ドリルダウン実装**
+7. [ ] 施設クリック → Layer2 ドリルダウン画面
+8. [ ] 日別売上チャート（予算/予約/実績の3本線）
+9. [ ] 売上内訳・稼働率パネル
+
+**Phase 4: 統合・確認**
+10. [ ] Layer1 → Layer2 遷移の動作確認
+11. [ ] ?resort URL制御でリゾートタブのみ表示確認
+12. [ ] task.md 変更ログ更新
 
 
 
