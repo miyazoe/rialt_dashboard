@@ -1269,6 +1269,12 @@ body.public-mode .private-only { display: none !important; }
   background: #eff6ff; border-left: 3px solid #2563eb;
   padding: 4px 10px; border-radius: 0 4px 4px 0; display: inline-block;
 }
+.resort-section-hdr td {
+  font-size: 11px; font-weight: 700; color: #374151;
+  background: #f1f5f9; border-top: 2px solid #e5e7eb;
+  border-bottom: 1px solid #e5e7eb; padding: 6px 10px;
+  letter-spacing: 0.03em;
+}
 .resort-section-label {
   font-size: 11px; font-weight: 700; color: #374151;
   padding: 10px 0 4px; letter-spacing: 0.03em;
@@ -7406,7 +7412,7 @@ document.getElementById('import-btn').addEventListener('click', openPasteDialog)
         gp_a: s('売上総利益_実績'),
         op_a: s('営業利益_実績'), op_b: s('営業利益_予算'),
         lc_a: s('人件費_実績'), lc_b: s('人件費_予算'),
-        occ:  avg('客室稼働率_実績'),
+        occ_a: avg('稼働率_実績'), occ_b: avg('稼働率_予算'),
         adr_a: avg('ADR_実績'), adr_b: avg('ADR_予算'),
         rvp_a: avg('RevPAR_実績'), rvp_b: avg('RevPAR_予算'),
         pax_a: s('来場客数_実績'), pax_b: s('来場客数_予算'),
@@ -7420,7 +7426,7 @@ document.getElementById('import-btn').addEventListener('click', openPasteDialog)
       gp_a: nv(d['売上総利益_実績']),
       op_a: nv(d['営業利益_実績']), op_b: nv(d['営業利益_予算']),
       lc_a: nv(d['人件費_実績']), lc_b: nv(d['人件費_予算']),
-      occ:  nv(d['客室稼働率_実績']),
+      occ_a: nv(d['稼働率_実績']), occ_b: nv(d['稼働率_予算']),
       adr_a: nv(d['ADR_実績']), adr_b: nv(d['ADR_予算']),
       rvp_a: nv(d['RevPAR_実績']), rvp_b: nv(d['RevPAR_予算']),
       pax_a: nv(d['来場客数_実績']), pax_b: nv(d['来場客数_予算']),
@@ -7440,7 +7446,7 @@ document.getElementById('import-btn').addEventListener('click', openPasteDialog)
     return { fac: fac, rev_a: r, rev_b: b, gp_a: m.gp_a, op_a: m.op_a, op_b: m.op_b,
              rate: rate, yoy: yoy, gp_rt: gp_rt, op_rt: op_rt,
              lc_a: m.lc_a, lc_b: m.lc_b, lc_rt: lc_rt,
-             occ: m.occ,
+             occ_a: m.occ_a, occ_b: m.occ_b,
              adr_a: m.adr_a, adr_b: m.adr_b,
              rvp_a: m.rvp_a, rvp_b: m.rvp_b,
              pax_a: m.pax_a, pax_b: m.pax_b,
@@ -7524,14 +7530,12 @@ document.getElementById('import-btn').addEventListener('click', openPasteDialog)
     var gfRows = sortW(gfFacs.map(function(f) { return calcRow(f, ym, mode); }));
     var ryAgg  = calcRow({ pl: '旅館事業合計', type: 'ryokan', label: '旅館合計' }, ym, mode);
     var gfAgg  = calcRow({ pl: 'ゴルフ事業合計', type: 'golf',   label: 'ゴルフ合計' }, ym, mode);
-    var tgrRow = calcRow({ pl: 'TGR全体',   type: 'total',  label: 'TGR 全体' }, ym, mode);
-
+    var tgrRow = calcRow({ pl: 'TGR全体', type: 'total', label: 'TGR 全体' }, ym, mode);
     var p = ym.split('-'), yr = +p[0], mo = +p[1];
     var fy = mo >= 7 ? yr : yr - 1;
     var periodLabel = mode === 'ytd'
       ? 'FY' + fy + ' 累計 〜 ' + ymLabel(ym) + 'まで'
       : ymLabel(ym) + '（単月）';
-
     function numCell(a, b, color) {
       var st = color ? ' style="color:' + color + '"' : '';
       return '<td class="resort-num"' + st + '><b>' + (a != null ? a : '—') + '</b>'
@@ -7546,6 +7550,10 @@ document.getElementById('import-btn').addEventListener('click', openPasteDialog)
     function barCell(bw, ac) {
       return '<td class="resort-bar-cell"><div class="resort-bar-bg"><div class="resort-bar-fill" style="width:' + bw.toFixed(1) + '%;background:' + ac + '"></div></div></td>';
     }
+    function fmtOcc(v) {
+      if (v == null) return '—';
+      return fmtPct(v * 100, 1);
+    }
     function rowColors(row) {
       return {
         ac:   achColor(row.rate),
@@ -7557,13 +7565,13 @@ document.getElementById('import-btn').addEventListener('click', openPasteDialog)
         lcC:  row.lc_rt==null?'#6b7280':row.lc_rt<=30 ?'#059669':row.lc_rt<=40?'#d97706':'#dc2626'
       };
     }
-    function trRy(row, isAgg) {
+    function trRow(row, isAgg) {
       if (!row) return '';
       var nm = isAgg ? (row.fac.label||row.fac.pl) : row.fac.pl;
       var css = isAgg ? 'resort-agg-row' : 'resort-fac-row';
       var nc = isAgg ? '<td class="resort-fac-name resort-agg-name">'+nm+'</td>' : '<td class="resort-fac-name">'+nm+'</td>';
       var attr = isAgg ? '' : ' data-fac="'+row.fac.pl+'"';
-      if (row.noData) return '<tr class="'+css+'"'+attr+'>'+nc+'<td colspan="11" style="color:#9ca3af">—</td></tr>';
+      if (row.noData) return '<tr class="'+css+'"'+attr+'>'+nc+'<td colspan="13" style="color:#9ca3af">—</td></tr>';
       var c = rowColors(row);
       return '<tr class="'+css+'"'+attr+'>'+nc
         + numCell(fmtM(row.rev_a), fmtM(row.rev_b))
@@ -7574,33 +7582,14 @@ document.getElementById('import-btn').addEventListener('click', openPasteDialog)
         + numCell(row.op_a!=null?fmtM(row.op_a):'—', fmtM(row.op_b), c.opC)
         + pctCell(row.op_rt, c.orC)
         + numCell(row.lc_a!=null?fmtM(row.lc_a):'—', fmtM(row.lc_b), c.lcC)
-        + pctCell(row.occ!=null?row.occ:null, '#374151')
+        + numCell(fmtOcc(row.occ_a), fmtOcc(row.occ_b))
         + numCell(row.adr_a!=null?fmtYen(row.adr_a):'—', row.adr_b!=null?fmtYen(row.adr_b):null)
         + numCell(row.rvp_a!=null?fmtYen(row.rvp_a):'—', row.rvp_b!=null?fmtYen(row.rvp_b):null)
-        + '</tr>';
-    }
-    function trGf(row, isAgg) {
-      if (!row) return '';
-      var nm = isAgg ? (row.fac.label||row.fac.pl) : row.fac.pl;
-      var css = isAgg ? 'resort-agg-row' : 'resort-fac-row';
-      var nc = isAgg ? '<td class="resort-fac-name resort-agg-name">'+nm+'</td>' : '<td class="resort-fac-name">'+nm+'</td>';
-      var attr = isAgg ? '' : ' data-fac="'+row.fac.pl+'"';
-      if (row.noData) return '<tr class="'+css+'"'+attr+'>'+nc+'<td colspan="10" style="color:#9ca3af">—</td></tr>';
-      var c = rowColors(row);
-      return '<tr class="'+css+'"'+attr+'>'+nc
-        + numCell(fmtM(row.rev_a), fmtM(row.rev_b))
-        + rateCell(row.rate, c.ac)
-        + barCell(c.bw, c.ac)
-        + pctCell(row.yoy, c.yoyC)
-        + pctCell(row.gp_rt, c.gpC)
-        + numCell(row.op_a!=null?fmtM(row.op_a):'—', fmtM(row.op_b), c.opC)
-        + pctCell(row.op_rt, c.orC)
-        + numCell(row.lc_a!=null?fmtM(row.lc_a):'—', fmtM(row.lc_b), c.lcC)
         + numCell(row.pax_a!=null?fmtN(row.pax_a):'—', row.pax_b!=null?fmtN(row.pax_b):null)
         + numCell(row.spd_a!=null?fmtYen(row.spd_a):'—', row.spd_b!=null?fmtYen(row.spd_b):null)
         + '</tr>';
     }
-    var ryHdr = '<thead><tr>'
+    var hdr = '<thead><tr>'
       + '<th class="resort-th-fac">施設</th>'
       + '<th class="resort-th-num">売上<span class="resort-th-sub">実績/予算</span></th>'
       + '<th class="resort-th-num">達成率</th>'
@@ -7610,33 +7599,20 @@ document.getElementById('import-btn').addEventListener('click', openPasteDialog)
       + '<th class="resort-th-num">営業利益<span class="resort-th-sub">実/予</span></th>'
       + '<th class="resort-th-num">利益率</th>'
       + '<th class="resort-th-num">人件費<span class="resort-th-sub">実/予</span></th>'
-      + '<th class="resort-th-num">稼働率</th>'
+      + '<th class="resort-th-num">稼働率<span class="resort-th-sub">実/予</span></th>'
       + '<th class="resort-th-num">ADR<span class="resort-th-sub">実/予</span></th>'
       + '<th class="resort-th-num">RevPAR<span class="resort-th-sub">実/予</span></th>'
-      + '</tr></thead>';
-    var gfHdr = '<thead><tr>'
-      + '<th class="resort-th-fac">施設</th>'
-      + '<th class="resort-th-num">売上<span class="resort-th-sub">実績/予算</span></th>'
-      + '<th class="resort-th-num">達成率</th>'
-      + '<th class="resort-th-bar"></th>'
-      + '<th class="resort-th-num">前年比</th>'
-      + '<th class="resort-th-num">荒利率</th>'
-      + '<th class="resort-th-num">営業利益<span class="resort-th-sub">実/予</span></th>'
-      + '<th class="resort-th-num">利益率</th>'
-      + '<th class="resort-th-num">人件費<span class="resort-th-sub">実/予</span></th>'
       + '<th class="resort-th-num">来場者数<span class="resort-th-sub">実/予</span></th>'
       + '<th class="resort-th-num">客単価<span class="resort-th-sub">実/予</span></th>'
       + '</tr></thead>';
     var html = '<div class="resort-period-label">' + periodLabel + '</div>';
-    html += '<div class="resort-section-label">▶ 旅館事業</div>'
-      + '<div class="resort-l1-table-wrap"><table class="resort-table">'+ryHdr+'<tbody>';
-    ryRows.forEach(function(r) { html += trRy(r, false); });
-    if (!ryAgg.noData) html += trRy(ryAgg, true);
-    html += '</tbody></table></div>';
-    html += '<div class="resort-section-label">▶ ゴルフ事業</div>'
-      + '<div class="resort-l1-table-wrap"><table class="resort-table">'+gfHdr+'<tbody>';
-    gfRows.forEach(function(r) { html += trGf(r, false); });
-    if (!gfAgg.noData) html += trGf(gfAgg, true);
+    html += '<div class="resort-l1-table-wrap"><table class="resort-table">' + hdr + '<tbody>';
+    html += '<tr class="resort-section-hdr"><td colspan="14">▶ 旅館事業</td></tr>';
+    ryRows.forEach(function(r) { html += trRow(r, false); });
+    if (!ryAgg.noData) html += trRow(ryAgg, true);
+    html += '<tr class="resort-section-hdr"><td colspan="14">▶ ゴルフ事業</td></tr>';
+    gfRows.forEach(function(r) { html += trRow(r, false); });
+    if (!gfAgg.noData) html += trRow(gfAgg, true);
     html += '</tbody></table></div>';
     if (!tgrRow.noData) {
       var tc = achColor(tgrRow.rate);
