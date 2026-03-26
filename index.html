@@ -7318,14 +7318,19 @@ document.getElementById('import-btn').addEventListener('click', openPasteDialog)
   function getPlRow(plName, month) {
     if (!window.RESORT_TABLE) return null;
     return (window.RESORT_TABLE.rows || []).find(function(r) {
-      return r.facility === plName && r.month === month;
+      return r.facility === plName && rowToYM(r) === month;
     }) || null;
+  }
+  function rowToYM(r) {
+    // RESORT_TABLE は year:2024, month:7 の整数形式
+    return r.year + '-' + String(r.month).padStart(2, '0');
   }
   function getAvailableMonths() {
     if (!window.RESORT_TABLE) return [];
     var seen = {}, months = [];
     (window.RESORT_TABLE.rows || []).forEach(function(r) {
-      if (!seen[r.month]) { seen[r.month] = true; months.push(r.month); }
+      var ym = rowToYM(r);
+      if (!seen[ym]) { seen[ym] = true; months.push(ym); }
     });
     return months.sort().reverse();
   }
