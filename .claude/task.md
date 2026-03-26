@@ -20,12 +20,15 @@
 
 | ファイル | 役割 | サイズ目安 |
 |---|---|---|
-| `index.html` | メインアプリ本体（HTML + CSS + JS） | ~16万文字 |
+| `index.html` | メインアプリ本体（HTML + CSS + JS） | ~19万文字 |
 | `data.js` | 週次TOP報告データ（`window.DASHBOARD_DATA`） | 週次追記 |
 | `rialt_data.js` | RIALT月次PLデータ（`window.RIALT_DATA`） | ~17MB |
+| `resort_table.js` | TGR月次PLフラットテーブル（`window.RESORT_TABLE`） | ~1MB |
 | `generate_rialt.py` | CP932 CSV → rialt_data.js 生成スクリプト | — |
+| `tools/generate_resort_table.py` | TGR xlsx → resort_table.js 生成スクリプト | — |
+| `tools/resort_gas.gs` | GAS Web App — 全施設日別売上集約エンドポイント | — |
 | `notebooklm_prompt.md` | NotebookLM用プロンプト集（Prompt1 / Prompt2） | — |
-| `data/rialt/pl_sample.xlsx` | PLフォーマットのサンプル（色設定参考用） | — |
+| `data/tgr/` | TGR月次xlsxソースファイル（2024.xlsx + YYYYMM.xlsx） | — |
 
 ---
 
@@ -34,7 +37,7 @@
 ### 外タブ構成
 
 ```
-[TOP報告] [RIALT]
+[RIALT] [TGR] [TOP]  ← TGRは全員表示、TOPはprivate-only
 ```
 
 ---
@@ -190,6 +193,9 @@ window.RIALT_DATA = {
 | 2026-03-24 | generate_resort_table.py — ADR/RevPAR削除・内訳保持（役員報酬・給与手当・広告宣伝費等）・見込み除外・旅館/ゴルフCSV分割 | — |
 | 2026-03-25 | generate_resort_table.py バグ修正 — parse_pl の施設列オフセット修正（start=2）、九重久織亭 欠落・全施設1列ズレを解消 | — |
 | 2026-03-25 | settings.local.json / ~/.claude/settings.json — bypassPermissions + skipDangerousModePermissionPrompt 設定（グローバル適用） | — |
+| 2026-03-26 | TGRタブ新規追加 — resort_table.js(1MB) ロード、Layer1: 月次PLランキング（達成率ワースト順・色分け）、Layer2: KPIカード+日別チャート | — |
+| 2026-03-26 | GAS Web App デプロイ — 全11施設日別売上集約エンドポイント（旅館/ゴルフ自動判別・JSONP対応） | — |
+| 2026-03-26 | TGRタブ テーマ統一・タブ順変更 — RIALTライトテーマ適用、順序 RIALT→TGR→TOP、ラベル変更 | — |
 
 ---
 
@@ -215,24 +221,22 @@ window.RIALT_DATA = {
 
 > 追加予定の機能・画面はここに記載し、完了したら変更ログへ移動する。
 
-### リゾートタブ（進行中）
+### TGRタブ（実装済み・残課題あり）
 
-#### 目的
-- TGR（リゾート事業）の月次PLデータをダッシュボード化
-- `?resort` URL で表示 → 別メンバーに共有
+#### 実装済み
+- 外タブ「TGR」追加（順序: RIALT → TGR → TOP）
+- RIALTライトテーマに統一（背景 #f4f6f9、白カード）
+- **Layer 1: 月次PLランキング**（達成率ワースト順・色分け）
+- **Layer 2: 施設別ドリルダウン**（KPIカード + GAS日別チャート + 売上内訳）
+- GAS Web App デプロイ済み（組織内アクセス制限、JSONP対応）
+  - URL: `https://script.google.com/a/macros/retail-ai.jp/s/AKfycbwggw9i2KD2JzxcXSSFayAxAYMT1HUJ5MpLklrY-NRJjiT8hdhNSnhx4Dn8MQbuNiemSg/exec`
 
-#### URL別表示制御（設計済み・未実装）
-
-| URL | 表示内容 |
-|---|---|
-| `index.html` | 通常版（全タブ表示） |
-| `index.html?public` | RIALTタブのみ（既存） |
-| `index.html?resort` | リゾートタブのみ（新規・未実装） |
-
-#### 外タブ追加位置（設計済み・未実装）
-```
-[TOP報告] [RIALT] [リゾート]  ← 新規追加予定
-```
+#### 既知の課題・残タスク
+| 優先度 | 課題 | 対処方針 |
+|---|---|---|
+| 高 | ゴルフ3施設のPLデータが全て0 | resort_table.js に大分/若宮/阿蘇コースのxlsxデータが入っていない可能性 → 要調査 |
+| 中 | Layer2 GASチャート未確認 | 組織Googleアカウントでログイン状態でTGRタブ → 施設クリックして確認 |
+| 低 | `?tgr` URL制御（TGRタブのみ表示） | 未実装 |
 
 #### データ構造（完成済み）
 
@@ -390,25 +394,11 @@ Layer 2：施設ドリルダウン（問題の所在特定）
 
 #### 次のステップ
 
-**Phase 1: データパイプライン完成**
-1. [ ] GASスクリプト作成（全施設集約エンドポイント）
-2. [ ] GASをWebアプリとしてデプロイ（アクセス権: 全員）
-3. [ ] 動作確認（?month=2025-07 で正しいJSONが返るか）
-
-**Phase 2: Layer1 — 月次PLランキング実装**
-4. [ ] index.html に ?resort URL制御追加（タブ骨格）
-5. [ ] リゾートタブ Layer1 UI（施設別予算達成率テーブル + 12ヶ月推移チャート）
-6. [ ] TGR月次データをresort_table.jsに変換・ロード
-
-**Phase 3: Layer2 — 日別ドリルダウン実装**
-7. [ ] 施設クリック → Layer2 ドリルダウン画面
-8. [ ] 日別売上チャート（予算/予約/実績の3本線）
-9. [ ] 売上内訳・稼働率パネル
-
-**Phase 4: 統合・確認**
-10. [ ] Layer1 → Layer2 遷移の動作確認
-11. [ ] ?resort URL制御でリゾートタブのみ表示確認
-12. [ ] task.md 変更ログ更新
+**次のステップ（残課題）**
+1. [ ] ゴルフ3施設のPLデータ欠落を調査・修正
+2. [ ] Layer2 GASチャートの動作確認（組織アカウントでログインして施設クリック）
+3. [ ] `?tgr` URL制御（TGRタブのみ表示、共有URL用）
+4. [ ] 12ヶ月推移チャートをLayer1に追加（オプション）
 
 
 
