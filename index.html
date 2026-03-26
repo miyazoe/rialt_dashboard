@@ -1231,60 +1231,67 @@ body {
 
 /* ===== PUBLIC MODE ===== */
 body.public-mode .private-only { display: none !important; }
-/* ===== RESORT TAB ===== */
+/* ===== RESORT (TGR) TAB - RIALTライトテーマに統一 ===== */
 #outer-resort {
-  padding: 16px 20px;
-  background: #0d1117;
-  min-height: calc(100vh - 80px);
-  color: #cdd9e5;
+  font-family: 'Noto Sans JP', 'Noto Sans', sans-serif;
+  background: #f4f6f9;
+  color: #1f2937;
+  flex: 1;
+  min-height: 0;
 }
 .resort-header {
   display: flex;
   align-items: center;
   gap: 12px;
-  margin-bottom: 16px;
+  padding: 10px 20px;
+  background: #ffffff;
+  border-bottom: 1px solid #e2e8f0;
   flex-wrap: wrap;
+  flex-shrink: 0;
 }
 .resort-back-btn {
-  background: #161b22;
-  border: 1px solid #30363d;
-  color: #79c0ff;
-  padding: 5px 12px;
+  background: #f1f5f9;
+  border: 1px solid #e2e8f0;
+  color: #2563eb;
+  padding: 4px 12px;
   border-radius: 6px;
   cursor: pointer;
   font-size: 12px;
+  font-family: inherit;
 }
-.resort-back-btn:hover { background: #1f2937; }
+.resort-back-btn:hover { background: #e0e7f0; }
 .resort-title {
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 700;
-  color: #79c0ff;
-  letter-spacing: 0.05em;
+  color: #1f2937;
 }
 .resort-month-sel {
-  background: #161b22;
-  border: 1px solid #30363d;
-  color: #cdd9e5;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  color: #374151;
   padding: 4px 8px;
   border-radius: 6px;
   font-size: 12px;
   margin-left: auto;
+  font-family: inherit;
 }
-.resort-status {
-  font-size: 11px;
-  color: #6b7280;
-}
-/* Layer1 table */
+.resort-status { font-size: 11px; color: #94a3b8; }
+.resort-body { padding: 16px 20px; overflow-y: auto; }
 .resort-table {
   width: 100%;
   border-collapse: collapse;
   font-size: 12px;
+  background: #ffffff;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.06);
 }
 .resort-table th {
   text-align: right;
-  padding: 6px 10px;
-  border-bottom: 1px solid #21262d;
-  color: #6b7280;
+  padding: 8px 12px;
+  background: #f8fafc;
+  border-bottom: 2px solid #e2e8f0;
+  color: #64748b;
   font-weight: 600;
   font-size: 11px;
   white-space: nowrap;
@@ -1292,74 +1299,50 @@ body.public-mode .private-only { display: none !important; }
 .resort-table th:first-child,
 .resort-table th:nth-child(2) { text-align: left; }
 .resort-table td {
-  padding: 9px 10px;
-  border-bottom: 1px solid #161b22;
+  padding: 10px 12px;
+  border-bottom: 1px solid #f1f5f9;
   white-space: nowrap;
   text-align: right;
+  color: #374151;
 }
 .resort-table td:first-child,
 .resort-table td:nth-child(2) { text-align: left; }
 .resort-row { cursor: pointer; transition: background 0.15s; }
-.resort-row:hover { background: #161b22; }
-.resort-fac-name { font-weight: 600; color: #cdd9e5; }
-.resort-type { font-size: 10px; color: #6b7280; padding: 4px 8px; }
-.resort-num { color: #8b949e; }
-.resort-rate { font-size: 13px; }
-.resort-th-rate { color: #79c0ff !important; }
-/* Layer2 */
-.resort-kpi-row {
-  display: flex;
-  gap: 12px;
-  margin-bottom: 16px;
-  flex-wrap: wrap;
-}
+.resort-row:hover { background: #f0f4ff; }
+.resort-fac-name { font-weight: 600; color: #1f2937; }
+.resort-type { font-size: 10px; color: #94a3b8; }
+.resort-num { color: #64748b; font-variant-numeric: tabular-nums; }
+.resort-rate { font-size: 13px; font-weight: 600; }
+.resort-th-rate { color: #2563eb !important; }
+.resort-kpi-row { display: flex; gap: 12px; margin-bottom: 16px; flex-wrap: wrap; }
 .resort-kpi-card {
-  background: #161b22;
-  border: 1px solid #21262d;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
   border-radius: 8px;
   padding: 12px 18px;
   min-width: 120px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
 }
 .resort-kpi-label {
-  font-size: 10px;
-  color: #6b7280;
-  margin-bottom: 4px;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
+  font-size: 10px; color: #94a3b8; margin-bottom: 4px;
+  text-transform: uppercase; letter-spacing: 0.05em;
 }
-.resort-kpi-value {
-  font-size: 20px;
-  font-weight: 700;
-  line-height: 1;
-}
-.resort-kpi-sub {
-  font-size: 10px;
-  color: #6b7280;
-  margin-top: 4px;
-}
+.resort-kpi-value { font-size: 20px; font-weight: 700; line-height: 1; }
+.resort-kpi-sub { font-size: 10px; color: #94a3b8; margin-top: 4px; }
 .resort-chart-wrap {
-  background: #0d1117;
-  border: 1px solid #21262d;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
   border-radius: 8px;
   padding: 12px;
   margin-bottom: 12px;
   position: relative;
   height: 240px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
 }
-.resort-chart-wrap canvas {
-  width: 100% !important;
-  height: 100% !important;
-  display: block;
-}
-.resort-breakdown {
-  display: flex;
-  gap: 20px;
-  font-size: 12px;
-  color: #8b949e;
-  padding: 8px 4px;
-}
+.resort-chart-wrap canvas { width: 100% !important; height: 100% !important; display: block; }
+.resort-breakdown { display: flex; gap: 20px; font-size: 12px; color: #64748b; padding: 8px 4px; }
 .resort-bd-item { display: flex; gap: 4px; align-items: center; }
-.resort-kpi-empty { color: #6b7280; font-size: 12px; padding: 8px; }
+.resort-kpi-empty { color: #94a3b8; font-size: 12px; padding: 8px; }
 
 </style>
 </head>
@@ -1395,8 +1378,8 @@ body.public-mode .private-only { display: none !important; }
 <!-- OUTER TAB NAV -->
 <div class="outer-tab-nav">
   <button class="outer-tab-btn active" data-outer="rialt">RIALT</button>
-  <button class="outer-tab-btn private-only" data-outer="top-report">TOP報告</button>
-  <button class="outer-tab-btn" data-outer="resort">リゾート</button>
+  <button class="outer-tab-btn" data-outer="resort">TGR</button>
+  <button class="outer-tab-btn private-only" data-outer="top-report">TOP</button>
 </div>
 
 <!-- PASTE DIALOG -->
@@ -1991,6 +1974,7 @@ body.public-mode .private-only { display: none !important; }
     <span class="resort-status" id="resort-status"></span>
   </div>
 
+  <div class="resort-body">
   <!-- Layer 1: 月次PLランキング -->
   <div id="resort-l1">
     <div id="resort-l1-table"></div>
@@ -2004,6 +1988,7 @@ body.public-mode .private-only { display: none !important; }
     </div>
     <div id="resort-breakdown"></div>
   </div>
+  </div><!-- end resort-body -->
 </div>
 
 
@@ -7530,17 +7515,17 @@ document.getElementById('import-btn').addEventListener('click', openPasteDialog)
     daily.forEach(function(d, i) { if (parseInt(d.date.slice(-2)) === today) todayIdx = i; });
 
     // グリッド
-    ctx.strokeStyle = '#1a2535'; ctx.lineWidth = 1;
+    ctx.strokeStyle = '#e2e8f0'; ctx.lineWidth = 1;
     for (var gi = 0; gi <= 4; gi++) {
       var gy = pT + gi / 4 * cH;
       ctx.beginPath(); ctx.moveTo(pL, gy); ctx.lineTo(W - pR, gy); ctx.stroke();
-      ctx.fillStyle = '#4b6a80'; ctx.font = '9px sans-serif'; ctx.textAlign = 'right';
+      ctx.fillStyle = '#94a3b8'; ctx.font = '9px sans-serif'; ctx.textAlign = 'right';
       ctx.fillText(Math.round(maxVal * (1 - gi / 4) / 10000) + '万', pL - 4, gy + 3);
     }
 
     // 今日縦線
     if (todayIdx >= 0) {
-      ctx.save(); ctx.strokeStyle = '#ffffff18'; ctx.lineWidth = 1;
+      ctx.save(); ctx.strokeStyle = '#94a3b840'; ctx.lineWidth = 1;
       ctx.setLineDash([3, 3]);
       ctx.beginPath(); ctx.moveTo(tx(todayIdx), pT); ctx.lineTo(tx(todayIdx), pT + cH); ctx.stroke();
       ctx.restore();
@@ -7548,7 +7533,7 @@ document.getElementById('import-btn').addEventListener('click', openPasteDialog)
 
     // 折れ線
     var lines = [
-      { vals: budget,  color: '#2d4a6b', label: '予算', dash: [4, 3] },
+      { vals: budget,  color: '#cbd5e1', label: '予算', dash: [4, 3] },
       { vals: booking, color: '#e3b341', label: '予約', dash: [] },
       { vals: actual,  color: '#3fb950', label: '実績', dash: [] },
     ];
@@ -7568,7 +7553,7 @@ document.getElementById('import-btn').addEventListener('click', openPasteDialog)
     });
 
     // X軸ラベル（5日おき）
-    ctx.fillStyle = '#4b6a80'; ctx.font = '9px sans-serif'; ctx.textAlign = 'center';
+    ctx.fillStyle = '#94a3b8'; ctx.font = '9px sans-serif'; ctx.textAlign = 'center';
     for (var i = 0; i < n; i += 5) {
       ctx.fillText(daily[i].date.slice(-2), tx(i), H - pB + 14);
     }
