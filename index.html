@@ -1231,118 +1231,169 @@ body {
 
 /* ===== PUBLIC MODE ===== */
 body.public-mode .private-only { display: none !important; }
-/* ===== RESORT (TGR) TAB - RIALTライトテーマに統一 ===== */
+/* ===== RESORT (TGR) TAB ===== */
 #outer-resort {
   font-family: 'Noto Sans JP', 'Noto Sans', sans-serif;
-  background: #f4f6f9;
-  color: #1f2937;
-  flex: 1;
-  min-height: 0;
+  background: #f4f6f9; color: #1f2937;
 }
 .resort-header {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 10px 20px;
-  background: #ffffff;
-  border-bottom: 1px solid #e2e8f0;
-  flex-wrap: wrap;
-  flex-shrink: 0;
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 20px; background: #fff;
+  border-bottom: 1px solid #e5e7eb; flex-wrap: wrap; flex-shrink: 0;
 }
 .resort-back-btn {
-  background: #f1f5f9;
-  border: 1px solid #e2e8f0;
-  color: #2563eb;
-  padding: 4px 12px;
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 12px;
-  font-family: inherit;
+  background: none; border: 1px solid #d1d5db; color: #374151;
+  padding: 4px 10px; border-radius: 4px; cursor: pointer;
+  font-size: 12px; font-family: inherit; white-space: nowrap;
 }
-.resort-back-btn:hover { background: #e0e7f0; }
-.resort-title {
-  font-size: 13px;
-  font-weight: 700;
-  color: #1f2937;
+.resort-back-btn:hover { background: #f9fafb; }
+.resort-title { font-size: 14px; font-weight: 700; color: #111827; white-space: nowrap; }
+.resort-mode-toggle { display: flex; border: 1px solid #d1d5db; border-radius: 6px; overflow: hidden; flex-shrink: 0; }
+.resort-mode-btn {
+  background: none; border: none; padding: 5px 12px; cursor: pointer;
+  font-size: 12px; color: #6b7280; font-family: inherit; white-space: nowrap;
 }
+.resort-mode-btn.active { background: #2563eb; color: #fff; font-weight: 600; }
 .resort-month-sel {
-  background: #f8fafc;
-  border: 1px solid #e2e8f0;
-  color: #374151;
-  padding: 4px 8px;
-  border-radius: 6px;
-  font-size: 12px;
-  margin-left: auto;
-  font-family: inherit;
+  border: 1px solid #d1d5db; border-radius: 6px; padding: 5px 8px;
+  font-size: 12px; margin-left: auto; font-family: inherit; background: #fff; color: #374151;
 }
-.resort-status { font-size: 11px; color: #94a3b8; }
-.resort-body { padding: 16px 20px; overflow-y: auto; }
+.resort-status { font-size: 11px; color: #9ca3af; }
+.resort-gas-fetch-btn { background:#eff6ff; border:1px solid #bfdbfe; border-radius:5px; padding:4px 10px; font-size:11px; cursor:pointer; color:#1d4ed8; font-family:inherit; }
+.resort-gas-fetch-btn:hover { background:#dbeafe; }
+.resort-gas-fetch-btn:disabled { opacity:0.5; cursor:not-allowed; }
+.resort-gas-cache-info { font-size:10px; color:#9ca3af; }
+.resort-gas-import-btn { background:#f0fdf4; border:1px solid #86efac; border-radius:5px; padding:4px 10px; font-size:11px; cursor:pointer; color:#15803d; font-family:inherit; margin-left:auto; }
+.resort-gas-import-btn:hover { background:#dcfce7; }
+.gas-open-link { display:inline-block; background:#eff6ff; border:1px solid #bfdbfe; border-radius:5px; padding:4px 12px; font-size:12px; color:#1d4ed8; text-decoration:none; font-family:inherit; }
+.gas-open-link:hover { background:#dbeafe; }
+.resort-body { padding: 12px 16px; overflow-y: auto; flex: 1; min-height: 0; }
+.resort-period-label {
+  font-size: 11px; color: #2563eb; margin-bottom: 8px;
+  background: #eff6ff; border-left: 3px solid #2563eb;
+  padding: 4px 10px; border-radius: 0 4px 4px 0; display: inline-block;
+}
+.resort-section-hdr td {
+  font-size: 11px; font-weight: 700; color: #374151;
+  background: #f1f5f9; border-top: 2px solid #e5e7eb;
+  border-bottom: 1px solid #e5e7eb; padding: 6px 10px;
+  letter-spacing: 0.03em;
+}
+.resort-tgr-hdr td {
+  background: #dbeafe !important; color: #1d4ed8 !important;
+  border-top-color: #93c5fd !important;
+}
+.resort-tgr-data-row td {
+  background: #eff6ff !important; font-weight: 700;
+  border-top: 1px solid #bfdbfe; border-bottom: 2px solid #93c5fd;
+}
+  font-size: 11px; font-weight: 700; color: #374151;
+  background: #f1f5f9; border-top: 2px solid #e5e7eb;
+  border-bottom: 1px solid #e5e7eb; padding: 6px 10px;
+  letter-spacing: 0.03em;
+}
+.resort-section-label {
+  font-size: 11px; font-weight: 700; color: #374151;
+  padding: 10px 0 4px; letter-spacing: 0.03em;
+}
+.resort-tgr-band {
+  display: flex; flex-wrap: wrap; gap: 14px; align-items: center;
+  background: #f0f9ff; border: 1px solid #bae6fd; border-radius: 8px;
+  padding: 8px 14px; margin-top: 12px;
+}
+.resort-tgr-label { font-weight: 700; font-size: 13px; color: #0369a1; }
+.resort-tgr-item { font-size: 12px; color: #374151; }
+.resort-tgr-item b { font-weight: 700; }
+.resort-tgr-item small { font-size: 10px; color: #9ca3af; margin-left: 4px; }
+.resort-l1-table-wrap { overflow-x: auto; }
 .resort-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 12px;
-  background: #ffffff;
-  border-radius: 8px;
-  overflow: hidden;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+  width: 100%; border-collapse: collapse; font-size: 12px;
+  background: #fff; border-radius: 8px; overflow: hidden;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.07);
 }
 .resort-table th {
-  text-align: right;
-  padding: 8px 12px;
-  background: #f8fafc;
-  border-bottom: 2px solid #e2e8f0;
-  color: #64748b;
-  font-weight: 600;
-  font-size: 11px;
-  white-space: nowrap;
+  text-align: right; padding: 7px 10px;
+  background: #f8fafc; border-bottom: 2px solid #e5e7eb;
+  color: #6b7280; font-weight: 600; font-size: 11px; white-space: nowrap;
 }
-.resort-table th:first-child,
-.resort-table th:nth-child(2) { text-align: left; }
+.resort-th-fac { text-align: left !important; min-width: 110px; }
+.resort-th-num { min-width: 78px; }
+.resort-th-bar { width: 84px; padding-left: 4px !important; }
+.resort-th-sub { color: #9ca3af; font-weight: 400; font-size: 10px; }
 .resort-table td {
-  padding: 10px 12px;
-  border-bottom: 1px solid #f1f5f9;
-  white-space: nowrap;
-  text-align: right;
-  color: #374151;
+  padding: 7px 10px; border-bottom: 1px solid #f3f4f6;
+  white-space: nowrap; text-align: right; color: #374151; font-size: 12px;
 }
-.resort-table td:first-child,
-.resort-table td:nth-child(2) { text-align: left; }
-.resort-row { cursor: pointer; transition: background 0.15s; }
-.resort-row:hover { background: #f0f4ff; }
+.resort-table td:first-child { text-align: left; }
+.resort-fac-row { cursor: pointer; transition: background 0.12s; }
+.resort-fac-row:hover { background: #eff6ff; }
 .resort-fac-name { font-weight: 600; color: #1f2937; }
-.resort-type { font-size: 10px; color: #94a3b8; }
-.resort-num { color: #64748b; font-variant-numeric: tabular-nums; }
-.resort-rate { font-size: 13px; font-weight: 600; }
-.resort-th-rate { color: #2563eb !important; }
-.resort-kpi-row { display: flex; gap: 12px; margin-bottom: 16px; flex-wrap: wrap; }
+.resort-agg-row { background: #f8fafc; }
+.resort-agg-row td { border-top: 1px solid #e5e7eb; }
+.resort-agg-name { font-weight: 700; color: #111827; padding-left: 14px !important; }
+.resort-group-hdr td {
+  background: #f1f5f9; color: #64748b; font-size: 11px; letter-spacing: 0.03em;
+  padding: 5px 10px; border-bottom: 1px solid #e5e7eb; border-top: 1px solid #e5e7eb;
+}
+.resort-tgr-sep td { background: #3b82f6; height: 2px; padding: 0; }
+.resort-num { color: #374151; font-variant-numeric: tabular-nums; }
+.resort-sub { display: block; color: #9ca3af; font-size: 10px; margin-top: 1px; }
+.resort-rate-cell { font-weight: 700; font-size: 13px; min-width: 50px; }
+.resort-bar-cell { width: 84px; padding: 7px 6px !important; }
+.resort-bar-bg {
+  background: #e5e7eb; border-radius: 3px; height: 8px;
+  position: relative; overflow: hidden;
+}
+.resort-bar-fill { height: 100%; border-radius: 3px; transition: width 0.5s ease; }
+.resort-kpi-row { display: flex; gap: 10px; margin-bottom: 12px; flex-wrap: wrap; }
 .resort-kpi-card {
-  background: #ffffff;
-  border: 1px solid #e2e8f0;
-  border-radius: 8px;
-  padding: 12px 18px;
-  min-width: 120px;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+  background: #fff; border: 1px solid #e5e7eb; border-radius: 8px;
+  padding: 11px 16px; min-width: 110px; box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+  flex: 1;
 }
 .resort-kpi-label {
-  font-size: 10px; color: #94a3b8; margin-bottom: 4px;
+  font-size: 10px; color: #9ca3af; margin-bottom: 4px;
   text-transform: uppercase; letter-spacing: 0.05em;
 }
 .resort-kpi-value { font-size: 20px; font-weight: 700; line-height: 1; }
-.resort-kpi-sub { font-size: 10px; color: #94a3b8; margin-top: 4px; }
+.resort-kpi-sub { font-size: 10px; color: #9ca3af; margin-top: 4px; }
+.resort-l2-tabs {
+  display: flex; border-bottom: 2px solid #e5e7eb; margin-bottom: 12px;
+}
+.resort-l2-tab {
+  background: none; border: none; padding: 7px 18px; cursor: pointer;
+  font-size: 12px; color: #6b7280; font-family: inherit;
+  border-bottom: 2px solid transparent; margin-bottom: -2px;
+}
+.resort-l2-tab.active { color: #2563eb; border-bottom-color: #2563eb; font-weight: 600; }
+.resort-l2-tab:hover:not(.active) { color: #374151; background: #f9fafb; }
 .resort-chart-wrap {
-  background: #ffffff;
-  border: 1px solid #e2e8f0;
-  border-radius: 8px;
-  padding: 12px;
-  margin-bottom: 12px;
-  position: relative;
-  height: 240px;
+  background: #fff; border: 1px solid #e5e7eb; border-radius: 8px;
+  padding: 10px; margin-bottom: 10px; height: 236px; overflow: hidden;
   box-shadow: 0 1px 3px rgba(0,0,0,0.05);
 }
-.resort-chart-wrap canvas { width: 100% !important; height: 100% !important; display: block; }
-.resort-breakdown { display: flex; gap: 20px; font-size: 12px; color: #64748b; padding: 8px 4px; }
+.resort-chart-wrap canvas { display: block; }
+.resort-breakdown {
+  display: flex; gap: 20px; font-size: 12px; color: #6b7280; padding: 6px 2px;
+}
 .resort-bd-item { display: flex; gap: 4px; align-items: center; }
-.resort-kpi-empty { color: #94a3b8; font-size: 12px; padding: 8px; }
+.resort-pl-tbl {
+  width: 100%; border-collapse: collapse; font-size: 12px;
+  background: #fff; border-radius: 8px; overflow: hidden;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.07);
+}
+.resort-pl-tbl th {
+  text-align: right; padding: 8px 12px; background: #f8fafc;
+  border-bottom: 2px solid #e5e7eb; color: #6b7280; font-weight: 600; font-size: 11px;
+  white-space: nowrap;
+}
+.resort-pl-tbl th:first-child { text-align: left; }
+.resort-pl-tbl td { padding: 9px 12px; border-bottom: 1px solid #f3f4f6; }
+.resort-pl-sec { background: #f8fafc; }
+.resort-pl-sec .resort-pl-lbl { font-weight: 700; color: #111827; }
+.resort-pl-lbl { text-align: left; color: #374151; }
+.resort-pl-num { text-align: right; font-variant-numeric: tabular-nums; color: #374151; }
+.resort-pl-bgt { color: #9ca3af; }
 
 </style>
 </head>
@@ -1968,27 +2019,41 @@ body.public-mode .private-only { display: none !important; }
 <!-- RESORT CONTENT -->
 <div class="outer-content" id="outer-resort">
   <div class="resort-header">
-    <button class="resort-back-btn" id="resort-back-btn" style="display:none">← 施設一覧</button>
+    <button class="resort-back-btn" id="resort-back-btn" style="display:none">&#8592; 施設一覧</button>
     <span class="resort-title" id="resort-title">月次PLランキング</span>
+    <div class="resort-mode-toggle">
+      <button class="resort-mode-btn active" data-mode="single">単月</button>
+      <button class="resort-mode-btn" data-mode="ytd">累計(FY)</button>
+    </div>
     <select class="resort-month-sel" id="resort-month-sel"></select>
     <span class="resort-status" id="resort-status"></span>
+    <button class="resort-gas-import-btn private-only" id="resort-gas-import-btn" title="GASデータを取得してgas_data.jsに保存">📥 GASデータ</button>
   </div>
-
   <div class="resort-body">
-  <!-- Layer 1: 月次PLランキング -->
-  <div id="resort-l1">
-    <div id="resort-l1-table"></div>
-  </div>
-
-  <!-- Layer 2: 日別ドリルダウン -->
-  <div id="resort-l2" style="display:none">
-    <div class="resort-kpi-row" id="resort-l2-kpi"></div>
-    <div class="resort-chart-wrap">
-      <canvas id="resort-daily-chart"></canvas>
+    <div id="resort-l1"><div id="resort-l1-table"></div></div>
+    <div id="resort-l2" style="display:none">
+      <div class="resort-kpi-row" id="resort-l2-kpi"></div>
+      <div class="resort-l2-tabs">
+        <button class="resort-l2-tab active" data-tab="daily">日別推移</button>
+        <button class="resort-l2-tab" data-tab="monthly">月次推移</button>
+        <button class="resort-l2-tab" data-tab="pl">PL明細</button>
+      </div>
+      <div id="resort-tab-daily">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+          <button class="resort-gas-fetch-btn" id="resort-gas-fetch-btn">📡 日別データを取得</button>
+          <span class="resort-gas-cache-info" id="resort-gas-cache-info"></span>
+        </div>
+        <div class="resort-chart-wrap"><canvas id="resort-daily-chart"></canvas></div>
+        <div id="resort-breakdown"></div>
+      </div>
+      <div id="resort-tab-monthly" style="display:none">
+        <div class="resort-chart-wrap"><canvas id="resort-monthly-chart"></canvas></div>
+      </div>
+      <div id="resort-tab-pl" style="display:none">
+        <div id="resort-pl-table"></div>
+      </div>
     </div>
-    <div id="resort-breakdown"></div>
   </div>
-  </div><!-- end resort-body -->
 </div>
 
 
@@ -2121,6 +2186,7 @@ body.public-mode .private-only { display: none !important; }
 </div>
 
 <script src="resort_table.js"></script>
+<script src="gas_data.js"></script>
 <script src="rialt_data.js"></script>
 <script>
 'use strict';
@@ -7266,238 +7332,848 @@ document.getElementById('import-btn').addEventListener('click', openPasteDialog)
 })();
 })();
 
+// ===== GAS IMPORT =====
+(function() {
+  'use strict';
+  var GAS_IMPORT_URL = 'https://script.google.com/a/macros/retail-ai.jp/s/AKfycbwggw9i2KD2JzxcXSSFayAxAYMT1HUJ5MpLklrY-NRJjiT8hdhNSnhx4Dn8MQbuNiemSg/exec';
+  function openGasOverlay() {
+    document.getElementById('gas-overlay').classList.add('open');
+    document.getElementById('gas-paste-area').value = '';
+    setTimeout(function() { document.getElementById('gas-paste-area').focus(); }, 50);
+  }
+  function closeGasOverlay() {
+    document.getElementById('gas-overlay').classList.remove('open');
+  }
+
+  // IndexedDB for gas_data.js handle
+  function openGasDB() {
+    return new Promise(function(resolve, reject) {
+      var req = indexedDB.open('dashboard_gas_handle_v1', 1);
+      req.onupgradeneeded = function(e) { e.target.result.createObjectStore('handles'); };
+      req.onsuccess = function(e) { resolve(e.target.result); };
+      req.onerror = function() { reject(new Error('DB open failed')); };
+    });
+  }
+  async function saveGasHandle(handle) {
+    try {
+      var db = await openGasDB();
+      db.transaction('handles', 'readwrite').objectStore('handles').put(handle, 'gasjs');
+    } catch(e) {}
+  }
+  async function loadGasHandle() {
+    try {
+      var db = await openGasDB();
+      return new Promise(function(resolve) {
+        var req = db.transaction('handles', 'readonly').objectStore('handles').get('gasjs');
+        req.onsuccess = function(e) { resolve(e.target.result || null); };
+        req.onerror = function() { resolve(null); };
+      });
+    } catch(e) { return null; }
+  }
+  async function getGasHandle() {
+    var handle = await loadGasHandle();
+    if (handle) {
+      try {
+        var perm = await handle.queryPermission({ mode: 'readwrite' });
+        if (perm !== 'granted') perm = await handle.requestPermission({ mode: 'readwrite' });
+        if (perm === 'granted') return handle;
+      } catch(e) {}
+    }
+    if (!window.showOpenFilePicker) {
+      showToast('ファイル選択APIが利用できません（Chrome/Edgeをお試しください）', 'error');
+      return null;
+    }
+    try {
+      var picks = await window.showOpenFilePicker({
+        types: [{ description: 'gas_data.js', accept: { 'application/javascript': ['.js'] } }],
+        multiple: false
+      });
+      handle = picks[0];
+      await saveGasHandle(handle);
+      return handle;
+    } catch(e) { return null; }
+  }
+
+  // ── GAS JSON 解析 ― 単月 / 全期間両対応 ──
+  function stripJsonp(text) {
+    var m = text.trim().match(/^[\w.]+\s*\(([\s\S]+)\)\s*;?\s*$/);
+    return JSON.parse(m ? m[1] : text.trim());
+  }
+  function parseOnePeriod(json) {
+    var month = json.month;
+    if (!month || !/^\d{4}-\d{2}$/.test(month)) return null;
+    var result = {};
+    (json.ryokan || []).forEach(function(fac) {
+      if (fac.error) return;
+      var mo = fac.monthly || {};
+      var pax_a = mo.pax_actual  > 0 ? mo.pax_actual  : null;
+      var pax_b = mo.pax_budget  > 0 ? mo.pax_budget  : null;
+      var adr_a = mo.adr         > 0 ? mo.adr         : null;
+      var occ_a = mo.occupancy   > 0 ? mo.occupancy   : null;
+      var rvp_a = mo.revpar      > 0 ? mo.revpar      : null;
+      if (pax_a != null || adr_a != null || occ_a != null)
+        result[fac.facility] = { pax_a: pax_a, pax_b: pax_b, adr_a: adr_a, occ_a: occ_a, rvp_a: rvp_a };
+    });
+    (json.golf || []).forEach(function(fac) {
+      if (fac.error) return;
+      var mo = fac.monthly || {};
+      var pax_a = mo.pax_actual  > 0 ? mo.pax_actual  : null;
+      var occ_a = mo.occupancy   > 0 ? mo.occupancy   : null;
+      if (pax_a != null || occ_a != null)
+        result[fac.facility] = { pax_a: pax_a, occ_a: occ_a };
+    });
+    return { month: month, data: result };
+  }
+  function parseGasJson(text) {
+    var json = stripJsonp(text);
+    if (json.all && Array.isArray(json.periods)) {
+      // 全期間モード: { all: true, periods: [...] }
+      return { type: 'all', periods: json.periods.map(parseOnePeriod).filter(Boolean) };
+    } else if (json.month) {
+      // 単月モード: { month: 'YYYY-MM', ryokan: [...] }
+      var p = parseOnePeriod(json);
+      if (!p) throw new Error('monthフィールドが不正です: ' + json.month);
+      return { type: 'single', periods: [p] };
+    } else {
+      throw new Error('不明なフォーマットです');
+    }
+  }
+
+  // Build gas_data.js block
+  function buildGasBlock(month, data) {
+    var now = new Date();
+    var ts = now.getFullYear() + '/'
+      + String(now.getMonth()+1).padStart(2,'0') + '/'
+      + String(now.getDate()).padStart(2,'0') + ' '
+      + String(now.getHours()).padStart(2,'0') + ':'
+      + String(now.getMinutes()).padStart(2,'0');
+    return (
+      '// [GAS:' + month + ':' + ts + ':START]\n'
+      + 'window.GAS_MONTHLY = window.GAS_MONTHLY || {};\n'
+      + 'Object.assign(window.GAS_MONTHLY["' + month + '"] = window.GAS_MONTHLY["' + month + '"] || {}, '
+      + JSON.stringify(data, null, 2) + ');\n'
+      + '// [GAS:' + month + ':END]\n'
+    );
+  }
+
+  window._processGasImport = async function(text) {
+    var parsed;
+    try { parsed = parseGasJson(text); }
+    catch(e) { showToast('JSONパースエラー: ' + e.message, 'error'); return; }
+
+    // データがある月のみ抽出（全施設0の月はスキップ）
+    var validPeriods = parsed.periods.filter(function(p) {
+      return Object.keys(p.data).length > 0;
+    });
+    var skipped = parsed.periods.length - validPeriods.length;
+    if (!validPeriods.length) {
+      showToast('有効なデータがありません（全施設0）', 'error'); return;
+    }
+
+    showToast(validPeriods.length + 'ヶ月分を処理中...', 'info');
+    var fileHandle = await getGasHandle();
+    if (!fileHandle) { showToast('キャンセルされました', 'error'); return; }
+
+    var currentContent = 'window.GAS_MONTHLY = window.GAS_MONTHLY || {};\n';
+    try {
+      var file = await fileHandle.getFile();
+      currentContent = await file.text();
+    } catch(e) {}
+
+    // 対象月の既存ブロックを削除
+    validPeriods.forEach(function(p) {
+      var ek = p.month.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      var re = new RegExp('// \\[GAS:' + ek + ':[^\\]]*:START\\][\\s\\S]*?// \\[GAS:' + ek + ':END\\]\\n?', 'g');
+      currentContent = currentContent.replace(re, '');
+    });
+
+    var allBlocks = validPeriods.map(function(p) { return buildGasBlock(p.month, p.data); }).join('\n');
+    var newContent = currentContent.trimEnd() + '\n' + allBlocks;
+
+    try {
+      var writable = await fileHandle.createWritable();
+      await writable.write(newContent);
+      await writable.close();
+    } catch(e) { showToast('書き込みに失敗: ' + e.message, 'error'); return; }
+
+    window.GAS_MONTHLY = window.GAS_MONTHLY || {};
+    validPeriods.forEach(function(p) {
+      window.GAS_MONTHLY[p.month] = Object.assign(window.GAS_MONTHLY[p.month] || {}, p.data);
+    });
+
+    var msg = validPeriods.length + 'ヶ月分を gas_data.js に保存しました';
+    if (skipped > 0) msg += '（' + skipped + 'ヶ月はデータなしでスキップ）';
+    showToast(msg, 'success');
+    setTimeout(function() { location.reload(); }, 2000);
+  };
+
+  // Event listeners
+  document.addEventListener('DOMContentLoaded', function() {
+    var importBtn = document.getElementById('resort-gas-import-btn');
+    var overlay   = document.getElementById('gas-overlay');
+    var closeBtn  = document.getElementById('gas-close-btn');
+    var cancelBtn = document.getElementById('gas-cancel-btn');
+    var execBtn   = document.getElementById('gas-exec-btn');
+    if (importBtn) importBtn.addEventListener('click', openGasOverlay);
+    if (closeBtn)  closeBtn.addEventListener('click', closeGasOverlay);
+    if (cancelBtn) cancelBtn.addEventListener('click', closeGasOverlay);
+    if (overlay)   overlay.addEventListener('click', function(e) {
+      if (e.target === overlay) closeGasOverlay();
+    });
+    if (execBtn) execBtn.addEventListener('click', function() {
+      var text = document.getElementById('gas-paste-area').value;
+      if (!text.trim()) { showToast('テキストを貼り付けてください', 'error'); return; }
+      closeGasOverlay();
+      window._processGasImport(text);
+    });
+  });
+})();
+
 // ===== RESORT MODULE =====
 (function() {
   'use strict';
-  var RESORT_GAS_URL = 'https://script.google.com/a/macros/retail-ai.jp/s/AKfycbwggw9i2KD2JzxcXSSFayAxAYMT1HUJ5MpLklrY-NRJjiT8hdhNSnhx4Dn8MQbuNiemSg/exec';
+  var GAS_URL = 'https://script.google.com/a/macros/retail-ai.jp/s/AKfycbwggw9i2KD2JzxcXSSFayAxAYMT1HUJ5MpLklrY-NRJjiT8hdhNSnhx4Dn8MQbuNiemSg/exec';
 
-  // 実施設マスタ（合計行・本社・PJ除く）
+  // 実施設マスタ（合計・本社除く）
   var RESORT_FACS = [
-    { pl: '宮若虎の湯',  gas: '宮若虎の湯',   type: 'ryokan' },
-    { pl: '古民家煉り',  gas: '古民家煉り',   type: 'ryokan' },
-    { pl: 'Tsmart',      gas: 'Tsmart',        type: 'ryokan' },
-    { pl: '九重久織亭',  gas: '九重久織亭',   type: 'ryokan' },
-    { pl: '九重虎の湯',  gas: '九重虎乃湯',   type: 'ryokan' },
+    { pl: '宮若虎の湯',   gas: '宮若虎の湯',   type: 'ryokan' },
+    { pl: '古民家煉り',   gas: '古民家煉り',   type: 'ryokan' },
+    { pl: 'Tsmart',       gas: 'Tsmart',        type: 'ryokan' },
+    { pl: '九重久織亭',   gas: '九重久織亭',   type: 'ryokan' },
+    { pl: '九重虎の湯',   gas: '九重虎乃湯',   type: 'ryokan' },
     { pl: '仙石原久の葉', gas: '仙石原久の葉', type: 'ryokan' },
-    { pl: '小塚久の葉',  gas: '小塚久の葉',   type: 'ryokan' },
-    { pl: '大分コース',  gas: '大分コース',   type: 'golf' },
-    { pl: '若宮コース',  gas: '若宮コース',   type: 'golf' },
-    { pl: '阿蘇コース',  gas: '阿蘇コース',   type: 'golf' },
+    { pl: '小塚久の葉',   gas: '小塚久の葉',   type: 'ryokan' },
+    { pl: '大分コース',   gas: '大分コース',   type: 'golf' },
+    { pl: '若宮コース',   gas: '若宮コース',   type: 'golf' },
+    { pl: '阿蘇コース',   gas: '阿蘇コース',   type: 'golf' },
   ];
 
-  var _inited = false;
-  var _currentMonth = null;
+  var _inited = false, _currentMonth = null, _viewMode = 'single', _currentFac = null;
   var _gasCache = {};
 
-  // ── ヘルパー ──────────────────────────────────
-  function fmtM(v) {
-    if (v == null || isNaN(Number(v))) return '—';
-    return Math.round(Number(v) / 10000).toLocaleString() + '万';
+  // GAS施設名取得（PL名 → GAS名）
+  function facGasName(plName) {
+    var f = RESORT_FACS.find(function(x) { return x.pl === plName; });
+    return f ? f.gas : plName;
   }
-  function achieveColor(rate) {
-    if (rate == null || isNaN(rate)) return '#6b7280';
-    if (rate >= 100) return '#3fb950';
-    if (rate >= 90)  return '#e3b341';
-    return '#f85149';
-  }
-  function getPlRow(plName, month) {
-    if (!window.RESORT_TABLE) return null;
-    return (window.RESORT_TABLE.rows || []).find(function(r) {
-      return r.facility === plName && rowToYM(r) === month;
-    }) || null;
-  }
-  function rowToYM(r) {
-    // RESORT_TABLE は year:2024, month:7 の整数形式
-    return r.year + '-' + String(r.month).padStart(2, '0');
-  }
-  function getAvailableMonths() {
-    if (!window.RESORT_TABLE) return [];
-    var seen = {}, months = [];
-    (window.RESORT_TABLE.rows || []).forEach(function(r) {
-      var ym = rowToYM(r);
-      if (!seen[ym]) { seen[ym] = true; months.push(ym); }
-    });
-    return months.sort().reverse();
-  }
-  function monthLabel(m) {
-    return m ? m.replace(/-0?/, '年') + '月' : '';
+  // GAS月次データでnull指標を補完
+  function suppFromGas(facPlName, ym, ret) {
+    if (!window.GAS_MONTHLY) return ret;
+    var gn = facGasName(facPlName);
+    var gm = window.GAS_MONTHLY[ym] && window.GAS_MONTHLY[ym][gn];
+    if (!gm) return ret;
+    if (ret.pax_a == null && gm.pax_a != null) ret.pax_a = gm.pax_a;
+    if (ret.pax_b == null && gm.pax_b != null) ret.pax_b = gm.pax_b;
+    if (ret.adr_a == null && gm.adr_a != null) ret.adr_a = gm.adr_a;
+    if (ret.occ_a == null && gm.occ_a != null) ret.occ_a = gm.occ_a;
+    if (ret.rvp_a == null && gm.rvp_a != null) ret.rvp_a = gm.rvp_a;
+    return ret;
   }
 
-  // ── 初期化 ──────────────────────────────────
+  // ── Helpers ──────────────────────────────────────────────────────
+  function fmtM(v) {
+    if (v == null || v === '' || isNaN(Number(v))) return '—';
+    var n = Math.round(Number(v) / 10000);
+    return n.toLocaleString() + '万';
+  }
+  function fmtPct(v, dec) {
+    if (v == null || isNaN(Number(v))) return '—';
+    return Number(v).toFixed(dec != null ? dec : 1) + '%';
+  }
+  function fmtN(v) {
+    if (v == null || isNaN(Number(v))) return '—';
+    return Math.round(Number(v)).toLocaleString() + '人';
+  }
+  function fmtYen(v) {
+    if (v == null || isNaN(Number(v))) return '—';
+    return '¥' + Math.round(Number(v)).toLocaleString();
+  }
+  function nv(v) { return (v != null && !isNaN(Number(v))) ? Number(v) : null; }
+  function achColor(r) {
+    if (r == null) return '#6b7280';
+    return r >= 100 ? '#059669' : r >= 90 ? '#d97706' : '#dc2626';
+  }
+  function getPlRow(facName, ym) {
+    if (!window.RESORT_TABLE) return null;
+    return (window.RESORT_TABLE.rows || []).find(function(r) {
+      return r.facility === facName && (r.year + '-' + String(r.month).padStart(2,'0')) === ym;
+    }) || null;
+  }
+  function prevYM(ym) {
+    var p = ym.split('-');
+    return (parseInt(p[0]) - 1) + '-' + p[1];
+  }
+  function ytdMonths(upTo) {
+    var p = upTo.split('-'), y = +p[0], m = +p[1];
+    var fy = (m >= 7) ? y : y - 1;
+    var res = [], cy = fy, cm = 7;
+    for (var guard = 0; guard < 13; guard++) {
+      var ym = cy + '-' + String(cm).padStart(2, '0');
+      res.push(ym);
+      if (ym === upTo) break;
+      if (++cm > 12) { cm = 1; cy++; }
+    }
+    return res;
+  }
+  function availMonths() {
+    if (!window.RESORT_TABLE) return [];
+    var seen = {}, arr = [];
+    (window.RESORT_TABLE.rows || []).forEach(function(r) {
+      var ym = r.year + '-' + String(r.month).padStart(2, '0');
+      if (!seen[ym]) { seen[ym] = true; arr.push(ym); }
+    });
+    return arr.sort().reverse();
+  }
+  function ymLabel(m) { return m ? m.replace(/-0?/, '年') + '月' : ''; }
+
+  // ── Metrics ──────────────────────────────────────────────────────
+  function getM(facName, ym, mode) {
+    if (mode === 'ytd') {
+      var months = ytdMonths(ym);
+      var rows = months.map(function(m) { return getPlRow(facName, m); }).filter(Boolean);
+      if (!rows.length) return null;
+      function s(k) {
+        var t = 0, has = false;
+        rows.forEach(function(r) { var v = nv(r[k]); if (v != null) { t += v; has = true; } });
+        return has ? t : null;
+      }
+      function avg(k) {
+        var t = 0, cnt = 0;
+        rows.forEach(function(r) { var v = nv(r[k]); if (v != null) { t += v; cnt++; } });
+        return cnt ? t / cnt : null;
+      }
+      var ytdRet = {
+        rev_a: s('売上高合計_実績'), rev_b: s('売上高合計_予算'),
+        gp_a: s('売上総利益_実績'),
+        op_a: s('営業利益_実績'), op_b: s('営業利益_予算'),
+        lc_a: s('人件費_実績'), lc_b: s('人件費_予算'),
+        occ_a: avg('稼働率_実績'), occ_b: avg('稼働率_予算'),
+        adr_a: avg('ADR_実績'), adr_b: avg('ADR_予算'),
+        rvp_a: avg('RevPAR_実績'), rvp_b: avg('RevPAR_予算'),
+        pax_a: s('来場客数_実績'), pax_b: s('来場客数_予算'),
+        spd_a: avg('客単価_実績'), spd_b: avg('客単価_予算')
+      };
+      // YTD: GAS月次合計で補完
+      if (window.GAS_MONTHLY) {
+        var gn2 = facGasName(facName);
+        var gpa = 0, gpb = 0, gad = 0, gadCnt = 0, gocc = 0, goccCnt = 0, grvp = 0, grvpCnt = 0;
+        months.forEach(function(mo) {
+          var gm = window.GAS_MONTHLY[mo] && window.GAS_MONTHLY[mo][gn2];
+          if (gm) {
+            if (gm.pax_a != null) gpa += gm.pax_a;
+            if (gm.pax_b != null) gpb += gm.pax_b;
+            if (gm.adr_a != null) { gad += gm.adr_a; gadCnt++; }
+            if (gm.occ_a != null) { gocc += gm.occ_a; goccCnt++; }
+            if (gm.rvp_a != null) { grvp += gm.rvp_a; grvpCnt++; }
+          }
+        });
+        if (ytdRet.pax_a == null && gpa > 0) ytdRet.pax_a = gpa;
+        if (ytdRet.pax_b == null && gpb > 0) ytdRet.pax_b = gpb;
+        if (ytdRet.adr_a == null && gadCnt > 0) ytdRet.adr_a = Math.round(gad / gadCnt);
+        if (ytdRet.occ_a == null && goccCnt > 0) ytdRet.occ_a = Math.round(gocc / goccCnt * 10) / 10;
+        if (ytdRet.rvp_a == null && grvpCnt > 0) ytdRet.rvp_a = Math.round(grvp / grvpCnt);
+      }
+      return ytdRet;
+    }
+    var d = getPlRow(facName, ym);
+    if (!d) return null;
+    var ret = {
+      rev_a: nv(d['売上高合計_実績']), rev_b: nv(d['売上高合計_予算']),
+      gp_a: nv(d['売上総利益_実績']),
+      op_a: nv(d['営業利益_実績']), op_b: nv(d['営業利益_予算']),
+      lc_a: nv(d['人件費_実績']), lc_b: nv(d['人件費_予算']),
+      occ_a: nv(d['稼働率_実績']), occ_b: nv(d['稼働率_予算']),
+      adr_a: nv(d['ADR_実績']), adr_b: nv(d['ADR_予算']),
+      rvp_a: nv(d['RevPAR_実績']), rvp_b: nv(d['RevPAR_予算']),
+      pax_a: nv(d['来場客数_実績']), pax_b: nv(d['来場客数_予算']),
+      spd_a: nv(d['客単価_実績']), spd_b: nv(d['客単価_予算'])
+    };
+    return suppFromGas(facName, ym, ret);
+  }
+  function calcRow(fac, ym, mode) {
+    var m = getM(fac.pl, ym, mode);
+    if (!m) return { fac: fac, noData: true };
+    var py = getM(fac.pl, prevYM(ym), mode === 'ytd' ? 'ytd' : 'single');
+    var r = m.rev_a, b = m.rev_b;
+    var rate  = (b != null && b > 0) ? r / b * 100 : null;
+    var yoy   = (py && py.rev_a != null && py.rev_a > 0) ? r / py.rev_a * 100 : null;
+    var gp_rt = (r != null && r > 0 && m.gp_a != null) ? m.gp_a / r * 100 : null;
+    var op_rt = (r != null && r > 0 && m.op_a != null) ? m.op_a / r * 100 : null;
+    var lc_rt = (r != null && r > 0 && m.lc_a != null) ? m.lc_a / r * 100 : null;
+    return { fac: fac, rev_a: r, rev_b: b, gp_a: m.gp_a, op_a: m.op_a, op_b: m.op_b,
+             rate: rate, yoy: yoy, gp_rt: gp_rt, op_rt: op_rt,
+             lc_a: m.lc_a, lc_b: m.lc_b, lc_rt: lc_rt,
+             occ_a: m.occ_a, occ_b: m.occ_b,
+             adr_a: m.adr_a, adr_b: m.adr_b,
+             rvp_a: m.rvp_a, rvp_b: m.rvp_b,
+             pax_a: m.pax_a, pax_b: m.pax_b,
+             spd_a: m.spd_a, spd_b: m.spd_b };
+  }
+
+  // ── Init ──────────────────────────────────────────────────────────
   function initResort() {
     if (_inited) return;
     _inited = true;
-
-    var months = getAvailableMonths();
+    var months = availMonths();
     var sel = document.getElementById('resort-month-sel');
     months.forEach(function(m) {
-      var opt = document.createElement('option');
-      opt.value = m; opt.textContent = monthLabel(m);
-      sel.appendChild(opt);
+      var o = document.createElement('option');
+      o.value = m; o.textContent = ymLabel(m); sel.appendChild(o);
     });
     _currentMonth = months[0] || '2026-02';
     sel.value = _currentMonth;
-
-    sel.addEventListener('change', function() {
-      _currentMonth = sel.value;
-      showLayer1();
+    sel.addEventListener('change', function() { _currentMonth = sel.value; showL1(); });
+    document.querySelectorAll('.resort-mode-btn').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        document.querySelectorAll('.resort-mode-btn').forEach(function(b) { b.classList.remove('active'); });
+        btn.classList.add('active');
+        _viewMode = btn.dataset.mode;
+        showL1();
+      });
     });
-    document.getElementById('resort-back-btn').addEventListener('click', function() {
-      showLayer1();
+    document.querySelectorAll('.resort-l2-tab').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        switchTab(btn.dataset.tab);
+        if (btn.dataset.tab === 'monthly' && _currentFac)
+          setTimeout(function() { renderMonthChart(_currentFac); }, 50);
+      });
     });
-    showLayer1();
+    document.getElementById('resort-back-btn').addEventListener('click', showL1);
+    document.getElementById('resort-gas-fetch-btn').addEventListener('click', function() {
+      if (!_currentFac || !_currentMonth) return;
+      var btn = document.getElementById('resort-gas-fetch-btn');
+      var cacheInfo = document.getElementById('resort-gas-cache-info');
+      btn.disabled = true; btn.textContent = '取得中…';
+      if (cacheInfo) cacheInfo.textContent = 'GASに接続中（数十秒かかります）';
+      var ym = _currentMonth;
+      delete _gasCache[ym];
+      try { localStorage.removeItem(_gasLsKey(ym)); } catch(e) {}
+      _fetchGas(ym, function(gasData) {
+        btn.disabled = false; btn.textContent = '📡 日別データを取得';
+        var ts = _gasTs(ym);
+        if (cacheInfo) cacheInfo.textContent = ts ? '最終取得: ' + ts : '取得完了';
+        var list = (gasData && gasData[_currentFac.type === 'ryokan' ? 'ryokan' : 'golf']) || [];
+        var fac = list.find(function(f) { return f.facility === _currentFac.gas; });
+        setTimeout(function() { renderDailyChart(fac ? (fac.daily || []) : [], _currentFac.type); }, 60);
+      }, function() {
+        btn.disabled = false; btn.textContent = '📡 日別データを取得';
+        if (cacheInfo) cacheInfo.textContent = '取得失敗（GAS接続エラー）';
+      });
+    });
+    showL1();
   }
 
-  // ── Layer1 ──────────────────────────────────
-  function showLayer1() {
+  // ── Layer 1 ──────────────────────────────────────────────────────
+  function showL1() {
     document.getElementById('resort-l1').style.display = '';
     document.getElementById('resort-l2').style.display = 'none';
     document.getElementById('resort-back-btn').style.display = 'none';
     document.getElementById('resort-title').textContent = '月次PLランキング';
-    renderLayer1(_currentMonth);
+    renderL1(_currentMonth, _viewMode);
   }
-  function renderLayer1(month) {
-    var rows = RESORT_FACS.map(function(fac) {
-      var d = getPlRow(fac.pl, month);
-      if (!d) return { fac: fac, rev_b: null, rev_a: null, rate: null, op_a: null, op_rate: null };
-      var rev_b = Number(d['売上高合計_予算']) || 0;
-      var rev_a = Number(d['売上高合計_実績']) || 0;
-      var op_a  = Number(d['営業利益_実績']);
-      var op_b  = Number(d['営業利益_予算']);
-      var rate  = rev_b > 0 ? Math.round(rev_a / rev_b * 1000) / 10 : null;
-      var op_rate = rev_a > 0 ? Math.round(op_a / rev_a * 1000) / 10 : null;
-      return { fac: fac, rev_b: rev_b, rev_a: rev_a, rate: rate, op_a: op_a, op_b: op_b, op_rate: op_rate };
-    });
-    rows.sort(function(a, b) {
-      if (a.rate == null && b.rate == null) return 0;
-      if (a.rate == null) return 1;
-      if (b.rate == null) return -1;
-      return a.rate - b.rate; // ワースト順
-    });
 
-    var html = '<table class="resort-table"><thead><tr>'
-      + '<th>施設</th><th>種別</th>'
-      + '<th>売上予算</th><th>売上実績</th><th class="resort-th-rate">達成率</th>'
-      + '<th>営業利益</th><th>利益率</th>'
-      + '</tr></thead><tbody>';
-    rows.forEach(function(r) {
-      var rateColor = achieveColor(r.rate);
-      var rateStr   = r.rate != null ? r.rate.toFixed(1) + '%' : '—';
-      var opRateStr = r.op_rate != null ? r.op_rate.toFixed(1) + '%' : '—';
-      var opColor   = r.op_rate != null && r.op_rate < 0 ? '#f85149' : '#3fb950';
-      html += '<tr class="resort-row" data-fac="' + r.fac.pl + '">'
-        + '<td class="resort-fac-name">' + r.fac.pl + '</td>'
-        + '<td class="resort-type">' + (r.fac.type === 'ryokan' ? '旅館' : 'ゴルフ') + '</td>'
-        + '<td class="resort-num">' + fmtM(r.rev_b) + '</td>'
-        + '<td class="resort-num">' + fmtM(r.rev_a) + '</td>'
-        + '<td class="resort-rate" style="color:' + rateColor + ';font-weight:700">' + rateStr + '</td>'
-        + '<td class="resort-num">' + fmtM(r.op_a) + '</td>'
-        + '<td class="resort-rate" style="color:' + opColor + '">' + opRateStr + '</td>'
+  function renderL1(ym, mode) {
+    var ryFacs = RESORT_FACS.filter(function(f) { return f.type === 'ryokan'; });
+    var gfFacs = RESORT_FACS.filter(function(f) { return f.type === 'golf'; });
+    function sortW(rows) {
+      return rows.slice().sort(function(a, b) {
+        if (a.noData && b.noData) return 0; if (a.noData) return 1; if (b.noData) return -1;
+        if (a.rate == null && b.rate == null) return 0;
+        if (a.rate == null) return 1; if (b.rate == null) return -1;
+        return a.rate - b.rate;
+      });
+    }
+    var ryRows = sortW(ryFacs.map(function(f) { return calcRow(f, ym, mode); }));
+    var gfRows = sortW(gfFacs.map(function(f) { return calcRow(f, ym, mode); }));
+    var ryAgg  = calcRow({ pl: '旅館事業合計', type: 'ryokan', label: '旅館合計' }, ym, mode);
+    var gfAgg  = calcRow({ pl: 'ゴルフ事業合計', type: 'golf', label: 'ゴルフ合計' }, ym, mode);
+    var tgrRow = calcRow({ pl: 'TGR全体', type: 'total', label: 'TGR 全体' }, ym, mode);
+    var p = ym.split('-'), yr = +p[0], mo = +p[1];
+    var fy = mo >= 7 ? yr : yr - 1;
+    var periodLabel = mode === 'ytd'
+      ? 'FY' + fy + ' 累計 〜 ' + ymLabel(ym) + 'まで'
+      : ymLabel(ym) + '（単月）';
+    function numCell(a, b, color) {
+      var st = color ? ' style="color:' + color + '"' : '';
+      return '<td class="resort-num"' + st + '><b>' + (a != null ? a : '—') + '</b>'
+        + (b != null ? '<span class="resort-sub">' + b + '</span>' : '') + '</td>';
+    }
+    function dashCell() { return '<td class="resort-num">—</td>'; }
+    function rateCell(v, color) {
+      return '<td class="resort-rate-cell" style="color:' + (color||'#6b7280') + '">' + fmtPct(v) + '</td>';
+    }
+    function pctCell(v, color) {
+      return '<td class="resort-num" style="color:' + (color||'#6b7280') + '">' + fmtPct(v) + '</td>';
+    }
+    function barCell(bw, ac) {
+      return '<td class="resort-bar-cell"><div class="resort-bar-bg"><div class="resort-bar-fill" style="width:' + bw.toFixed(1) + '%;background:' + ac + '"></div></div></td>';
+    }
+    function fmtOcc(v) {
+      if (v == null) return '—';
+      return fmtPct(v * 100, 1);
+    }
+    function rowColors(row) {
+      return {
+        ac:   achColor(row.rate),
+        bw:   row.rate != null ? Math.min(Math.max(row.rate,0),120)/120*100 : 0,
+        yoyC: row.yoy  ==null?'#6b7280':row.yoy  >=100?'#059669':'#dc2626',
+        gpC:  row.gp_rt==null?'#6b7280':row.gp_rt>=40 ?'#059669':row.gp_rt>=30?'#d97706':'#dc2626',
+        opC:  row.op_a ==null?'#6b7280':row.op_a >=0  ?'#059669':'#dc2626',
+        orC:  row.op_rt==null?'#6b7280':row.op_rt>=0  ?'#059669':'#dc2626',
+        lcC:  row.lc_rt==null?'#6b7280':row.lc_rt<=30 ?'#059669':row.lc_rt<=40?'#d97706':'#dc2626'
+      };
+    }
+    // Unified row (14 cols)
+    function trRow(row, isAgg) {
+      if (!row) return '';
+      var nm = isAgg ? (row.fac.label||row.fac.pl) : row.fac.pl;
+      var css = isAgg ? 'resort-agg-row' : 'resort-fac-row';
+      var nc = isAgg ? '<td class="resort-fac-name resort-agg-name">'+nm+'</td>' : '<td class="resort-fac-name">'+nm+'</td>';
+      var attr = isAgg ? '' : ' data-fac="'+row.fac.pl+'"';
+      if (row.noData) return '<tr class="'+css+'"'+attr+'>'+nc+'<td colspan="13" style="color:#9ca3af">—</td></tr>';
+      var c = rowColors(row);
+      return '<tr class="'+css+'"'+attr+'>'+nc
+        + numCell(fmtM(row.rev_a), fmtM(row.rev_b))
+        + rateCell(row.rate, c.ac)
+        + barCell(c.bw, c.ac)
+        + pctCell(row.yoy, c.yoyC)
+        + pctCell(row.gp_rt, c.gpC)
+        + numCell(row.op_a!=null?fmtM(row.op_a):'—', fmtM(row.op_b), c.opC)
+        + pctCell(row.op_rt, c.orC)
+        + numCell(row.lc_a!=null?fmtM(row.lc_a):'—', fmtM(row.lc_b), c.lcC)
+        + numCell(fmtOcc(row.occ_a), fmtOcc(row.occ_b))
+        + numCell(row.adr_a!=null?fmtYen(row.adr_a):'—', row.adr_b!=null?fmtYen(row.adr_b):null)
+        + numCell(row.rvp_a!=null?fmtYen(row.rvp_a):'—', row.rvp_b!=null?fmtYen(row.rvp_b):null)
+        + numCell(row.pax_a!=null?fmtN(row.pax_a):'—', row.pax_b!=null?fmtN(row.pax_b):null)
+        + numCell(row.spd_a!=null?fmtYen(row.spd_a):'—', row.spd_b!=null?fmtYen(row.spd_b):null)
         + '</tr>';
-    });
-    html += '</tbody></table>';
+    }
+    // TGR 全体 row (numeric columns only, no occ/ADR/RevPAR/pax/spd)
+    function trTgr(row) {
+      if (!row || row.noData) return '';
+      var c = rowColors(row);
+      return '<tr class="resort-tgr-data-row">'
+        + '<td class="resort-fac-name resort-agg-name">TGR 全体</td>'
+        + numCell(fmtM(row.rev_a), fmtM(row.rev_b))
+        + rateCell(row.rate, c.ac)
+        + barCell(c.bw, c.ac)
+        + pctCell(row.yoy, c.yoyC)
+        + pctCell(row.gp_rt, c.gpC)
+        + numCell(row.op_a!=null?fmtM(row.op_a):'—', fmtM(row.op_b), c.opC)
+        + pctCell(row.op_rt, c.orC)
+        + numCell(row.lc_a!=null?fmtM(row.lc_a):'—', fmtM(row.lc_b), c.lcC)
+        + dashCell() + dashCell() + dashCell() + dashCell() + dashCell()
+        + '</tr>';
+    }
+    var hdr = '<thead><tr>'
+      + '<th class="resort-th-fac">施設</th>'
+      + '<th class="resort-th-num">売上<span class="resort-th-sub">実績/予算</span></th>'
+      + '<th class="resort-th-num">達成率</th>'
+      + '<th class="resort-th-bar"></th>'
+      + '<th class="resort-th-num">前年比</th>'
+      + '<th class="resort-th-num">荒利率</th>'
+      + '<th class="resort-th-num">営業利益<span class="resort-th-sub">実/予</span></th>'
+      + '<th class="resort-th-num">利益率</th>'
+      + '<th class="resort-th-num">人件費<span class="resort-th-sub">実/予</span></th>'
+      + '<th class="resort-th-num">稼働率<span class="resort-th-sub">実/予</span></th>'
+      + '<th class="resort-th-num">ADR<span class="resort-th-sub">実/予</span></th>'
+      + '<th class="resort-th-num">RevPAR<span class="resort-th-sub">実/予</span></th>'
+      + '<th class="resort-th-num">来場者数<span class="resort-th-sub">実/予</span></th>'
+      + '<th class="resort-th-num">客単価<span class="resort-th-sub">実/予</span></th>'
+      + '</tr></thead>';
+    var html = '<div class="resort-period-label">' + periodLabel + '</div>';
+    html += '<div class="resort-l1-table-wrap"><table class="resort-table">' + hdr + '<tbody>';
+    // 旅館事業 section
+    html += '<tr class="resort-section-hdr"><td colspan="14">▶ 旅館事業</td></tr>';
+    ryRows.forEach(function(r) { html += trRow(r, false); });
+    if (!ryAgg.noData) html += trRow(ryAgg, true);
+    // ゴルフ事業 section
+    html += '<tr class="resort-section-hdr"><td colspan="14">▶ ゴルフ事業</td></tr>';
+    gfRows.forEach(function(r) { html += trRow(r, false); });
+    if (!gfAgg.noData) html += trRow(gfAgg, true);
+    // TGR 全体 section
+    if (!tgrRow.noData) {
+      html += '<tr class="resort-section-hdr resort-tgr-hdr"><td colspan="14">TGR 全体</td></tr>';
+      html += trTgr(tgrRow);
+    }
+    html += '</tbody></table></div>';
     document.getElementById('resort-l1-table').innerHTML = html;
-
-    document.querySelectorAll('.resort-row').forEach(function(row) {
+    document.querySelectorAll('.resort-fac-row[data-fac]').forEach(function(row) {
       row.addEventListener('click', function() {
         var fac = RESORT_FACS.find(function(f) { return f.pl === row.dataset.fac; });
-        if (fac) showLayer2(fac);
+        if (fac) showL2(fac);
       });
     });
   }
 
-  // ── Layer2 ──────────────────────────────────
-  function showLayer2(facObj) {
+  // ── Layer 2 ──────────────────────────────────────────────────────
+  function showL2(facObj) {
+    _currentFac = facObj;
     document.getElementById('resort-l1').style.display = 'none';
     document.getElementById('resort-l2').style.display = '';
     document.getElementById('resort-back-btn').style.display = '';
-    document.getElementById('resort-title').textContent = facObj.pl + '　' + monthLabel(_currentMonth);
-    renderLayer2(facObj, _currentMonth);
+    document.getElementById('resort-title').textContent = facObj.pl + '　' + ymLabel(_currentMonth);
+    renderL2(facObj, _currentMonth);
   }
-  function renderLayer2(facObj, month) {
-    var d = getPlRow(facObj.pl, month);
-    var kpiEl = document.getElementById('resort-l2-kpi');
+
+  function renderL2(facObj, ym) {
+    var d = getPlRow(facObj.pl, ym);
+    var kEl = document.getElementById('resort-l2-kpi');
     if (d) {
-      var rev_b = Number(d['売上高合計_予算']) || 0;
-      var rev_a = Number(d['売上高合計_実績']) || 0;
-      var op_a  = Number(d['営業利益_実績']);
-      var op_b  = Number(d['営業利益_予算']);
-      var rate  = rev_b > 0 ? (rev_a / rev_b * 100) : null;
-      var op_rate = rev_a > 0 ? (op_a / rev_a * 100) : null;
-      kpiEl.innerHTML =
-        kpiCard('売上', fmtM(rev_a), '予算 ' + fmtM(rev_b), achieveColor(rate))
-        + kpiCard('達成率', rate != null ? rate.toFixed(1) + '%' : '—', '', achieveColor(rate))
-        + kpiCard('営業利益', fmtM(op_a), '予算 ' + fmtM(op_b), op_a < 0 ? '#f85149' : '#3fb950')
-        + kpiCard('利益率', op_rate != null ? op_rate.toFixed(1) + '%' : '—', '',
-            op_rate == null ? '#6b7280' : op_rate < 0 ? '#f85149' : '#3fb950');
+      var rev_a = nv(d['売上高合計_実績']), rev_b = nv(d['売上高合計_予算']);
+      var gp_a  = nv(d['売上総利益_実績']);
+      var op_a  = nv(d['営業利益_実績']), op_b = nv(d['営業利益_予算']);
+      var py_d  = getPlRow(facObj.pl, prevYM(ym));
+      var py_rev = py_d ? nv(py_d['売上高合計_実績']) : null;
+      var rate   = (rev_b != null && rev_b > 0) ? rev_a / rev_b * 100 : null;
+      var yoy    = (py_rev != null && py_rev > 0) ? rev_a / py_rev * 100 : null;
+      var gp_rt  = (rev_a != null && rev_a > 0 && gp_a != null) ? gp_a / rev_a * 100 : null;
+      var op_rt  = (rev_a != null && rev_a > 0 && op_a != null) ? op_a / rev_a * 100 : null;
+      var gpc = gp_rt == null ? '#6b7280' : gp_rt >= 40 ? '#059669' : gp_rt >= 30 ? '#d97706' : '#dc2626';
+      var opc = op_a  == null ? '#6b7280' : op_a  >= 0  ? '#059669' : '#dc2626';
+      var orc = op_rt == null ? '#6b7280' : op_rt >= 0  ? '#059669' : '#dc2626';
+      kEl.innerHTML =
+        kpi('売上', fmtM(rev_a), '予算 ' + fmtM(rev_b), achColor(rate))
+        + kpi('達成率', fmtPct(rate), '前年比 ' + fmtPct(yoy), achColor(rate))
+        + kpi('荒利率', fmtPct(gp_rt), '荒利 ' + fmtM(gp_a), gpc)
+        + kpi('営業利益', fmtM(op_a), '予算 ' + fmtM(op_b), opc)
+        + kpi('利益率', fmtPct(op_rt), '', orc);
     } else {
-      kpiEl.innerHTML = '<div class="resort-kpi-empty">PLデータなし（' + facObj.pl + '/' + month + '）</div>';
+      kEl.innerHTML = '<div style="color:#9ca3af;padding:8px">PLデータなし</div>';
     }
+    switchTab('daily');
+    renderPlTable(facObj.pl, ym);
+    setTimeout(function() { renderMonthChart(facObj); }, 50);
 
-    document.getElementById('resort-status').textContent = '日別データ読込中…';
     document.getElementById('resort-breakdown').innerHTML = '';
-    clearChart();
-
-    loadGasData(month, function(gasData) {
+    clearCanvas('resort-daily-chart');
+    var _cacheInfo = document.getElementById('resort-gas-cache-info');
+    var _ts = _gasTs(ym);
+    if (_ts) {
+      if (_cacheInfo) _cacheInfo.textContent = '最終取得: ' + _ts;
       document.getElementById('resort-status').textContent = '';
+    } else {
+      if (_cacheInfo) _cacheInfo.textContent = 'キャッシュなし — 「日別データを取得」を押してください';
+      document.getElementById('resort-status').textContent = '';
+    }
+    loadGas(ym, function(gasData) {
+      var ts2 = _gasTs(ym);
+      if (_cacheInfo && ts2) _cacheInfo.textContent = '最終取得: ' + ts2;
       var list = (gasData && gasData[facObj.type === 'ryokan' ? 'ryokan' : 'golf']) || [];
       var fac = list.find(function(f) { return f.facility === facObj.gas; });
-      renderDailyChart(fac ? (fac.daily || []) : [], facObj.type);
-    }, function(err) {
-      document.getElementById('resort-status').textContent = '日別データ取得失敗';
-      renderDailyChart([], facObj.type);
+      setTimeout(function() { renderDailyChart(fac ? (fac.daily || []) : [], facObj.type); }, 60);
+    }, function() {
+      document.getElementById('resort-status').textContent = '';
+      if (_cacheInfo && !_ts) _cacheInfo.textContent = '取得失敗—「日別データを取得」を押してください';
+      setTimeout(function() { renderDailyChart([], facObj.type); }, 60);
     });
   }
-  function kpiCard(label, value, sub, color) {
+
+  function kpi(lbl, val, sub, color) {
     return '<div class="resort-kpi-card">'
-      + '<div class="resort-kpi-label">' + label + '</div>'
-      + '<div class="resort-kpi-value" style="color:' + color + '">' + value + '</div>'
+      + '<div class="resort-kpi-label">' + lbl + '</div>'
+      + '<div class="resort-kpi-value" style="color:' + color + '">' + val + '</div>'
       + (sub ? '<div class="resort-kpi-sub">' + sub + '</div>' : '')
       + '</div>';
   }
 
-  // ── GAS JSONP ────────────────────────────────
-  function loadGasData(month, onOk, onErr) {
-    if (_gasCache[month]) { onOk(_gasCache[month]); return; }
-    var cbName = '_rGas_' + Date.now();
-    var script = document.createElement('script');
-    var done = false;
-    function finish(data, err) {
-      if (done) return; done = true;
-      delete window[cbName];
-      try { document.head.removeChild(script); } catch(e) {}
-      if (err) onErr(err); else { _gasCache[month] = data; onOk(data); }
-    }
-    script.onerror = function() { finish(null, 'script error'); };
-    window[cbName] = function(data) { finish(data, null); };
-    setTimeout(function() { finish(null, 'timeout'); }, 30000);
-    script.src = RESORT_GAS_URL + '?month=' + month + '&callback=' + cbName;
-    document.head.appendChild(script);
+  function switchTab(tab) {
+    document.querySelectorAll('.resort-l2-tab').forEach(function(b) {
+      b.classList.toggle('active', b.dataset.tab === tab);
+    });
+    ['daily', 'monthly', 'pl'].forEach(function(t) {
+      document.getElementById('resort-tab-' + t).style.display = (t === tab ? '' : 'none');
+    });
   }
 
-  // ── 日別チャート ──────────────────────────────
-  function clearChart() {
-    var canvas = document.getElementById('resort-daily-chart');
-    if (!canvas) return;
-    var ctx = canvas.getContext('2d');
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+  // ── PL Table ─────────────────────────────────────────────────────
+  function renderPlTable(facName, ym) {
+    var d = getPlRow(facName, ym);
+    var el = document.getElementById('resort-pl-table');
+    if (!d) { el.innerHTML = '<div style="color:#9ca3af;padding:16px">データなし</div>'; return; }
+    var items = [
+      { lbl: '売上高合計',              key: '売上高合計',   sec: true  },
+      { lbl: '　売上原価',              key: '売上原価',          sec: false },
+      { lbl: '売上総利益（荒利）', key: '売上総利益', sec: true  },
+      { lbl: '　人件費',                    key: '人件費',                sec: false },
+      { lbl: '　管理可能費',        key: '管理可能費',    sec: false },
+      { lbl: '営業利益',                    key: '営業利益',          sec: true  },
+    ];
+    var html = '<table class="resort-pl-tbl"><thead><tr>'
+      + '<th>項目</th><th>実績</th><th>予算</th><th>差異</th><th>達成率</th>'
+      + '</tr></thead><tbody>';
+    items.forEach(function(it) {
+      var a = nv(d[it.key + '_実績']), b = nv(d[it.key + '_予算']);
+      var diff = (a != null && b != null) ? a - b : null;
+      var rt   = (b != null && b !== 0 && a != null) ? a / b * 100 : null;
+      var dc = diff == null ? '#6b7280' : diff >= 0 ? '#059669' : '#dc2626';
+      var rc = achColor(rt);
+      html += '<tr class="' + (it.sec ? 'resort-pl-sec' : '') + '">'
+        + '<td class="resort-pl-lbl">' + it.lbl + '</td>'
+        + '<td class="resort-pl-num">' + fmtM(a) + '</td>'
+        + '<td class="resort-pl-num resort-pl-bgt">' + fmtM(b) + '</td>'
+        + '<td class="resort-pl-num" style="color:' + dc + '">' + (diff != null ? (diff >= 0 ? '+' : '') + fmtM(diff) : '—') + '</td>'
+        + '<td class="resort-pl-num" style="color:' + rc + '">' + fmtPct(rt) + '</td>'
+        + '</tr>';
+    });
+    html += '</tbody></table>';
+    el.innerHTML = html;
   }
-  function renderDailyChart(daily, type) {
-    var wrap = document.querySelector('.resort-chart-wrap');
-    var canvas = document.getElementById('resort-daily-chart');
+
+  // ── Monthly Trend Chart ──────────────────────────────────────────
+  function renderMonthChart(facObj) {
+    var canvas = document.getElementById('resort-monthly-chart');
+    var wrap = document.querySelector('#resort-tab-monthly .resort-chart-wrap');
     if (!canvas || !wrap) return;
-    var W = wrap.clientWidth - 24;
-    var H = 216;
+    var allM = availMonths().slice(0, 12).reverse();
+    var rev_a = [], rev_b = [], op_a = [];
+    allM.forEach(function(ym) {
+      var d = getPlRow(facObj.pl, ym);
+      rev_a.push(d ? nv(d['売上高合計_実績']) : null);
+      rev_b.push(d ? nv(d['売上高合計_予算']) : null);
+      op_a.push(d  ? nv(d['営業利益_実績'])        : null);
+    });
+    var W = Math.max(wrap.clientWidth - 8, 200), H = 220;
     canvas.width = W; canvas.height = H;
     var ctx = canvas.getContext('2d');
     ctx.clearRect(0, 0, W, H);
+    var n = allM.length;
+    var pL = 58, pR = 58, pT = 28, pB = 44;
+    var cW = W - pL - pR, cH = H - pT - pB;
+    var allR = rev_a.concat(rev_b).filter(function(v) { return v != null; });
+    var maxR = allR.length ? Math.max.apply(null, allR) * 1.15 : 1;
+    var bw = Math.max(8, cW / n * 0.5);
+    function bx(i) { return pL + (i + 0.5) / n * cW; }
+    function ry(v) { return pT + (1 - v / maxR) * cH; }
+    // Grid
+    ctx.strokeStyle = '#e5e7eb'; ctx.lineWidth = 0.5;
+    for (var gi = 0; gi <= 4; gi++) {
+      var gy = pT + gi / 4 * cH;
+      ctx.beginPath(); ctx.moveTo(pL, gy); ctx.lineTo(W - pR, gy); ctx.stroke();
+      ctx.fillStyle = '#9ca3af'; ctx.font = '9px sans-serif'; ctx.textAlign = 'right';
+      ctx.fillText(Math.round(maxR * (1 - gi / 4) / 10000) + '万', pL - 4, gy + 3);
+    }
+    // 予算バー
+    for (var i = 0; i < n; i++) {
+      if (rev_b[i] != null) {
+        ctx.fillStyle = '#e5e7eb';
+        ctx.fillRect(bx(i) - bw / 2 - 2, ry(rev_b[i]), bw + 4, rev_b[i] / maxR * cH);
+      }
+    }
+    // 実績バー
+    for (var i = 0; i < n; i++) {
+      if (rev_a[i] != null) {
+        var rt3 = (rev_b[i] && rev_b[i] > 0) ? rev_a[i] / rev_b[i] * 100 : 100;
+        ctx.fillStyle = achColor(rt3) + 'aa';
+        ctx.fillRect(bx(i) - bw / 2, ry(rev_a[i]), bw, rev_a[i] / maxR * cH);
+      }
+    }
+    // 利益軸
+    var opVals = op_a.filter(function(v) { return v != null; });
+    var opRange = opVals.length ? Math.max(Math.max.apply(null, opVals.map(Math.abs)) * 1.6, 1) : 1;
+    function opy(v) { return pT + cH / 2 * (1 - v / opRange); }
+    ctx.strokeStyle = '#d1d5db'; ctx.lineWidth = 0.8; ctx.setLineDash([3, 3]);
+    ctx.beginPath(); ctx.moveTo(pL, opy(0)); ctx.lineTo(W - pR, opy(0)); ctx.stroke();
+    ctx.setLineDash([]);
+    // 利益ライン
+    ctx.strokeStyle = '#f59e0b'; ctx.lineWidth = 2.5;
+    ctx.beginPath(); var started = false;
+    op_a.forEach(function(v, i) {
+      if (v == null) { started = false; return; }
+      if (!started) { ctx.moveTo(bx(i), opy(v)); started = true; }
+      else ctx.lineTo(bx(i), opy(v));
+    });
+    ctx.stroke();
+    op_a.forEach(function(v, i) {
+      if (v == null) return;
+      ctx.fillStyle = v >= 0 ? '#059669' : '#dc2626';
+      ctx.beginPath(); ctx.arc(bx(i), opy(v), 3.5, 0, Math.PI * 2); ctx.fill();
+    });
+    // 右軸 (利益)
+    ctx.fillStyle = '#9ca3af'; ctx.font = '9px sans-serif'; ctx.textAlign = 'left';
+    [-1, 0, 1].forEach(function(k) {
+      var ov = opRange * k;
+      ctx.fillText(Math.round(ov / 10000) + '万', W - pR + 4, opy(ov) + 3);
+    });
+    // X軸
+    ctx.fillStyle = '#6b7280'; ctx.font = '9px sans-serif'; ctx.textAlign = 'center';
+    allM.forEach(function(m, i) {
+      var p2 = m.split('-');
+      ctx.fillText(p2[1] + '月', bx(i), H - pB + 14);
+      ctx.fillStyle = '#9ca3af'; ctx.font = '8px sans-serif';
+      ctx.fillText("'" + p2[0].slice(2), bx(i), H - pB + 24);
+      ctx.fillStyle = '#6b7280'; ctx.font = '9px sans-serif';
+    });
+    // 凡例
+    var lx = pL, ly = 15;
+    ctx.fillStyle = '#e5e7eb'; ctx.fillRect(lx, ly - 7, 12, 8);
+    ctx.fillStyle = '#6b7280'; ctx.font = '10px sans-serif'; ctx.textAlign = 'left';
+    ctx.fillText('予算', lx + 15, ly);
+    ctx.fillStyle = '#059669aa'; ctx.fillRect(lx + 52, ly - 7, 12, 8);
+    ctx.fillStyle = '#6b7280'; ctx.fillText('実績', lx + 67, ly);
+    ctx.strokeStyle = '#f59e0b'; ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.moveTo(lx + 104, ly - 3); ctx.lineTo(lx + 116, ly - 3); ctx.stroke();
+    ctx.fillText('営業利益', lx + 120, ly);
+  }
 
-    if (!daily || daily.length === 0) {
-      ctx.fillStyle = '#4b6a80'; ctx.font = '13px sans-serif';
-      ctx.textAlign = 'center'; ctx.fillText('日別データなし', W / 2, H / 2);
+  // ── GAS ──────────────────────────────────────────────────────────
+  function _gasLsKey(month) { return 'resort_gas_v1_' + month; }
+  function _saveGasToLS(month, data) {
+    try { localStorage.setItem(_gasLsKey(month), JSON.stringify({ ts: Date.now(), data: data })); } catch(e) {}
+  }
+  function _loadGasFromLS(month) {
+    try {
+      var s = localStorage.getItem(_gasLsKey(month));
+      if (!s) return null;
+      var p = JSON.parse(s);
+      return (p && p.data) ? p : null;
+    } catch(e) { return null; }
+  }
+  function _gasTs(month) {
+    var p = _loadGasFromLS(month);
+    if (!p) return null;
+    var d = new Date(p.ts);
+    return (d.getMonth()+1) + '/' + d.getDate() + ' ' + d.getHours() + ':' + String(d.getMinutes()).padStart(2,'0');
+  }
+  function loadGas(month, onOk, onErr) {
+    if (_gasCache[month]) { onOk(_gasCache[month]); return; }
+    var ls = _loadGasFromLS(month);
+    if (ls) { _gasCache[month] = ls.data; onOk(ls.data); return; }
+    _fetchGas(month, onOk, onErr);
+  }
+  function _fetchGas(month, onOk, onErr) {
+    var cb = '_rGas_' + Date.now(), script = document.createElement('script'), done = false;
+    function fin(data, err) {
+      if (done) return; done = true; delete window[cb];
+      try { document.head.removeChild(script); } catch(e) {}
+      if (err) { onErr(err); } else { _saveGasToLS(month, data); _gasCache[month] = data; onOk(data); }
+    }
+    script.onerror = function() { fin(null, 'err'); };
+    window[cb] = function(data) { fin(data, null); };
+    setTimeout(function() { fin(null, 'timeout'); }, 60000);
+    script.src = GAS_URL + '?month=' + month + '&callback=' + cb;
+    document.head.appendChild(script);
+  }
+
+  // ── Daily Chart ──────────────────────────────────────────────────
+  function clearCanvas(id) {
+    var c = document.getElementById(id);
+    if (c) c.getContext('2d').clearRect(0, 0, c.width, c.height);
+  }
+  function renderDailyChart(daily, type) {
+    var wrap = document.querySelector('#resort-tab-daily .resort-chart-wrap');
+    var canvas = document.getElementById('resort-daily-chart');
+    if (!canvas || !wrap) return;
+    var W = Math.max(wrap.clientWidth - 8, 200), H = 200;
+    canvas.width = W; canvas.height = H;
+    var ctx = canvas.getContext('2d');
+    ctx.clearRect(0, 0, W, H);
+    if (!daily || !daily.length) {
+      ctx.fillStyle = '#9ca3af'; ctx.font = '13px sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText('日別データなし', W / 2, H / 2);
       return;
     }
-
     var budget  = daily.map(function(d) { return Number(d.revenue_budget)  || 0; });
     var booking = daily.map(function(d) { return Number(d.revenue_booking) || 0; });
     var actual  = daily.map(function(d) { return Number(d.revenue_actual)  || 0; });
@@ -7506,100 +8182,95 @@ document.getElementById('import-btn').addEventListener('click', openPasteDialog)
     var n = daily.length;
     var pL = 54, pR = 10, pT = 28, pB = 36;
     var cW = W - pL - pR, cH = H - pT - pB;
-    function tx(i)  { return pL + (i + 0.5) / n * cW; }
-    function ty(v)  { return pT + (1 - v / maxVal) * cH; }
-
-    // 今日のインデックス（当月想定）
-    var today = new Date().getDate();
-    var todayIdx = -1;
+    function tx(i) { return pL + (i + 0.5) / n * cW; }
+    function ty(v) { return pT + (1 - v / maxVal) * cH; }
+    var today = new Date().getDate(), todayIdx = -1;
     daily.forEach(function(d, i) { if (parseInt(d.date.slice(-2)) === today) todayIdx = i; });
-
-    // グリッド
-    ctx.strokeStyle = '#e2e8f0'; ctx.lineWidth = 1;
+    ctx.strokeStyle = '#e5e7eb'; ctx.lineWidth = 0.5;
     for (var gi = 0; gi <= 4; gi++) {
       var gy = pT + gi / 4 * cH;
       ctx.beginPath(); ctx.moveTo(pL, gy); ctx.lineTo(W - pR, gy); ctx.stroke();
-      ctx.fillStyle = '#94a3b8'; ctx.font = '9px sans-serif'; ctx.textAlign = 'right';
+      ctx.fillStyle = '#9ca3af'; ctx.font = '9px sans-serif'; ctx.textAlign = 'right';
       ctx.fillText(Math.round(maxVal * (1 - gi / 4) / 10000) + '万', pL - 4, gy + 3);
     }
-
-    // 今日縦線
     if (todayIdx >= 0) {
-      ctx.save(); ctx.strokeStyle = '#94a3b840'; ctx.lineWidth = 1;
-      ctx.setLineDash([3, 3]);
-      ctx.beginPath(); ctx.moveTo(tx(todayIdx), pT); ctx.lineTo(tx(todayIdx), pT + cH); ctx.stroke();
-      ctx.restore();
+      ctx.save(); ctx.strokeStyle = '#9ca3af40'; ctx.lineWidth = 1; ctx.setLineDash([3, 3]);
+      ctx.beginPath(); ctx.moveTo(tx(todayIdx), pT); ctx.lineTo(tx(todayIdx), pT + cH);
+      ctx.stroke(); ctx.restore();
     }
-
-    // 折れ線
     var lines = [
-      { vals: budget,  color: '#cbd5e1', label: '予算', dash: [4, 3] },
-      { vals: booking, color: '#e3b341', label: '予約', dash: [] },
-      { vals: actual,  color: '#3fb950', label: '実績', dash: [] },
+      { vals: budget,  color: '#d1d5db', lbl: '予算', dash: [4, 3] },
+      { vals: booking, color: '#d97706', lbl: '予約', dash: [] },
+      { vals: actual,  color: '#059669', lbl: '実績', dash: [] },
     ];
     lines.forEach(function(line) {
-      ctx.save();
-      ctx.strokeStyle = line.color; ctx.lineWidth = 2;
+      ctx.save(); ctx.strokeStyle = line.color; ctx.lineWidth = 2;
       if (line.dash.length) ctx.setLineDash(line.dash);
-      ctx.beginPath();
-      var started = false;
+      ctx.beginPath(); var s = false;
       line.vals.forEach(function(v, i) {
-        // 実績は今日以降の0をスキップ
-        if (line.label === '実績' && v === 0 && i > todayIdx && todayIdx >= 0) return;
-        if (!started) { ctx.moveTo(tx(i), ty(v)); started = true; }
-        else ctx.lineTo(tx(i), ty(v));
+        if (line.lbl === '実績' && v === 0 && i > todayIdx && todayIdx >= 0) return;
+        if (!s) { ctx.moveTo(tx(i), ty(v)); s = true; } else ctx.lineTo(tx(i), ty(v));
       });
       ctx.stroke(); ctx.restore();
     });
-
-    // X軸ラベル（5日おき）
-    ctx.fillStyle = '#94a3b8'; ctx.font = '9px sans-serif'; ctx.textAlign = 'center';
-    for (var i = 0; i < n; i += 5) {
-      ctx.fillText(daily[i].date.slice(-2), tx(i), H - pB + 14);
-    }
-
-    // 凡例
+    ctx.fillStyle = '#9ca3af'; ctx.font = '9px sans-serif'; ctx.textAlign = 'center';
+    for (var i = 0; i < n; i += 5) ctx.fillText(daily[i].date.slice(-2), tx(i), H - pB + 14);
     var lx = pL + 4, ly = 12;
     lines.forEach(function(line, idx) {
       ctx.save(); ctx.strokeStyle = line.color; ctx.lineWidth = 2;
       if (line.dash.length) ctx.setLineDash(line.dash);
-      ctx.beginPath(); ctx.moveTo(lx + idx * 72, ly); ctx.lineTo(lx + idx * 72 + 18, ly); ctx.stroke();
-      ctx.restore();
+      ctx.beginPath(); ctx.moveTo(lx + idx * 68, ly); ctx.lineTo(lx + idx * 68 + 18, ly);
+      ctx.stroke(); ctx.restore();
       ctx.fillStyle = line.color; ctx.font = '10px sans-serif'; ctx.textAlign = 'left';
-      ctx.fillText(line.label, lx + idx * 72 + 22, ly + 4);
+      ctx.fillText(line.lbl, lx + idx * 68 + 22, ly + 4);
     });
-
-    // 売上内訳（旅館）
     var bdEl = document.getElementById('resort-breakdown');
     if (type === 'ryokan') {
-      var sumStay = daily.reduce(function(s, d) { return s + (Number(d.stay)  || 0); }, 0);
-      var sumFood = daily.reduce(function(s, d) { return s + (Number(d.food)  || 0); }, 0);
-      var sumShop = daily.reduce(function(s, d) { return s + (Number(d.shop)  || 0); }, 0);
-      var tot = sumStay + sumFood + sumShop;
+      var sS = daily.reduce(function(s,d){return s+(Number(d.stay)||0);},0);
+      var sF = daily.reduce(function(s,d){return s+(Number(d.food)||0);},0);
+      var sSh= daily.reduce(function(s,d){return s+(Number(d.shop)||0);},0);
+      var tot = sS + sF + sSh;
       if (tot > 0) {
-        var pct = function(v) { return '(' + Math.round(v / tot * 100) + '%)'; };
+        var pc = function(v) { return '(' + Math.round(v/tot*100) + '%)'; };
         bdEl.innerHTML = '<div class="resort-breakdown">'
-          + '<span class="resort-bd-item"><span style="color:#58a6ff">泊</span>&nbsp;' + fmtM(sumStay) + '&nbsp;' + pct(sumStay) + '</span>'
-          + '<span class="resort-bd-item"><span style="color:#f0883e">食</span>&nbsp;' + fmtM(sumFood) + '&nbsp;' + pct(sumFood) + '</span>'
-          + '<span class="resort-bd-item"><span style="color:#bc8cff">売店</span>&nbsp;' + fmtM(sumShop) + '&nbsp;' + pct(sumShop) + '</span>'
+          + '<span class="resort-bd-item"><span style="color:#3b82f6">泊</span>&nbsp;' + fmtM(sS) + '&nbsp;' + pc(sS) + '</span>'
+          + '<span class="resort-bd-item"><span style="color:#f59e0b">食</span>&nbsp;' + fmtM(sF) + '&nbsp;' + pc(sF) + '</span>'
+          + '<span class="resort-bd-item"><span style="color:#8b5cf6">売店</span>&nbsp;' + fmtM(sSh) + '&nbsp;' + pc(sSh) + '</span>'
           + '</div>';
       }
     } else if (type === 'golf') {
-      var sumGrp = daily.reduce(function(s, d) { return s + (Number(d.groups_actual)   || 0); }, 0);
-      var sumVis = daily.reduce(function(s, d) { return s + (Number(d.visitors_actual) || 0); }, 0);
+      var sG = daily.reduce(function(s,d){return s+(Number(d.groups_actual)||0);},0);
+      var sV = daily.reduce(function(s,d){return s+(Number(d.visitors_actual)||0);},0);
       bdEl.innerHTML = '<div class="resort-breakdown">'
-        + '<span class="resort-bd-item"><span style="color:#79c0ff">組数</span>&nbsp;' + sumGrp + '組</span>'
-        + '<span class="resort-bd-item"><span style="color:#3fb950">来場者</span>&nbsp;' + sumVis + '名</span>'
+        + '<span class="resort-bd-item"><span style="color:#3b82f6">組数</span>&nbsp;' + sG + '組</span>'
+        + '<span class="resort-bd-item"><span style="color:#059669">来場者</span>&nbsp;' + sV + '名</span>'
         + '</div>';
     }
   }
 
-  window._resortInit = function() {
-    if (!_inited) initResort();
-  };
+  window._resortInit = function() { if (!_inited) initResort(); };
 })();
 
 </script>
   <div id="sl-tip"></div>
+
+<!-- GAS IMPORT DIALOG -->
+<div class="paste-overlay" id="gas-overlay">
+  <div class="paste-box">
+    <div class="modal-head">
+      <span class="modal-head-title">// GAS_DATA_IMPORT</span>
+      <button class="modal-close" id="gas-close-btn">✕</button>
+    </div>
+    <p class="paste-hint">次のリンクを開いて表示されたJSONをコピー→下のエリアに貼り付けてください</p>
+    <div style="margin-bottom:8px">
+      <a href="https://script.google.com/a/macros/retail-ai.jp/s/AKfycbwggw9i2KD2JzxcXSSFayAxAYMT1HUJ5MpLklrY-NRJjiT8hdhNSnhx4Dn8MQbuNiemSg/exec?all=1" target="_blank" class="gas-open-link">📡 GASを開く ↗</a>
+    </div>
+    <textarea class="paste-area" id="gas-paste-area" placeholder="test({...}) または {...}"></textarea>
+    <div class="paste-foot">
+      <button class="btn-reset" id="gas-cancel-btn">キャンセル</button>
+      <button class="btn-paste-exec" id="gas-exec-btn">↓ gas_data.jsに保存</button>
+    </div>
+  </div>
+</div>
 </body>
 </html>

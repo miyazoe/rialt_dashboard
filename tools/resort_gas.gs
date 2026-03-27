@@ -9,8 +9,10 @@
 //   4. デプロイURLをダッシュボードの RESORT_GAS_URL に設定
 //
 // エンドポイント:
-//   GET {URL}?month=2025-07           → 全施設の当月データ
-//   GET {URL}?month=2025-07&facility=宮若虎の湯  → 1施設のみ
+//   GET {URL}?all=1                          → 全期間・全施設データ（月次集計のみ）
+//   GET {URL}?month=2025-07                  → 全施設の当月データ（日別含む）
+//   GET {URL}?month=2025-07&facility=宮若虎の湯 → 1施設のみ
+//   GET {URL}?debug=1&facility=宮若虎の湯&month=2025-07 → 生セル値確認（デバッグ用）
 // ============================================================
 
 // ── 施設マスタ ──────────────────────────────────────────────
@@ -33,9 +35,89 @@ const FACILITIES = [
 // ── メインハンドラ ────────────────────────────────────────────
 function doGet(e) {
   try {
-    const month      = (e.parameter.month    || getCurrentMonth()); // "2025-07"
-    const filterName = (e.parameter.facility || '');               // 施設名（省略可）
+    const cb = (e.parameter.callback || '').replace(/[^a-zA-Z0-9_]/g, '');
 
+    // ── debug=1: 生セル値を返す（列構成確認用）──
+    if (e.parameter.debug) {
+      const facilityName = e.parameter.facility || FACILITIES[0].name;
+      const month        = e.parameter.month    || getCurrentMonth();
+      const facility     = FACILITIES.find(f => f.name === facilityName);
+      if (!facility) return jsonResponse({ error: `施設が見つかりません: ${facilityName}` });
+
+      const ss        = SpreadsheetApp.openById(facility.id);
+      const sheetName = monthToSheetName(month);
+
+      // シート一覧も返す
+      const allSheets = ss.getSheets().map(s => s.getName());
+
+      const sheet = ss.getSheetByName(sheetName);
+      if (!sheet) {
+        return jsonResponse({
+          debug: true, facility: facilityName, month, sheetName,
+          allSheets,
+          error: `シート "${sheetName}" が見つかりません`,
+        });
+      }
+
+      const rows = sheet.getDataRange().getValues();
+      // 最初の15行を返す（生の型情報付き）
+      const rawRows = rows.slice(0, 15).map((row, ri) => {
+        return row.map((cell, ci) => ({
+          col: String.fromCharCode(65 + ci),   // A, B, C ...
+          raw: cell instanceof Date ? cell.toISOString() : cell,
+          type: cell instanceof Date ? 'Date'
+              : cell === null        ? 'null'
+              : typeof cell,
+          extractDate_result: ci === 0 ? extractDate(cell) : undefined,
+          toNum_result:       ci > 0  ? toNum(cell)        : undefined,
+        }));
+      });
+
+      return jsonResponse({
+        debug: true, facility: facilityName, month, sheetName,
+        allSheets,
+        totalRows: rows.length,
+        first15rows: rawRows,
+      });
+    }
+
+    // ── all=1: 全期間まとめて返す（月次集計のみ・日別配列なし）──
+    if (e.parameter.all) {
+      const result = { all: true, generated: new Date().toISOString(), periods: [] };
+      // 施設ごとにスプレッドシートを1回だけ開き、全シートを走査
+      const periodMap = {};
+      FACILITIES.forEach(facility => {
+        try {
+          const ss = SpreadsheetApp.openById(facility.id);
+          ss.getSheets().forEach(sheet => {
+            const m = sheet.getName().match(/^(\d{4})\.(\d{1,2})$/);
+            if (!m) return;
+            const month = m[1] + '-' + m[2].padStart(2, '0');
+            if (!periodMap[month]) periodMap[month] = { month, ryokan: [], golf: [] };
+            try {
+              // 月次集計のみ取得（日別配列は返さない）
+              const data = facility.type === 'ryokan'
+                ? parseRyokan(sheet, facility.name)
+                : parseGolf(sheet, facility.name);
+              periodMap[month][facility.type].push({
+                facility: data.facility,
+                type:     data.type,
+                monthly:  data.monthly,   // daily は含めない
+              });
+            } catch(err) {
+              pushError(periodMap[month], facility, err.message);
+            }
+          });
+        } catch(err) { /* スプレッドシートにアクセスできない場合はスキップ */ }
+      });
+      // 降順ソートして配列化
+      result.periods = Object.values(periodMap).sort((a, b) => b.month.localeCompare(a.month));
+      return cb ? jsonpResponse(result, cb) : jsonResponse(result);
+    }
+
+    // ── 通常: 指定月（省略時は当月）──
+    const month      = (e.parameter.month    || getCurrentMonth());
+    const filterName = (e.parameter.facility || '');
     const targets = filterName
       ? FACILITIES.filter(f => f.name === filterName)
       : FACILITIES;
@@ -69,7 +151,6 @@ function doGet(e) {
       }
     });
 
-    const cb = (e.parameter.callback || '').replace(/[^a-zA-Z0-9_]/g, '');
     return cb ? jsonpResponse(result, cb) : jsonResponse(result);
 
   } catch (outerErr) {
