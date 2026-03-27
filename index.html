@@ -7596,6 +7596,10 @@ document.getElementById('import-btn').addEventListener('click', openPasteDialog)
     var n = Math.round(Number(v) / 10000);
     return n.toLocaleString() + '万';
   }
+  function fmtYen(v) {
+    if (v == null || v === '' || isNaN(Number(v))) return '—';
+    return '¥' + Math.round(Number(v)).toLocaleString();
+  }
   function fmtPct(v, dec) {
     if (v == null || isNaN(Number(v))) return '—';
     return Number(v).toFixed(dec != null ? dec : 1) + '%';
@@ -8275,27 +8279,27 @@ document.getElementById('import-btn').addEventListener('click', openPasteDialog)
       + '</td></tr>'
       + '<tr style="background:#fafafa"><td style="padding:7px 12px;color:#6b7280;white-space:nowrap;border-bottom:1px solid #f3f4f6;font-size:11px">ベスト日</td>'
       + '<td style="padding:7px 12px;border-bottom:1px solid #f3f4f6"><strong style="color:#1f2937">'+dayLabel(best)+'</strong>'
-      + ' <span style="color:#374151">'+fmtM(Number(best.rev_actual))+'</span>'
+      + ' <span style="color:#374151">'+fmtYen(Number(best.rev_actual))+'</span>'
       + (Number(best.rev_budget)>0 ? ' <span style="color:#9ca3af;font-size:11px">(予算比'+Math.round(Number(best.rev_actual)/Number(best.rev_budget)*100)+'%)</span>' : '')
       + '</td></tr>'
       + '<tr><td style="padding:7px 12px;color:#6b7280;white-space:nowrap;border-bottom:1px solid #f3f4f6;font-size:11px">ワースト日</td>'
       + '<td style="padding:7px 12px;border-bottom:1px solid #f3f4f6"><strong style="color:#1f2937">'+dayLabel(worst)+'</strong>'
-      + ' <span style="color:#374151">'+fmtM(Number(worst.rev_actual))+'</span>'
+      + ' <span style="color:#374151">'+fmtYen(Number(worst.rev_actual))+'</span>'
       + (Number(worst.rev_budget)>0 ? ' <span style="color:#9ca3af;font-size:11px">(予算比'+Math.round(Number(worst.rev_actual)/Number(worst.rev_budget)*100)+'%)</span>' : '')
       + '</td></tr>'
       + (wkendAvg&&wkdayAvg
         ? '<tr style="background:#fafafa"><td style="padding:7px 12px;color:#6b7280;white-space:nowrap;border-bottom:1px solid #f3f4f6;font-size:11px">週末 vs 平日</td>'
           + '<td style="padding:7px 12px;border-bottom:1px solid #f3f4f6">'
-          + chip('週末平均', fmtM(wkendAvg), '#374151')
-          + chip('平日平均', fmtM(wkdayAvg), '#374151')
+          + chip('週末平均', fmtYen(wkendAvg), '#374151')
+          + chip('平日平均', fmtYen(wkdayAvg), '#374151')
           + '<span style="font-size:11px;color:'+(wkendAvg>wkdayAvg?'#16a34a':'#6b7280')+'">週末比'+Math.round(wkendAvg/wkdayAvg*100)+'%</span>'
           + '</td></tr>' : '')
       + (firstAvg&&secAvg
         ? '<tr><td style="padding:7px 12px;color:#6b7280;white-space:nowrap;border-bottom:1px solid #f3f4f6;font-size:11px">月トレンド</td>'
           + '<td style="padding:7px 12px;border-bottom:1px solid #f3f4f6">'
-          + chip('前半平均', fmtM(firstAvg), '#374151')
+          + chip('前半平均', fmtYen(firstAvg), '#374151')
           + '<span style="color:#9ca3af;margin:0 4px">→</span>'
-          + chip('後半平均', fmtM(secAvg), trendColor)
+          + chip('後半平均', fmtYen(secAvg), trendColor)
           + '<strong style="color:'+trendColor+';font-size:11px">'+trendArrow+'</strong>'
           + '</td></tr>' : '')
       + extraRows
@@ -8342,7 +8346,7 @@ document.getElementById('import-btn').addEventListener('click', openPasteDialog)
       var cells = '';
       cells += tdc(day, 'color:'+(isToday?'#2563eb':'#374151')+';'+(isToday?'font-weight:700;':''));
       cells += tdc(wd, 'color:'+wdCol+';font-weight:600');
-      cells += td(isFuture ? '—' : fmtM(rev_a), 'color:#1f2937;font-weight:600');
+      cells += td(isFuture ? '—' : fmtYen(rev_a), 'color:#1f2937;font-weight:600');
       cells += td(ach!=null ? ach+'%' : '—', 'color:'+achCol+';'+achBold);
       if (isRyo) {
         var occ  = Number(d.occupancy)||0;
@@ -8351,10 +8355,10 @@ document.getElementById('import-btn').addEventListener('click', openPasteDialog)
         var stay = Number(d.stay)||0;
         var food = Number(d.food)||0;
         cells += td(occ>0 ? Math.round(occ*1000)/10+'%' : '—', 'color:#2563eb');
-        cells += td(adr>0 ? '¥'+adr.toLocaleString() : '—', 'color:#374151');
+        cells += td(adr>0 ? '¥'+Math.round(adr).toLocaleString() : '—', 'color:#374151');
         cells += td(pax>0 ? pax+'人' : '—', 'color:#6b7280');
-        cells += td(stay>0 ? fmtM(stay) : '—', 'color:#9ca3af');
-        cells += td(food>0 ? fmtM(food) : '—', 'color:#9ca3af');
+        cells += td(stay>0 ? fmtYen(stay) : '—', 'color:#9ca3af');
+        cells += td(food>0 ? fmtYen(food) : '—', 'color:#9ca3af');
       } else {
         var occ2  = Number(d.occupancy)||0;
         var unit  = Number(d.unit_actual)||0;
@@ -8476,9 +8480,9 @@ document.getElementById('import-btn').addEventListener('click', openPasteDialog)
       if (tot > 0) {
         var pc = function(v) { return '<span style="color:#9ca3af;font-size:11px">('+Math.round(v/tot*100)+'%)</span>'; };
         bdHtml = '<div class="resort-breakdown">'
-          + '<span class="resort-bd-item"><span style="color:#2563eb">泊</span>&nbsp;'+fmtM(sS)+'&nbsp;'+pc(sS)+'</span>'
-          + '<span class="resort-bd-item"><span style="color:#f59e0b">食</span>&nbsp;'+fmtM(sF)+'&nbsp;'+pc(sF)+'</span>'
-          + '<span class="resort-bd-item"><span style="color:#8b5cf6">売店</span>&nbsp;'+fmtM(sSh)+'&nbsp;'+pc(sSh)+'</span>'
+          + '<span class="resort-bd-item"><span style="color:#2563eb">泊</span>&nbsp;'+fmtYen(sS)+'&nbsp;'+pc(sS)+'</span>'
+          + '<span class="resort-bd-item"><span style="color:#f59e0b">食</span>&nbsp;'+fmtYen(sF)+'&nbsp;'+pc(sF)+'</span>'
+          + '<span class="resort-bd-item"><span style="color:#8b5cf6">売店</span>&nbsp;'+fmtYen(sSh)+'&nbsp;'+pc(sSh)+'</span>'
           + '</div>';
       }
     } else if (type === 'golf') {
