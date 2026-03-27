@@ -7409,18 +7409,20 @@ document.getElementById('import-btn').addEventListener('click', openPasteDialog)
       var pax_a = mo.pax_actual  > 0 ? mo.pax_actual  : null;
       var pax_b = mo.pax_budget  > 0 ? mo.pax_budget  : null;
       var adr_a = mo.adr         > 0 ? mo.adr         : null;
-      var occ_a = mo.occupancy   > 0 ? mo.occupancy   : null;
+      var occ_a = mo.occupancy   > 0 ? mo.occupancy / 100 : null;  // % → 小数
       var rvp_a = mo.revpar      > 0 ? mo.revpar      : null;
+      var spd_a = (mo.pax_actual > 0 && mo.rev_actual > 0) ? Math.round(mo.rev_actual / mo.pax_actual) : null;
       if (pax_a != null || adr_a != null || occ_a != null)
-        result[fac.facility] = { pax_a: pax_a, pax_b: pax_b, adr_a: adr_a, occ_a: occ_a, rvp_a: rvp_a };
+        result[fac.facility] = { pax_a: pax_a, pax_b: pax_b, adr_a: adr_a, occ_a: occ_a, rvp_a: rvp_a, spd_a: spd_a };
     });
     (json.golf || []).forEach(function(fac) {
       if (fac.error) return;
       var mo = fac.monthly || {};
       var pax_a = mo.pax_actual  > 0 ? mo.pax_actual  : null;
-      var occ_a = mo.occupancy   > 0 ? mo.occupancy   : null;
+      var occ_a = mo.occupancy   > 0 ? mo.occupancy / 100 : null;  // % → 小数
+      var spd_a = (mo.pax_actual > 0 && mo.rev_actual > 0) ? Math.round(mo.rev_actual / mo.pax_actual) : null;
       if (pax_a != null || occ_a != null)
-        result[fac.facility] = { pax_a: pax_a, occ_a: occ_a };
+        result[fac.facility] = { pax_a: pax_a, occ_a: occ_a, spd_a: spd_a };
     });
     return { month: month, data: result };
   }
@@ -7567,6 +7569,7 @@ document.getElementById('import-btn').addEventListener('click', openPasteDialog)
     if (ret.adr_a == null && gm.adr_a != null) ret.adr_a = gm.adr_a;
     if (ret.occ_a == null && gm.occ_a != null) ret.occ_a = gm.occ_a;
     if (ret.rvp_a == null && gm.rvp_a != null) ret.rvp_a = gm.rvp_a;
+    if (ret.spd_a == null && gm.spd_a != null) ret.spd_a = gm.spd_a;
     return ret;
   }
 
@@ -7656,7 +7659,7 @@ document.getElementById('import-btn').addEventListener('click', openPasteDialog)
       // YTD: GAS月次合計で補完
       if (window.GAS_MONTHLY) {
         var gn2 = facGasName(facName);
-        var gpa = 0, gpb = 0, gad = 0, gadCnt = 0, gocc = 0, goccCnt = 0, grvp = 0, grvpCnt = 0;
+        var gpa = 0, gpb = 0, gad = 0, gadCnt = 0, gocc = 0, goccCnt = 0, grvp = 0, grvpCnt = 0, gspd = 0, gspdCnt = 0;
         months.forEach(function(mo) {
           var gm = window.GAS_MONTHLY[mo] && window.GAS_MONTHLY[mo][gn2];
           if (gm) {
@@ -7665,13 +7668,15 @@ document.getElementById('import-btn').addEventListener('click', openPasteDialog)
             if (gm.adr_a != null) { gad += gm.adr_a; gadCnt++; }
             if (gm.occ_a != null) { gocc += gm.occ_a; goccCnt++; }
             if (gm.rvp_a != null) { grvp += gm.rvp_a; grvpCnt++; }
+            if (gm.spd_a != null) { gspd += gm.spd_a; gspdCnt++; }
           }
         });
         if (ytdRet.pax_a == null && gpa > 0) ytdRet.pax_a = gpa;
         if (ytdRet.pax_b == null && gpb > 0) ytdRet.pax_b = gpb;
         if (ytdRet.adr_a == null && gadCnt > 0) ytdRet.adr_a = Math.round(gad / gadCnt);
-        if (ytdRet.occ_a == null && goccCnt > 0) ytdRet.occ_a = Math.round(gocc / goccCnt * 10) / 10;
+        if (ytdRet.occ_a == null && goccCnt > 0) ytdRet.occ_a = gocc / goccCnt;  // 小数平均
         if (ytdRet.rvp_a == null && grvpCnt > 0) ytdRet.rvp_a = Math.round(grvp / grvpCnt);
+        if (ytdRet.spd_a == null && gspdCnt > 0) ytdRet.spd_a = Math.round(gspd / gspdCnt);
       }
       return ytdRet;
     }
