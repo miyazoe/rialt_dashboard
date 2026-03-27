@@ -7757,7 +7757,7 @@ document.getElementById('import-btn').addEventListener('click', openPasteDialog)
         document.querySelectorAll('.resort-mode-btn').forEach(function(b) { b.classList.remove('active'); });
         btn.classList.add('active');
         _viewMode = btn.dataset.mode;
-        showL1();
+        if (_currentFac) { showL2(_currentFac); } else { showL1(); }
       });
     });
     document.querySelectorAll('.resort-l2-tab').forEach(function(btn) {
