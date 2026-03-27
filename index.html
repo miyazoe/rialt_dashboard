@@ -8165,6 +8165,179 @@ document.getElementById('import-btn').addEventListener('click', openPasteDialog)
     var c = document.getElementById(id);
     if (c) c.getContext('2d').clearRect(0, 0, c.width, c.height);
   }
+  // ── 日別ストーリー生成 ──────────────────────────────────────
+  function buildDailyStory(daily, type) {
+    if (!daily || !daily.length) return '';
+    var WD = ['日','月','火','水','木','金','土'];
+    var today = new Date();
+    var todayStr = today.getFullYear() + '-'
+      + String(today.getMonth()+1).padStart(2,'0') + '-'
+      + String(today.getDate()).padStart(2,'0');
+    // 実績データのある行のみ（未来は除外）
+    var rows = daily.filter(function(d) { return d.date <= todayStr && (Number(d.rev_actual)||0) > 0; });
+    if (!rows.length) return '';
+
+    var totalActual = rows.reduce(function(s,d){return s+(Number(d.rev_actual)||0);},0);
+    var totalBudget = rows.reduce(function(s,d){return s+(Number(d.rev_budget)||0);},0);
+
+    // ベスト・ワースト日
+    var sorted = rows.slice().sort(function(a,b){return (Number(b.rev_actual)||0)-(Number(a.rev_actual)||0);});
+    var best = sorted[0], worst = sorted[sorted.length-1];
+    function dayLabel(d) {
+      var wd = d.weekday || WD[new Date(d.date).getDay()];
+      return d.date.slice(5).replace('-','/') + '(' + wd + ')';
+    }
+
+    // 達成日数
+    var okDays = rows.filter(function(d){
+      var a=Number(d.rev_actual)||0, b=Number(d.rev_budget)||0;
+      return b>0 && a>=b;
+    }).length;
+    var ngDays = rows.filter(function(d){
+      var b=Number(d.rev_budget)||0; return b>0;
+    }).length - okDays;
+
+    // 週末(土日) vs 平日
+    var wkend = rows.filter(function(d){ var w=new Date(d.date).getDay(); return w===0||w===6; });
+    var wkday = rows.filter(function(d){ var w=new Date(d.date).getDay(); return w>=1&&w<=5; });
+    var wkendAvg = wkend.length ? Math.round(wkend.reduce(function(s,d){return s+(Number(d.rev_actual)||0);},0)/wkend.length) : null;
+    var wkdayAvg = wkday.length ? Math.round(wkday.reduce(function(s,d){return s+(Number(d.rev_actual)||0);},0)/wkday.length) : null;
+
+    // 月前半 vs 後半
+    var first = rows.filter(function(d){ return parseInt(d.date.slice(-2))<=15; });
+    var second = rows.filter(function(d){ return parseInt(d.date.slice(-2))>15; });
+    var firstAvg = first.length ? Math.round(first.reduce(function(s,d){return s+(Number(d.rev_actual)||0);},0)/first.length) : null;
+    var secAvg   = second.length ? Math.round(second.reduce(function(s,d){return s+(Number(d.rev_actual)||0);},0)/second.length) : null;
+
+    var achRate = totalBudget>0 ? Math.round(totalActual/totalBudget*100) : null;
+    var achCol = achRate==null?'#9ca3af':achRate>=100?'#059669':achRate>=90?'#d97706':'#dc2626';
+
+    // 旅館固有：稼働率・ADR統計
+    var extraHtml = '';
+    if (type === 'ryokan') {
+      var occRows = rows.filter(function(d){return (Number(d.occupancy)||0)>0;});
+      var adrRows = rows.filter(function(d){return (Number(d.adr_actual)||0)>0;});
+      if (occRows.length) {
+        var occAvg = Math.round(occRows.reduce(function(s,d){return s+(Number(d.occupancy)||0);},0)/occRows.length*1000)/10;
+        var occSorted = occRows.slice().sort(function(a,b){return (Number(b.occupancy)||0)-(Number(a.occupancy)||0);});
+        extraHtml += '<tr><td>稼働率</td><td>平均 <strong>'+occAvg+'%</strong>'
+          + ' &nbsp;最高 <strong>'+Math.round((Number(occSorted[0].occupancy)||0)*1000)/10+'% '+dayLabel(occSorted[0])+'</strong>'
+          + ' &nbsp;最低 <strong>'+Math.round((Number(occSorted[occSorted.length-1].occupancy)||0)*1000)/10+'% '+dayLabel(occSorted[occSorted.length-1])+'</strong></td></tr>';
+      }
+      if (adrRows.length) {
+        var adrAvg = Math.round(adrRows.reduce(function(s,d){return s+(Number(d.adr_actual)||0);},0)/adrRows.length);
+        extraHtml += '<tr><td>ADR</td><td>平均 <strong>¥'+adrAvg.toLocaleString()+'</strong></td></tr>';
+      }
+    } else if (type === 'golf') {
+      var unitRows = rows.filter(function(d){return (Number(d.unit_actual)||0)>0;});
+      var paxRows  = rows.filter(function(d){return (Number(d.pax_actual)||0)>0;});
+      if (unitRows.length) {
+        var unitTotal = unitRows.reduce(function(s,d){return s+(Number(d.unit_actual)||0);},0);
+        var paxTotal  = paxRows.reduce(function(s,d){return s+(Number(d.pax_actual)||0);},0);
+        extraHtml += '<tr><td>来場</td><td>組数合計 <strong>'+unitTotal+'組</strong>'
+          + (paxTotal?' &nbsp;来場者合計 <strong>'+paxTotal+'名</strong>':'')+'</td></tr>';
+      }
+      var occRows2 = rows.filter(function(d){return (Number(d.occupancy)||0)>0;});
+      if (occRows2.length) {
+        var occ2Avg = Math.round(occRows2.reduce(function(s,d){return s+(Number(d.occupancy)||0);},0)/occRows2.length*1000)/10;
+        extraHtml += '<tr><td>稼働率</td><td>平均 <strong>'+occ2Avg+'%</strong></td></tr>';
+      }
+    }
+
+    var trendHtml = '';
+    if (firstAvg && secAvg) {
+      var trendDir = secAvg > firstAvg ? '↑ 後半加速' : secAvg < firstAvg ? '↓ 後半減速' : '→ 安定推移';
+      var trendCol = secAvg >= firstAvg ? '#059669' : '#dc2626';
+      trendHtml = '<tr><td>月中トレンド</td><td>前半平均 <strong>'+fmtM(firstAvg)+'</strong> → 後半平均 <strong>'+fmtM(secAvg)+'</strong>'
+        + ' &nbsp;<span style="color:'+trendCol+'">'+trendDir+'</span></td></tr>';
+    }
+
+    return '<div style="margin:10px 0;border:1px solid #374151;border-radius:6px;overflow:hidden">'
+      + '<div style="background:#1f2937;padding:5px 10px;font-size:11px;color:#9ca3af;letter-spacing:.05em">📊 日別分析サマリー（実績'+rows.length+'日分）</div>'
+      + '<table style="width:100%;font-size:11px;border-collapse:collapse">'
+      + '<tr><td style="padding:4px 10px;color:#9ca3af;width:80px">達成状況</td>'
+      + '<td style="padding:4px 10px">予算達成 <strong style="color:#059669">'+okDays+'日</strong>'
+      + ' / 未達 <strong style="color:#dc2626">'+ngDays+'日</strong>'
+      + (achRate!=null?' &nbsp;累計達成率 <strong style="color:'+achCol+'">'+achRate+'%</strong>':'')+'</td></tr>'
+      + '<tr style="background:#111827"><td style="padding:4px 10px;color:#9ca3af">ベスト日</td>'
+      + '<td style="padding:4px 10px"><strong>'+dayLabel(best)+'</strong> '+fmtM(Number(best.rev_actual))
+      + (Number(best.rev_budget)>0?' <span style="color:#9ca3af">(予算比'+Math.round(Number(best.rev_actual)/Number(best.rev_budget)*100)+'%)</span>':'')+'</td></tr>'
+      + '<tr><td style="padding:4px 10px;color:#9ca3af">ワースト日</td>'
+      + '<td style="padding:4px 10px"><strong>'+dayLabel(worst)+'</strong> '+fmtM(Number(worst.rev_actual))
+      + (Number(worst.rev_budget)>0?' <span style="color:#9ca3af">(予算比'+Math.round(Number(worst.rev_actual)/Number(worst.rev_budget)*100)+'%)</span>':'')+'</td></tr>'
+      + (wkendAvg&&wkdayAvg
+        ? '<tr style="background:#111827"><td style="padding:4px 10px;color:#9ca3af">週末 vs 平日</td>'
+          + '<td style="padding:4px 10px">週末平均 <strong>'+fmtM(wkendAvg)+'</strong>'
+          + ' / 平日平均 <strong>'+fmtM(wkdayAvg)+'</strong>'
+          + ' &nbsp;<span style="color:'+(wkendAvg>wkdayAvg?'#059669':'#6b7280')+'">週末比'
+          + Math.round(wkendAvg/wkdayAvg*100)+'%</span></td></tr>' : '')
+      + trendHtml
+      + (extraHtml ? extraHtml.replace(/<tr>/g,'<tr style="background:#111827">').replace(/<tr style="background:#111827"><td/g,'<tr><td') : '')
+      + '</table></div>';
+  }
+
+  // ── 日別明細テーブル ─────────────────────────────────────────
+  function buildDailyTable(daily, type) {
+    if (!daily || !daily.length) return '';
+    var today = new Date();
+    var todayStr = today.getFullYear() + '-'
+      + String(today.getMonth()+1).padStart(2,'0') + '-'
+      + String(today.getDate()).padStart(2,'0');
+    var WD = ['日','月','火','水','木','金','土'];
+    var isRyo = type === 'ryokan';
+    var hdrs = isRyo
+      ? ['日','曜','実績','予算比','稼働率','ADR','宿泊客数','泊売上','食売上']
+      : ['日','曜','実績','予算比','稼働率','組数','来場者数'];
+    var th = hdrs.map(function(h){
+      return '<th style="padding:3px 6px;text-align:right;color:#9ca3af;font-weight:normal;white-space:nowrap">'+h+'</th>';
+    }).join('');
+    var rows = '';
+    daily.forEach(function(d) {
+      var isFuture = d.date > todayStr;
+      var rev_a = Number(d.rev_actual)||0;
+      var rev_b = Number(d.rev_budget)||0;
+      var ach   = rev_b>0 ? Math.round(rev_a/rev_b*100) : null;
+      var achCol = ach==null?'#6b7280':ach>=100?'#059669':ach>=90?'#d97706':'#dc2626';
+      var day   = d.date.slice(8);
+      var wd    = d.weekday || WD[new Date(d.date).getDay()];
+      var wdCol = wd==='土'?'#60a5fa':wd==='日'?'#f87171':'#9ca3af';
+      var isToday = d.date === todayStr;
+      var rowStyle = isToday ? 'background:#1e3a5f' : (isFuture ? 'opacity:.45' : '');
+      var cells = '';
+      cells += '<td style="padding:3px 6px;text-align:right;color:#e5e7eb">'+day+'</td>';
+      cells += '<td style="padding:3px 6px;text-align:right;color:'+wdCol+'">'+wd+'</td>';
+      cells += '<td style="padding:3px 6px;text-align:right;color:#e5e7eb">'+(isFuture?'—':fmtM(rev_a))+'</td>';
+      cells += '<td style="padding:3px 6px;text-align:right;color:'+achCol+'">'+(ach!=null?ach+'%':'—')+'</td>';
+      if (isRyo) {
+        var occ = Number(d.occupancy)||0;
+        var adr = Number(d.adr_actual)||0;
+        var pax = Number(d.pax_actual)||0;
+        var stay= Number(d.stay)||0;
+        var food= Number(d.food)||0;
+        var occPct = occ>0 ? Math.round(occ*1000)/10+'%' : '—';
+        cells += '<td style="padding:3px 6px;text-align:right;color:#79c0ff">'+occPct+'</td>';
+        cells += '<td style="padding:3px 6px;text-align:right;color:#e5e7eb">'+(adr>0?'¥'+adr.toLocaleString():'—')+'</td>';
+        cells += '<td style="padding:3px 6px;text-align:right;color:#e5e7eb">'+(pax>0?pax+'人':'—')+'</td>';
+        cells += '<td style="padding:3px 6px;text-align:right;color:#6b7280">'+(stay>0?fmtM(stay):'—')+'</td>';
+        cells += '<td style="padding:3px 6px;text-align:right;color:#6b7280">'+(food>0?fmtM(food):'—')+'</td>';
+      } else {
+        var occ2  = Number(d.occupancy)||0;
+        var unit  = Number(d.unit_actual)||0;
+        var pax2  = Number(d.pax_actual)||0;
+        var occPct2 = occ2>0 ? Math.round(occ2*1000)/10+'%' : '—';
+        cells += '<td style="padding:3px 6px;text-align:right;color:#79c0ff">'+occPct2+'</td>';
+        cells += '<td style="padding:3px 6px;text-align:right;color:#e5e7eb">'+(unit>0?unit+'組':'—')+'</td>';
+        cells += '<td style="padding:3px 6px;text-align:right;color:#e5e7eb">'+(pax2>0?pax2+'人':'—')+'</td>';
+      }
+      rows += '<tr style="'+rowStyle+';border-top:1px solid #1f2937">'+cells+'</tr>';
+    });
+    return '<div style="margin-top:10px;overflow-x:auto">'
+      + '<table style="width:100%;font-size:11px;border-collapse:collapse;border:1px solid #374151">'
+      + '<thead><tr style="background:#1f2937">'+th+'</tr></thead>'
+      + '<tbody>'+rows+'</tbody>'
+      + '</table></div>';
+  }
+
   function renderDailyChart(daily, type) {
     var wrap = document.querySelector('#resort-tab-daily .resort-chart-wrap');
     var canvas = document.getElementById('resort-daily-chart');
@@ -8176,12 +8349,13 @@ document.getElementById('import-btn').addEventListener('click', openPasteDialog)
     if (!daily || !daily.length) {
       ctx.fillStyle = '#9ca3af'; ctx.font = '13px sans-serif';
       ctx.textAlign = 'center';
-      ctx.fillText('日別データなし', W / 2, H / 2);
+      ctx.fillText('日別データなし — GASデータをインポートしてください', W / 2, H / 2);
       return;
     }
-    var budget  = daily.map(function(d) { return Number(d.revenue_budget)  || 0; });
-    var booking = daily.map(function(d) { return Number(d.revenue_booking) || 0; });
-    var actual  = daily.map(function(d) { return Number(d.revenue_actual)  || 0; });
+    // GAS v5 フィールド名: rev_budget / rev_booking / rev_actual
+    var budget  = daily.map(function(d) { return Number(d.rev_budget)  || 0; });
+    var booking = daily.map(function(d) { return Number(d.rev_booking) || 0; });
+    var actual  = daily.map(function(d) { return Number(d.rev_actual)  || 0; });
     var all = budget.concat(booking).concat(actual);
     var maxVal = Math.max.apply(null, all) * 1.12 || 1;
     var n = daily.length;
@@ -8229,7 +8403,9 @@ document.getElementById('import-btn').addEventListener('click', openPasteDialog)
       ctx.fillStyle = line.color; ctx.font = '10px sans-serif'; ctx.textAlign = 'left';
       ctx.fillText(line.lbl, lx + idx * 68 + 22, ly + 4);
     });
+    // ── 売上内訳バー ──
     var bdEl = document.getElementById('resort-breakdown');
+    var bdHtml = '';
     if (type === 'ryokan') {
       var sS = daily.reduce(function(s,d){return s+(Number(d.stay)||0);},0);
       var sF = daily.reduce(function(s,d){return s+(Number(d.food)||0);},0);
@@ -8237,20 +8413,24 @@ document.getElementById('import-btn').addEventListener('click', openPasteDialog)
       var tot = sS + sF + sSh;
       if (tot > 0) {
         var pc = function(v) { return '(' + Math.round(v/tot*100) + '%)'; };
-        bdEl.innerHTML = '<div class="resort-breakdown">'
+        bdHtml += '<div class="resort-breakdown">'
           + '<span class="resort-bd-item"><span style="color:#3b82f6">泊</span>&nbsp;' + fmtM(sS) + '&nbsp;' + pc(sS) + '</span>'
           + '<span class="resort-bd-item"><span style="color:#f59e0b">食</span>&nbsp;' + fmtM(sF) + '&nbsp;' + pc(sF) + '</span>'
           + '<span class="resort-bd-item"><span style="color:#8b5cf6">売店</span>&nbsp;' + fmtM(sSh) + '&nbsp;' + pc(sSh) + '</span>'
           + '</div>';
       }
     } else if (type === 'golf') {
-      var sG = daily.reduce(function(s,d){return s+(Number(d.groups_actual)||0);},0);
-      var sV = daily.reduce(function(s,d){return s+(Number(d.visitors_actual)||0);},0);
-      bdEl.innerHTML = '<div class="resort-breakdown">'
+      var sG = daily.reduce(function(s,d){return s+(Number(d.unit_actual)||0);},0);
+      var sV = daily.reduce(function(s,d){return s+(Number(d.pax_actual)||0);},0);
+      bdHtml += '<div class="resort-breakdown">'
         + '<span class="resort-bd-item"><span style="color:#3b82f6">組数</span>&nbsp;' + sG + '組</span>'
         + '<span class="resort-bd-item"><span style="color:#059669">来場者</span>&nbsp;' + sV + '名</span>'
         + '</div>';
     }
+    // ── 分析ストーリー + 明細テーブル ──
+    bdHtml += buildDailyStory(daily, type);
+    bdHtml += buildDailyTable(daily, type);
+    bdEl.innerHTML = bdHtml;
   }
 
   window._resortInit = function() { if (!_inited) initResort(); };
