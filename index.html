@@ -1263,6 +1263,10 @@ body.public-mode .private-only { display: none !important; }
 .resort-gas-fetch-btn:hover { background:#dbeafe; }
 .resort-gas-fetch-btn:disabled { opacity:0.5; cursor:not-allowed; }
 .resort-gas-cache-info { font-size:10px; color:#9ca3af; }
+.resort-gas-import-btn { background:#f0fdf4; border:1px solid #86efac; border-radius:5px; padding:4px 10px; font-size:11px; cursor:pointer; color:#15803d; font-family:inherit; margin-left:auto; }
+.resort-gas-import-btn:hover { background:#dcfce7; }
+.gas-open-link { display:inline-block; background:#eff6ff; border:1px solid #bfdbfe; border-radius:5px; padding:4px 12px; font-size:12px; color:#1d4ed8; text-decoration:none; font-family:inherit; }
+.gas-open-link:hover { background:#dbeafe; }
 .resort-body { padding: 12px 16px; overflow-y: auto; flex: 1; min-height: 0; }
 .resort-period-label {
   font-size: 11px; color: #2563eb; margin-bottom: 8px;
@@ -2023,6 +2027,7 @@ body.public-mode .private-only { display: none !important; }
     </div>
     <select class="resort-month-sel" id="resort-month-sel"></select>
     <span class="resort-status" id="resort-status"></span>
+    <button class="resort-gas-import-btn" id="resort-gas-import-btn" title="GASデータを取得してgas_data.jsに保存">📥 GASデータ</button>
   </div>
   <div class="resort-body">
     <div id="resort-l1"><div id="resort-l1-table"></div></div>
@@ -2181,6 +2186,7 @@ body.public-mode .private-only { display: none !important; }
 </div>
 
 <script src="resort_table.js"></script>
+<script src="gas_data.js"></script>
 <script src="rialt_data.js"></script>
 <script>
 'use strict';
@@ -7326,6 +7332,186 @@ document.getElementById('import-btn').addEventListener('click', openPasteDialog)
 })();
 })();
 
+// ===== GAS IMPORT =====
+(function() {
+  'use strict';
+  var GAS_IMPORT_URL = 'https://script.google.com/a/macros/retail-ai.jp/s/AKfycbwggw9i2KD2JzxcXSSFayAxAYMT1HUJ5MpLklrY-NRJjiT8hdhNSnhx4Dn8MQbuNiemSg/exec';
+  function openGasOverlay() {
+    document.getElementById('gas-overlay').classList.add('open');
+    document.getElementById('gas-paste-area').value = '';
+    setTimeout(function() { document.getElementById('gas-paste-area').focus(); }, 50);
+  }
+  function closeGasOverlay() {
+    document.getElementById('gas-overlay').classList.remove('open');
+  }
+
+  // IndexedDB for gas_data.js handle
+  function openGasDB() {
+    return new Promise(function(resolve, reject) {
+      var req = indexedDB.open('dashboard_gas_handle_v1', 1);
+      req.onupgradeneeded = function(e) { e.target.result.createObjectStore('handles'); };
+      req.onsuccess = function(e) { resolve(e.target.result); };
+      req.onerror = function() { reject(new Error('DB open failed')); };
+    });
+  }
+  async function saveGasHandle(handle) {
+    try {
+      var db = await openGasDB();
+      db.transaction('handles', 'readwrite').objectStore('handles').put(handle, 'gasjs');
+    } catch(e) {}
+  }
+  async function loadGasHandle() {
+    try {
+      var db = await openGasDB();
+      return new Promise(function(resolve) {
+        var req = db.transaction('handles', 'readonly').objectStore('handles').get('gasjs');
+        req.onsuccess = function(e) { resolve(e.target.result || null); };
+        req.onerror = function() { resolve(null); };
+      });
+    } catch(e) { return null; }
+  }
+  async function getGasHandle() {
+    var handle = await loadGasHandle();
+    if (handle) {
+      try {
+        var perm = await handle.queryPermission({ mode: 'readwrite' });
+        if (perm !== 'granted') perm = await handle.requestPermission({ mode: 'readwrite' });
+        if (perm === 'granted') return handle;
+      } catch(e) {}
+    }
+    if (!window.showOpenFilePicker) {
+      showToast('ファイル選択APIが利用できません（Chrome/Edgeをお試しください）', 'error');
+      return null;
+    }
+    try {
+      var picks = await window.showOpenFilePicker({
+        types: [{ description: 'gas_data.js', accept: { 'application/javascript': ['.js'] } }],
+        multiple: false
+      });
+      handle = picks[0];
+      await saveGasHandle(handle);
+      return handle;
+    } catch(e) { return null; }
+  }
+
+  // Parse & transform GAS JSON → window.GAS_MONTHLY entry
+  function parseGasJson(text) {
+    var json;
+    // Strip JSONP wrapper: test({...})
+    var m = text.trim().match(/^[\w.]+\s*\(([\s\S]+)\)\s*;?\s*$/);
+    if (m) { json = JSON.parse(m[1]); }
+    else { json = JSON.parse(text.trim()); }
+
+    var month = json.month; // "YYYY-MM"
+    if (!month || !/^\d{4}-\d{2}$/.test(month)) throw new Error('monthフィールドが不正です: ' + month);
+
+    var result = {};
+    // Ryokan: rooms_actual=宿泊室数, stay=宿泊売上
+    (json.ryokan || []).forEach(function(fac) {
+      var mo = fac.monthly || {};
+      var pax_a = (mo.rooms_actual > 0) ? mo.rooms_actual : null;
+      var pax_b = (mo.rooms_budget > 0) ? mo.rooms_budget : null;
+      var stay  = mo.stay || 0;
+      var adr_a = (stay > 0 && pax_a) ? Math.round(stay / pax_a) : null;
+      if (pax_a != null || pax_b != null || adr_a != null) {
+        result[fac.facility] = { pax_a: pax_a, pax_b: pax_b, adr_a: adr_a };
+      }
+    });
+    // Golf: already has PL data; supplement visitors if available
+    (json.golf || []).forEach(function(fac) {
+      if (fac.error) return;
+      var mo = fac.monthly || {};
+      var pax_a = mo.visitors_actual || mo.rooms_actual || null;
+      if (pax_a > 0) result[fac.facility] = { pax_a: pax_a };
+    });
+
+    return { month: month, data: result };
+  }
+
+  // Build gas_data.js block
+  function buildGasBlock(month, data) {
+    var now = new Date();
+    var ts = now.getFullYear() + '/'
+      + String(now.getMonth()+1).padStart(2,'0') + '/'
+      + String(now.getDate()).padStart(2,'0') + ' '
+      + String(now.getHours()).padStart(2,'0') + ':'
+      + String(now.getMinutes()).padStart(2,'0');
+    return (
+      '// [GAS:' + month + ':' + ts + ':START]\n'
+      + 'window.GAS_MONTHLY = window.GAS_MONTHLY || {};\n'
+      + 'Object.assign(window.GAS_MONTHLY["' + month + '"] = window.GAS_MONTHLY["' + month + '"] || {}, '
+      + JSON.stringify(data, null, 2) + ');\n'
+      + '// [GAS:' + month + ':END]\n'
+    );
+  }
+
+  window._processGasImport = async function(text) {
+    var parsed;
+    try { parsed = parseGasJson(text); }
+    catch(e) { showToast('JSONパースエラー: ' + e.message, 'error'); return; }
+
+    if (!Object.keys(parsed.data).length) {
+      showToast(parsed.month + ' のデータが空です（全施設0）', 'error'); return;
+    }
+
+    showToast(parsed.month + ' を処理中...', 'info');
+    var fileHandle = await getGasHandle();
+    if (!fileHandle) { showToast('キャンセルされました', 'error'); return; }
+
+    // Read existing content
+    var currentContent = 'window.GAS_MONTHLY = window.GAS_MONTHLY || {};\n';
+    try {
+      var file = await fileHandle.getFile();
+      currentContent = await file.text();
+    } catch(e) { /* new file or empty */ }
+
+    // Remove existing block for this month
+    var ek = parsed.month.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    var blockRe = new RegExp(
+      '// \\[GAS:' + ek + ':[^\\]]*:START\\][\\s\\S]*?// \\[GAS:' + ek + ':END\\]\\n?', 'g');
+    currentContent = currentContent.replace(blockRe, '');
+
+    // Append new block
+    var newBlock = buildGasBlock(parsed.month, parsed.data);
+    var newContent = currentContent.trimEnd() + '\n' + newBlock;
+
+    try {
+      var writable = await fileHandle.createWritable();
+      await writable.write(newContent);
+      await writable.close();
+    } catch(e) { showToast('書き込みに失敗: ' + e.message, 'error'); return; }
+
+    // Update in-memory
+    window.GAS_MONTHLY = window.GAS_MONTHLY || {};
+    window.GAS_MONTHLY[parsed.month] = Object.assign(
+      window.GAS_MONTHLY[parsed.month] || {}, parsed.data);
+
+    showToast(parsed.month + ' を gas_data.js に保存しました', 'success');
+    setTimeout(function() { location.reload(); }, 2000);
+  };
+
+  // Event listeners
+  document.addEventListener('DOMContentLoaded', function() {
+    var importBtn = document.getElementById('resort-gas-import-btn');
+    var overlay   = document.getElementById('gas-overlay');
+    var closeBtn  = document.getElementById('gas-close-btn');
+    var cancelBtn = document.getElementById('gas-cancel-btn');
+    var execBtn   = document.getElementById('gas-exec-btn');
+    if (importBtn) importBtn.addEventListener('click', openGasOverlay);
+    if (closeBtn)  closeBtn.addEventListener('click', closeGasOverlay);
+    if (cancelBtn) cancelBtn.addEventListener('click', closeGasOverlay);
+    if (overlay)   overlay.addEventListener('click', function(e) {
+      if (e.target === overlay) closeGasOverlay();
+    });
+    if (execBtn) execBtn.addEventListener('click', function() {
+      var text = document.getElementById('gas-paste-area').value;
+      if (!text.trim()) { showToast('テキストを貼り付けてください', 'error'); return; }
+      closeGasOverlay();
+      window._processGasImport(text);
+    });
+  });
+})();
+
 // ===== RESORT MODULE =====
 (function() {
   'use strict';
@@ -7347,6 +7533,23 @@ document.getElementById('import-btn').addEventListener('click', openPasteDialog)
 
   var _inited = false, _currentMonth = null, _viewMode = 'single', _currentFac = null;
   var _gasCache = {};
+
+  // GAS施設名取得（PL名 → GAS名）
+  function facGasName(plName) {
+    var f = RESORT_FACS.find(function(x) { return x.pl === plName; });
+    return f ? f.gas : plName;
+  }
+  // GAS月次データでnull指標を補完
+  function suppFromGas(facPlName, ym, ret) {
+    if (!window.GAS_MONTHLY) return ret;
+    var gn = facGasName(facPlName);
+    var gm = window.GAS_MONTHLY[ym] && window.GAS_MONTHLY[ym][gn];
+    if (!gm) return ret;
+    if (ret.pax_a == null && gm.pax_a != null) ret.pax_a = gm.pax_a;
+    if (ret.pax_b == null && gm.pax_b != null) ret.pax_b = gm.pax_b;
+    if (ret.adr_a == null && gm.adr_a != null) ret.adr_a = gm.adr_a;
+    return ret;
+  }
 
   // ── Helpers ──────────────────────────────────────────────────────
   function fmtM(v) {
@@ -7420,7 +7623,7 @@ document.getElementById('import-btn').addEventListener('click', openPasteDialog)
         rows.forEach(function(r) { var v = nv(r[k]); if (v != null) { t += v; cnt++; } });
         return cnt ? t / cnt : null;
       }
-      return {
+      var ytdRet = {
         rev_a: s('売上高合計_実績'), rev_b: s('売上高合計_予算'),
         gp_a: s('売上総利益_実績'),
         op_a: s('営業利益_実績'), op_b: s('営業利益_予算'),
@@ -7431,10 +7634,27 @@ document.getElementById('import-btn').addEventListener('click', openPasteDialog)
         pax_a: s('来場客数_実績'), pax_b: s('来場客数_予算'),
         spd_a: avg('客単価_実績'), spd_b: avg('客単価_予算')
       };
+      // YTD: GAS月次合計で補完
+      if (window.GAS_MONTHLY) {
+        var gn2 = facGasName(facName);
+        var gpa = 0, gpb = 0, gad = 0, gadCnt = 0;
+        months.forEach(function(mo) {
+          var gm = window.GAS_MONTHLY[mo] && window.GAS_MONTHLY[mo][gn2];
+          if (gm) {
+            if (gm.pax_a != null) gpa += gm.pax_a;
+            if (gm.pax_b != null) gpb += gm.pax_b;
+            if (gm.adr_a != null) { gad += gm.adr_a; gadCnt++; }
+          }
+        });
+        if (ytdRet.pax_a == null && gpa > 0) ytdRet.pax_a = gpa;
+        if (ytdRet.pax_b == null && gpb > 0) ytdRet.pax_b = gpb;
+        if (ytdRet.adr_a == null && gadCnt > 0) ytdRet.adr_a = Math.round(gad / gadCnt);
+      }
+      return ytdRet;
     }
     var d = getPlRow(facName, ym);
     if (!d) return null;
-    return {
+    var ret = {
       rev_a: nv(d['売上高合計_実績']), rev_b: nv(d['売上高合計_予算']),
       gp_a: nv(d['売上総利益_実績']),
       op_a: nv(d['営業利益_実績']), op_b: nv(d['営業利益_予算']),
@@ -7445,6 +7665,7 @@ document.getElementById('import-btn').addEventListener('click', openPasteDialog)
       pax_a: nv(d['来場客数_実績']), pax_b: nv(d['来場客数_予算']),
       spd_a: nv(d['客単価_実績']), spd_b: nv(d['客単価_予算'])
     };
+    return suppFromGas(facName, ym, ret);
   }
   function calcRow(fac, ym, mode) {
     var m = getM(fac.pl, ym, mode);
@@ -8009,5 +8230,24 @@ document.getElementById('import-btn').addEventListener('click', openPasteDialog)
 
 </script>
   <div id="sl-tip"></div>
+
+<!-- GAS IMPORT DIALOG -->
+<div class="paste-overlay" id="gas-overlay">
+  <div class="paste-box">
+    <div class="modal-head">
+      <span class="modal-head-title">// GAS_DATA_IMPORT</span>
+      <button class="modal-close" id="gas-close-btn">✕</button>
+    </div>
+    <p class="paste-hint">次のリンクを開いて表示されたJSONをコピー→下のエリアに貼り付けてください</p>
+    <div style="margin-bottom:8px">
+      <a href="https://script.google.com/a/macros/retail-ai.jp/s/AKfycbwggw9i2KD2JzxcXSSFayAxAYMT1HUJ5MpLklrY-NRJjiT8hdhNSnhx4Dn8MQbuNiemSg/exec" target="_blank" class="gas-open-link">📡 GASを開く ↗</a>
+    </div>
+    <textarea class="paste-area" id="gas-paste-area" placeholder="test({...}) または {...}"></textarea>
+    <div class="paste-foot">
+      <button class="btn-reset" id="gas-cancel-btn">キャンセル</button>
+      <button class="btn-paste-exec" id="gas-exec-btn">↓ gas_data.jsに保存</button>
+    </div>
+  </div>
+</div>
 </body>
 </html>
