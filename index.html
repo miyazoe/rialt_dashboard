@@ -2043,7 +2043,10 @@ body.public-mode .private-only { display: none !important; }
           <button class="resort-gas-fetch-btn" id="resort-gas-fetch-btn" style="display:none">📡 日別データを取得</button>
           <span class="resort-gas-cache-info" id="resort-gas-cache-info"></span>
         </div>
-        <div class="resort-chart-wrap"><canvas id="resort-daily-chart"></canvas></div>
+        <div id="resort-daily-top" style="display:flex;gap:12px;align-items:flex-start;margin-bottom:0">
+          <div id="resort-daily-story" style="flex:1;min-width:0"></div>
+          <div class="resort-chart-wrap" style="flex:2;min-width:0"><canvas id="resort-daily-chart"></canvas></div>
+        </div>
         <div id="resort-breakdown"></div>
       </div>
       <div id="resort-tab-monthly" style="display:none">
@@ -8316,8 +8319,8 @@ document.getElementById('import-btn').addEventListener('click', openPasteDialog)
     var WD = ['日','月','火','水','木','金','土'];
     var isRyo = type === 'ryokan';
     var hdrs = isRyo
-      ? ['日','曜','実績','予算比','稼働率','ADR','宿泊客','泊売上','食売上']
-      : ['日','曜','実績','予算比','稼働率','組数','来場者'];
+      ? ['日','曜','実績','予算','予算比','予約','稼働率','ADR','RevPAR','宿泊客','客単価','泊売上','食売上','売店']
+      : ['日','曜','実績','予算','予算比','予約','稼働率','組数','来場者','客単価'];
     var th = '<tr>' + hdrs.map(function(h, i) {
       var align = i < 2 ? 'center' : 'right';
       return '<th style="padding:6px 10px;text-align:'+align+';background:#f8fafc;color:#6b7280;font-weight:600;font-size:11px;white-space:nowrap;border-bottom:2px solid #e2e8f0;border-right:1px solid #f3f4f6">'+h+'</th>';
@@ -8347,25 +8350,39 @@ document.getElementById('import-btn').addEventListener('click', openPasteDialog)
       cells += tdc(day, 'color:'+(isToday?'#2563eb':'#374151')+';'+(isToday?'font-weight:700;':''));
       cells += tdc(wd, 'color:'+wdCol+';font-weight:600');
       cells += td(isFuture ? '—' : fmtYen(rev_a), 'color:#1f2937;font-weight:600');
-      cells += td(ach!=null ? ach+'%' : '—', 'color:'+achCol+';'+achBold);
       if (isRyo) {
         var occ  = Number(d.occupancy)||0;
         var adr  = Number(d.adr_actual)||0;
         var pax  = Number(d.pax_actual)||0;
         var stay = Number(d.stay)||0;
         var food = Number(d.food)||0;
+        var shop = Number(d.shop)||0;
+        var rvp  = adr>0 && occ>0 ? Math.round(adr * occ) : 0;
+        var spd  = pax>0 && rev_a>0 ? Math.round(rev_a/pax) : 0;
+        cells += td(isFuture ? '—' : fmtYen(rev_b), 'color:#6b7280');
+        cells += td(ach!=null ? ach+'%' : '—', 'color:'+achCol+';'+achBold);
+        cells += td(isFuture ? '—' : (Number(d.rev_booking)||0)>0 ? fmtYen(Number(d.rev_booking)) : '—', 'color:#f59e0b');
         cells += td(occ>0 ? Math.round(occ*1000)/10+'%' : '—', 'color:#2563eb');
         cells += td(adr>0 ? '¥'+Math.round(adr).toLocaleString() : '—', 'color:#374151');
+        cells += td(rvp>0 ? '¥'+rvp.toLocaleString() : '—', 'color:#7c3aed');
         cells += td(pax>0 ? pax+'人' : '—', 'color:#6b7280');
+        cells += td(spd>0 ? '¥'+spd.toLocaleString() : '—', 'color:#0891b2');
         cells += td(stay>0 ? fmtYen(stay) : '—', 'color:#9ca3af');
         cells += td(food>0 ? fmtYen(food) : '—', 'color:#9ca3af');
+        cells += td(shop>0 ? fmtYen(shop) : '—', 'color:#9ca3af');
       } else {
         var occ2  = Number(d.occupancy)||0;
         var unit  = Number(d.unit_actual)||0;
         var pax2  = Number(d.pax_actual)||0;
+        var bk2   = Number(d.rev_booking)||0;
+        var spd2  = unit>0 && rev_a>0 ? Math.round(rev_a/unit) : 0;
+        cells += td(isFuture ? '—' : fmtYen(rev_b), 'color:#6b7280');
+        cells += td(ach!=null ? ach+'%' : '—', 'color:'+achCol+';'+achBold);
+        cells += td(isFuture ? '—' : bk2>0 ? fmtYen(bk2) : '—', 'color:#f59e0b');
         cells += td(occ2>0 ? Math.round(occ2*1000)/10+'%' : '—', 'color:#2563eb');
         cells += td(unit>0 ? unit+'組' : '—', 'color:#374151');
         cells += td(pax2>0 ? pax2+'名' : '—', 'color:#6b7280');
+        cells += td(spd2>0 ? '¥'+spd2.toLocaleString() : '—', 'color:#0891b2');
       }
       rows += '<tr style="'+rowStyle+'">'+cells+'</tr>';
     });
@@ -8493,9 +8510,9 @@ document.getElementById('import-btn').addEventListener('click', openPasteDialog)
         + '<span class="resort-bd-item"><span style="color:#16a34a">来場者</span>&nbsp;'+sV+'名</span>'
         + '</div>';
     }
-    bdHtml += buildDailyStory(daily, type);
-    bdHtml += buildDailyTable(daily, type);
-    bdEl.innerHTML = bdHtml;
+    var storyEl = document.getElementById('resort-daily-story');
+    if (storyEl) storyEl.innerHTML = buildDailyStory(daily, type);
+    bdEl.innerHTML = bdHtml + buildDailyTable(daily, type);
   }
 
   window._resortInit = function() { if (!_inited) initResort(); };
