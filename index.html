@@ -2027,7 +2027,7 @@ body.public-mode .private-only { display: none !important; }
     </div>
     <select class="resort-month-sel" id="resort-month-sel"></select>
     <span class="resort-status" id="resort-status"></span>
-    <button class="resort-gas-import-btn" id="resort-gas-import-btn" title="GASデータを取得してgas_data.jsに保存">📥 GASデータ</button>
+    <button class="resort-gas-import-btn private-only" id="resort-gas-import-btn" title="GASデータを取得してgas_data.jsに保存">📥 GASデータ</button>
   </div>
   <div class="resort-body">
     <div id="resort-l1"><div id="resort-l1-table"></div></div>
@@ -7394,38 +7394,45 @@ document.getElementById('import-btn').addEventListener('click', openPasteDialog)
     } catch(e) { return null; }
   }
 
-  // Parse & transform GAS JSON → window.GAS_MONTHLY entry
-  function parseGasJson(text) {
-    var json;
-    // Strip JSONP wrapper: test({...})
+  // ── GAS JSON 解析 ― 単月 / 全期間両対応 ──
+  function stripJsonp(text) {
     var m = text.trim().match(/^[\w.]+\s*\(([\s\S]+)\)\s*;?\s*$/);
-    if (m) { json = JSON.parse(m[1]); }
-    else { json = JSON.parse(text.trim()); }
-
-    var month = json.month; // "YYYY-MM"
-    if (!month || !/^\d{4}-\d{2}$/.test(month)) throw new Error('monthフィールドが不正です: ' + month);
-
+    return JSON.parse(m ? m[1] : text.trim());
+  }
+  function parseOnePeriod(json) {
+    var month = json.month;
+    if (!month || !/^\d{4}-\d{2}$/.test(month)) return null;
     var result = {};
-    // Ryokan: rooms_actual=宿泊室数, stay=宿泊売上
     (json.ryokan || []).forEach(function(fac) {
       var mo = fac.monthly || {};
-      var pax_a = (mo.rooms_actual > 0) ? mo.rooms_actual : null;
-      var pax_b = (mo.rooms_budget > 0) ? mo.rooms_budget : null;
+      var pax_a = mo.rooms_actual > 0 ? mo.rooms_actual : null;
+      var pax_b = mo.rooms_budget > 0 ? mo.rooms_budget : null;
       var stay  = mo.stay || 0;
       var adr_a = (stay > 0 && pax_a) ? Math.round(stay / pax_a) : null;
-      if (pax_a != null || pax_b != null || adr_a != null) {
+      if (pax_a != null || pax_b != null || adr_a != null)
         result[fac.facility] = { pax_a: pax_a, pax_b: pax_b, adr_a: adr_a };
-      }
     });
-    // Golf: already has PL data; supplement visitors if available
     (json.golf || []).forEach(function(fac) {
       if (fac.error) return;
       var mo = fac.monthly || {};
-      var pax_a = mo.visitors_actual || mo.rooms_actual || null;
-      if (pax_a > 0) result[fac.facility] = { pax_a: pax_a };
+      var pax_a = (mo.visitors_actual > 0) ? mo.visitors_actual : null;
+      if (pax_a) result[fac.facility] = { pax_a: pax_a };
     });
-
     return { month: month, data: result };
+  }
+  function parseGasJson(text) {
+    var json = stripJsonp(text);
+    if (json.all && Array.isArray(json.periods)) {
+      // 全期間モード: { all: true, periods: [...] }
+      return { type: 'all', periods: json.periods.map(parseOnePeriod).filter(Boolean) };
+    } else if (json.month) {
+      // 単月モード: { month: 'YYYY-MM', ryokan: [...] }
+      var p = parseOnePeriod(json);
+      if (!p) throw new Error('monthフィールドが不正です: ' + json.month);
+      return { type: 'single', periods: [p] };
+    } else {
+      throw new Error('不明なフォーマットです');
+    }
   }
 
   // Build gas_data.js block
@@ -7450,30 +7457,34 @@ document.getElementById('import-btn').addEventListener('click', openPasteDialog)
     try { parsed = parseGasJson(text); }
     catch(e) { showToast('JSONパースエラー: ' + e.message, 'error'); return; }
 
-    if (!Object.keys(parsed.data).length) {
-      showToast(parsed.month + ' のデータが空です（全施設0）', 'error'); return;
+    // データがある月のみ抽出（全施設0の月はスキップ）
+    var validPeriods = parsed.periods.filter(function(p) {
+      return Object.keys(p.data).length > 0;
+    });
+    var skipped = parsed.periods.length - validPeriods.length;
+    if (!validPeriods.length) {
+      showToast('有効なデータがありません（全施設0）', 'error'); return;
     }
 
-    showToast(parsed.month + ' を処理中...', 'info');
+    showToast(validPeriods.length + 'ヶ月分を処理中...', 'info');
     var fileHandle = await getGasHandle();
     if (!fileHandle) { showToast('キャンセルされました', 'error'); return; }
 
-    // Read existing content
     var currentContent = 'window.GAS_MONTHLY = window.GAS_MONTHLY || {};\n';
     try {
       var file = await fileHandle.getFile();
       currentContent = await file.text();
-    } catch(e) { /* new file or empty */ }
+    } catch(e) {}
 
-    // Remove existing block for this month
-    var ek = parsed.month.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-    var blockRe = new RegExp(
-      '// \\[GAS:' + ek + ':[^\\]]*:START\\][\\s\\S]*?// \\[GAS:' + ek + ':END\\]\\n?', 'g');
-    currentContent = currentContent.replace(blockRe, '');
+    // 対象月の既存ブロックを削除
+    validPeriods.forEach(function(p) {
+      var ek = p.month.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      var re = new RegExp('// \\[GAS:' + ek + ':[^\\]]*:START\\][\\s\\S]*?// \\[GAS:' + ek + ':END\\]\\n?', 'g');
+      currentContent = currentContent.replace(re, '');
+    });
 
-    // Append new block
-    var newBlock = buildGasBlock(parsed.month, parsed.data);
-    var newContent = currentContent.trimEnd() + '\n' + newBlock;
+    var allBlocks = validPeriods.map(function(p) { return buildGasBlock(p.month, p.data); }).join('\n');
+    var newContent = currentContent.trimEnd() + '\n' + allBlocks;
 
     try {
       var writable = await fileHandle.createWritable();
@@ -7481,12 +7492,14 @@ document.getElementById('import-btn').addEventListener('click', openPasteDialog)
       await writable.close();
     } catch(e) { showToast('書き込みに失敗: ' + e.message, 'error'); return; }
 
-    // Update in-memory
     window.GAS_MONTHLY = window.GAS_MONTHLY || {};
-    window.GAS_MONTHLY[parsed.month] = Object.assign(
-      window.GAS_MONTHLY[parsed.month] || {}, parsed.data);
+    validPeriods.forEach(function(p) {
+      window.GAS_MONTHLY[p.month] = Object.assign(window.GAS_MONTHLY[p.month] || {}, p.data);
+    });
 
-    showToast(parsed.month + ' を gas_data.js に保存しました', 'success');
+    var msg = validPeriods.length + 'ヶ月分を gas_data.js に保存しました';
+    if (skipped > 0) msg += '（' + skipped + 'ヶ月はデータなしでスキップ）';
+    showToast(msg, 'success');
     setTimeout(function() { location.reload(); }, 2000);
   };
 
@@ -8240,7 +8253,7 @@ document.getElementById('import-btn').addEventListener('click', openPasteDialog)
     </div>
     <p class="paste-hint">次のリンクを開いて表示されたJSONをコピー→下のエリアに貼り付けてください</p>
     <div style="margin-bottom:8px">
-      <a href="https://script.google.com/a/macros/retail-ai.jp/s/AKfycbwggw9i2KD2JzxcXSSFayAxAYMT1HUJ5MpLklrY-NRJjiT8hdhNSnhx4Dn8MQbuNiemSg/exec" target="_blank" class="gas-open-link">📡 GASを開く ↗</a>
+      <a href="https://script.google.com/a/macros/retail-ai.jp/s/AKfycbwggw9i2KD2JzxcXSSFayAxAYMT1HUJ5MpLklrY-NRJjiT8hdhNSnhx4Dn8MQbuNiemSg/exec?all=1" target="_blank" class="gas-open-link">📡 GASを開く ↗</a>
     </div>
     <textarea class="paste-area" id="gas-paste-area" placeholder="test({...}) または {...}"></textarea>
     <div class="paste-foot">

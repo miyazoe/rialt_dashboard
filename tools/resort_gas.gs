@@ -9,8 +9,9 @@
 //   4. デプロイURLをダッシュボードの RESORT_GAS_URL に設定
 //
 // エンドポイント:
-//   GET {URL}?month=2025-07           → 全施設の当月データ
-//   GET {URL}?month=2025-07&facility=宮若虎の湯  → 1施設のみ
+//   GET {URL}?all=1                          → 全期間・全施設データ（月次集計のみ）
+//   GET {URL}?month=2025-07                  → 全施設の当月データ（日別含む）
+//   GET {URL}?month=2025-07&facility=宮若虎の湯 → 1施設のみ
 // ============================================================
 
 // ── 施設マスタ ──────────────────────────────────────────────
@@ -33,9 +34,45 @@ const FACILITIES = [
 // ── メインハンドラ ────────────────────────────────────────────
 function doGet(e) {
   try {
-    const month      = (e.parameter.month    || getCurrentMonth()); // "2025-07"
-    const filterName = (e.parameter.facility || '');               // 施設名（省略可）
+    const cb = (e.parameter.callback || '').replace(/[^a-zA-Z0-9_]/g, '');
 
+    // ── all=1: 全期間まとめて返す（月次集計のみ・日別配列なし）──
+    if (e.parameter.all) {
+      const result = { all: true, generated: new Date().toISOString(), periods: [] };
+      // 施設ごとにスプレッドシートを1回だけ開き、全シートを走査
+      const periodMap = {};
+      FACILITIES.forEach(facility => {
+        try {
+          const ss = SpreadsheetApp.openById(facility.id);
+          ss.getSheets().forEach(sheet => {
+            const m = sheet.getName().match(/^(\d{4})\.(\d{1,2})$/);
+            if (!m) return;
+            const month = m[1] + '-' + m[2].padStart(2, '0');
+            if (!periodMap[month]) periodMap[month] = { month, ryokan: [], golf: [] };
+            try {
+              // 月次集計のみ取得（日別配列は返さない）
+              const data = facility.type === 'ryokan'
+                ? parseRyokan(sheet, facility.name)
+                : parseGolf(sheet, facility.name);
+              periodMap[month][facility.type].push({
+                facility: data.facility,
+                type:     data.type,
+                monthly:  data.monthly,   // daily は含めない
+              });
+            } catch(err) {
+              pushError(periodMap[month], facility, err.message);
+            }
+          });
+        } catch(err) { /* スプレッドシートにアクセスできない場合はスキップ */ }
+      });
+      // 降順ソートして配列化
+      result.periods = Object.values(periodMap).sort((a, b) => b.month.localeCompare(a.month));
+      return cb ? jsonpResponse(result, cb) : jsonResponse(result);
+    }
+
+    // ── 通常: 指定月（省略時は当月）──
+    const month      = (e.parameter.month    || getCurrentMonth());
+    const filterName = (e.parameter.facility || '');
     const targets = filterName
       ? FACILITIES.filter(f => f.name === filterName)
       : FACILITIES;
@@ -69,7 +106,6 @@ function doGet(e) {
       }
     });
 
-    const cb = (e.parameter.callback || '').replace(/[^a-zA-Z0-9_]/g, '');
     return cb ? jsonpResponse(result, cb) : jsonResponse(result);
 
   } catch (outerErr) {
