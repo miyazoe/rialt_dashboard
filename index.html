@@ -2040,7 +2040,7 @@ body.public-mode .private-only { display: none !important; }
       </div>
       <div id="resort-tab-daily">
         <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
-          <button class="resort-gas-fetch-btn" id="resort-gas-fetch-btn">📡 日別データを取得</button>
+          <button class="resort-gas-fetch-btn" id="resort-gas-fetch-btn" style="display:none">📡 日別データを取得</button>
           <span class="resort-gas-cache-info" id="resort-gas-cache-info"></span>
         </div>
         <div class="resort-chart-wrap"><canvas id="resort-daily-chart"></canvas></div>
@@ -7459,8 +7459,8 @@ document.getElementById('import-btn').addEventListener('click', openPasteDialog)
   }
 
   window._processGasImport = async function(text) {
-    var parsed;
-    try { parsed = parseGasJson(text); }
+    var parsed, rawJson;
+    try { rawJson = stripJsonp(text); parsed = parseGasJson(text); }
     catch(e) { showToast('JSONパースエラー: ' + e.message, 'error'); return; }
 
     // データがある月のみ抽出（全施設0の月はスキップ）
@@ -7501,6 +7501,23 @@ document.getElementById('import-btn').addEventListener('click', openPasteDialog)
     window.GAS_MONTHLY = window.GAS_MONTHLY || {};
     validPeriods.forEach(function(p) {
       window.GAS_MONTHLY[p.month] = Object.assign(window.GAS_MONTHLY[p.month] || {}, p.data);
+    });
+
+    // 日別データもlocalStorageに保存（loadGasが参照するキーに）
+    var rawPeriods = rawJson.all ? rawJson.periods : [rawJson];
+    rawPeriods.forEach(function(rawP) {
+      if (!rawP || !rawP.month) return;
+      var dailyData = {
+        ryokan: (rawP.ryokan || []).map(function(f) {
+          return { facility: f.facility, daily: f.daily || [] };
+        }),
+        golf: (rawP.golf || []).map(function(f) {
+          return { facility: f.facility, daily: f.daily || [] };
+        })
+      };
+      var hasDaily = dailyData.ryokan.some(function(f) { return f.daily.length > 0; })
+                  || dailyData.golf.some(function(f) { return f.daily.length > 0; });
+      if (hasDaily) _saveGasToLS(rawP.month, dailyData);
     });
 
     var msg = validPeriods.length + 'ヶ月分を gas_data.js に保存しました';
@@ -7958,7 +7975,7 @@ document.getElementById('import-btn').addEventListener('click', openPasteDialog)
       if (_cacheInfo) _cacheInfo.textContent = '最終取得: ' + _ts;
       document.getElementById('resort-status').textContent = '';
     } else {
-      if (_cacheInfo) _cacheInfo.textContent = 'キャッシュなし — 「日別データを取得」を押してください';
+      if (_cacheInfo) _cacheInfo.textContent = '日別データなし — GASデータをインポートしてください';
       document.getElementById('resort-status').textContent = '';
     }
     loadGas(ym, function(gasData) {
@@ -7969,7 +7986,7 @@ document.getElementById('import-btn').addEventListener('click', openPasteDialog)
       setTimeout(function() { renderDailyChart(fac ? (fac.daily || []) : [], facObj.type); }, 60);
     }, function() {
       document.getElementById('resort-status').textContent = '';
-      if (_cacheInfo && !_ts) _cacheInfo.textContent = '取得失敗—「日別データを取得」を押してください';
+      if (_cacheInfo && !_ts) _cacheInfo.textContent = '日別データなし — GASデータをインポートしてください';
       setTimeout(function() { renderDailyChart([], facObj.type); }, 60);
     });
   }
