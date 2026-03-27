@@ -7412,20 +7412,29 @@ document.getElementById('import-btn').addEventListener('click', openPasteDialog)
       var pax_a = mo.pax_actual  > 0 ? mo.pax_actual  : null;
       var pax_b = mo.pax_budget  > 0 ? mo.pax_budget  : null;
       var adr_a = mo.adr         > 0 ? mo.adr         : null;
+      var adr_b = mo.adr_b       > 0 ? mo.adr_b       : null;
       var occ_a = mo.occupancy   > 0 ? mo.occupancy / 100 : null;  // % → 小数
+      var occ_b = mo.occ_b       != null ? (mo.occ_b > 1 ? mo.occ_b / 100 : mo.occ_b) : null;
       var rvp_a = mo.revpar      > 0 ? mo.revpar      : null;
+      var rvp_b = mo.rvp_b       > 0 ? mo.rvp_b       : null;
       var spd_a = (mo.pax_actual > 0 && mo.rev_actual > 0) ? Math.round(mo.rev_actual / mo.pax_actual) : null;
+      var spd_b = mo.spd_b       > 0 ? mo.spd_b       : null;
       if (pax_a != null || adr_a != null || occ_a != null)
-        result[fac.facility] = { pax_a: pax_a, pax_b: pax_b, adr_a: adr_a, occ_a: occ_a, rvp_a: rvp_a, spd_a: spd_a };
+        result[fac.facility] = { pax_a: pax_a, pax_b: pax_b, adr_a: adr_a, adr_b: adr_b, occ_a: occ_a, occ_b: occ_b, rvp_a: rvp_a, rvp_b: rvp_b, spd_a: spd_a, spd_b: spd_b };
     });
     (json.golf || []).forEach(function(fac) {
       if (fac.error) return;
       var mo = fac.monthly || {};
       var pax_a = mo.pax_actual  > 0 ? mo.pax_actual  : null;
+      var pax_b = mo.pax_budget  > 0 ? mo.pax_budget  : null;
+      var unit_a = mo.unit_actual > 0 ? mo.unit_actual : null;
+      var unit_b = mo.unit_b     > 0 ? mo.unit_b      : null;
       var occ_a = mo.occupancy   > 0 ? mo.occupancy / 100 : null;  // % → 小数
+      var occ_b = mo.occ_b       != null ? (mo.occ_b > 1 ? mo.occ_b / 100 : mo.occ_b) : null;
       var spd_a = (mo.pax_actual > 0 && mo.rev_actual > 0) ? Math.round(mo.rev_actual / mo.pax_actual) : null;
+      var spd_b = mo.spd_b       > 0 ? mo.spd_b       : null;
       if (pax_a != null || occ_a != null)
-        result[fac.facility] = { pax_a: pax_a, occ_a: occ_a, spd_a: spd_a };
+        result[fac.facility] = { pax_a: pax_a, pax_b: pax_b, unit_a: unit_a, unit_b: unit_b, occ_a: occ_a, occ_b: occ_b, spd_a: spd_a, spd_b: spd_b };
     });
     return { month: month, data: result };
   }
@@ -7558,15 +7567,15 @@ document.getElementById('import-btn').addEventListener('click', openPasteDialog)
 
   // 実施設マスタ（合計・本社除く）
   var RESORT_FACS = [
-    { pl: '宮若虎の湯',   gas: '宮若虎の湯',   type: 'ryokan' },
-    { pl: '古民家煉り',   gas: '古民家煉り',   type: 'ryokan' },
-    { pl: 'Tsmart',       gas: 'Tsmart',        type: 'ryokan' },
     { pl: '九重久織亭',   gas: '九重久織亭',   type: 'ryokan' },
-    { pl: '九重虎の湯',   gas: '九重虎乃湯',   type: 'ryokan' },
-    { pl: '仙石原久の葉', gas: '仙石原久の葉', type: 'ryokan' },
+    { pl: 'ロッジ虎の湯', gas: '九重虎乃湯',   type: 'ryokan' },
+    { pl: '宮若虎の湯',   gas: '宮若虎の湯',   type: 'ryokan' },
     { pl: '小塚久の葉',   gas: '小塚久の葉',   type: 'ryokan' },
-    { pl: '大分コース',   gas: '大分コース',   type: 'golf' },
+    { pl: '仙石原久の葉', gas: '仙石原久の葉', type: 'ryokan' },
+    { pl: '古民家煉り',   gas: '古民家煉り',   type: 'ryokan' },
+    { pl: 'TSMART',       gas: 'Tsmart',        type: 'ryokan' },
     { pl: '若宮コース',   gas: '若宮コース',   type: 'golf' },
+    { pl: '大分コース',   gas: '大分コース',   type: 'golf' },
     { pl: '阿蘇コース',   gas: '阿蘇コース',   type: 'golf' },
   ];
 
@@ -7590,6 +7599,11 @@ document.getElementById('import-btn').addEventListener('click', openPasteDialog)
     if (ret.occ_a == null && gm.occ_a != null) ret.occ_a = gm.occ_a;
     if (ret.rvp_a == null && gm.rvp_a != null) ret.rvp_a = gm.rvp_a;
     if (ret.spd_a == null && gm.spd_a != null) ret.spd_a = gm.spd_a;
+    if (ret.adr_b == null && gm.adr_b != null) ret.adr_b = gm.adr_b;
+    if (ret.occ_b == null && gm.occ_b != null) ret.occ_b = gm.occ_b;
+    if (ret.rvp_b == null && gm.rvp_b != null) ret.rvp_b = gm.rvp_b;
+    if (ret.pax_b == null && gm.pax_b != null) ret.pax_b = gm.pax_b;
+    if (ret.spd_b == null && gm.spd_b != null) ret.spd_b = gm.spd_b;
     return ret;
   }
 
