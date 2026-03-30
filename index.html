@@ -1396,14 +1396,14 @@ body.public-mode .private-only { display: none !important; }
 .resort-pl-bgt { color: #9ca3af; }
 
 
-  /* ── IR Panel (TOP tab right) ── */
-  #tab-top { display: none; }
-  #tab-top.active { display: flex !important; flex-direction: row; gap: 0; }
-  #tab-top-left { flex: 2; display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; min-width: 0; }
+  /* ── IR Tab (outer) ── */
   #ir-panel {
-    flex: 1; min-width: 280px; max-width: 380px;
-    background: #0d1117; border-left: 1px solid #30363d;
-    display: flex; flex-direction: column; overflow-y: auto;
+    flex: 1;
+    background: #0d1117;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    align-content: start;
+    overflow-y: auto;
     font-family: 'Courier New', monospace;
   }
   #ir-panel .ir-section {
@@ -1473,6 +1473,7 @@ body.public-mode .private-only { display: none !important; }
   <button class="outer-tab-btn active" data-outer="rialt">RIALT</button>
   <button class="outer-tab-btn" data-outer="resort">TGR</button>
   <button class="outer-tab-btn private-only" data-outer="top-report">TOP</button>
+  <button class="outer-tab-btn private-only" data-outer="ir">IR</button>
 </div>
 
 <!-- PASTE DIALOG -->
@@ -1871,7 +1872,6 @@ body.public-mode .private-only { display: none !important; }
 
 <!-- ===== TAB 1: TOPメッセージ ===== -->
 <div class="tab-content active" id="tab-top">
-      <div id="tab-top-left">
 
   <div class="panel" id="panel-exec-ishibashi">
     <div class="panel-inner">
@@ -1929,52 +1929,6 @@ body.public-mode .private-only { display: none !important; }
     </div>
   </div>
 
-      </div><!-- end tab-top-left -->
-      <div id="ir-panel">
-        <div class="ir-section">
-          <div class="ir-title">
-            <span>&#x1F4C8; 141A トライアルHD</span>
-            <span id="ir-status">&#x2014;</span>
-          </div>
-          <div id="ir-price-main" class="ir-price-main">&#x2014;</div>
-          <div id="ir-price-change" class="ir-price-change">&#x2014;</div>
-          <canvas id="ir-sparkline" height="56"></canvas>
-        </div>
-        <div class="ir-section">
-          <div class="ir-title"><span>&#x6642;&#x4FA1;&#x7DCF;&#x984D;&#x30FB;&#x682A;&#x4FA1;&#x60C5;&#x5831;</span></div>
-          <div class="ir-kv-row"><span class="k">&#x6642;&#x4FA1;&#x7DCF;&#x984D;</span><span class="v" id="ir-mktcap">&#x2014;</span></div>
-          <div class="ir-kv-row"><span class="k">52&#x9031;&#x9AD8;&#x5024;</span><span class="v" id="ir-52h">&#x2014;</span></div>
-          <div class="ir-kv-row"><span class="k">52&#x9031;&#x5B89;&#x5024;</span><span class="v" id="ir-52l">&#x2014;</span></div>
-          <div class="ir-kv-row"><span class="k">&#x51FA;&#x6765;&#x9AD8;</span><span class="v" id="ir-vol">&#x2014;</span></div>
-        </div>
-        <div class="ir-section">
-          <div class="ir-title"><span>&#x30D0;&#x30EA;&#x30E5;&#x30A8;&#x30FC;&#x30B7;&#x30E7;&#x30F3;</span></div>
-          <div class="ir-kv-row"><span class="k">PER&#xFF08;&#x5B9F;&#x7E3E;&#xFF09;</span><span class="v" id="ir-per">&#x2014;</span></div>
-          <div class="ir-kv-row"><span class="k">PER&#xFF08;&#x4E88;&#x60F3;&#xFF09;</span><span class="v" id="ir-fper">&#x2014;</span></div>
-          <div class="ir-kv-row"><span class="k">PBR</span><span class="v" id="ir-pbr">&#x2014;</span></div>
-          <div class="ir-kv-row"><span class="k">EV/EBITDA</span><span class="v" id="ir-evebitda">&#x2014;</span></div>
-          <div class="ir-kv-row"><span class="k">PSR</span><span class="v" id="ir-psr">&#x2014;</span></div>
-        </div>
-        <div class="ir-section">
-          <div class="ir-title"><span>&#x8CA1;&#x52D9;&#x30CF;&#x30A4;&#x30E9;&#x30A4;&#x30C8;&#xFF08;&#x76F4;&#x8FD1;&#x901A;&#x671F;&#xFF09;</span></div>
-          <div class="ir-kv-row"><span class="k">&#x58F2;&#x4E0A;&#x9AD8;</span><span class="v" id="ir-rev">&#x2014;</span></div>
-          <div class="ir-kv-row"><span class="k">EBITDA</span><span class="v" id="ir-ebitda">&#x2014;</span></div>
-          <div class="ir-kv-row"><span class="k">EBITDA&#x30DE;&#x30FC;&#x30B8;&#x30F3;</span><span class="v" id="ir-ebitdam">&#x2014;</span></div>
-          <div class="ir-kv-row"><span class="k">FCF</span><span class="v" id="ir-fcf">&#x2014;</span></div>
-          <div class="ir-kv-row"><span class="k">ROE</span><span class="v" id="ir-roe">&#x2014;</span></div>
-        </div>
-        <div class="ir-section">
-          <div class="ir-title"><span>&#x30A2;&#x30CA;&#x30EA;&#x30B9;&#x30C8;&#x8A55;&#x4FA1;</span></div>
-          <canvas id="ir-analyst-chart" height="32"></canvas>
-          <div id="ir-analyst-legend" style="margin-top:4px;font-size:10px;color:#8b949e"></div>
-          <div class="ir-kv-row" style="margin-top:6px"><span class="k">&#x76EE;&#x6A19;&#x682A;&#x4FA1; &#x5E73;&#x5747;</span><span class="v" id="ir-tgt-mean">&#x2014;</span></div>
-          <div class="ir-kv-row"><span class="k">&#x76EE;&#x6A19;&#x682A;&#x4FA1; &#x30EC;&#x30F3;&#x30B8;</span><span class="v" id="ir-tgt-range">&#x2014;</span></div>
-        </div>
-        <div class="ir-section">
-          <div class="ir-title"><span>&#x6700;&#x65B0;&#x30CB;&#x30E5;&#x30FC;&#x30B9;</span></div>
-          <ul id="ir-news-list"><li class="ir-loading">&#x8AAD;&#x307F;&#x8FBC;&#x307F;&#x4E2D;...</li></ul>
-        </div>
-      </div><!-- end ir-panel -->
     </div><!-- end tab-top -->
 
 <!-- ===== TAB 2: &#x5B9F;&#x52D9; ===== -->
@@ -2105,6 +2059,54 @@ body.public-mode .private-only { display: none !important; }
 
 </div>
 </div><!-- end outer-top-report -->
+<!-- IR CONTENT -->
+<div class="outer-content" id="outer-ir">
+      <div id="ir-panel">
+        <div class="ir-section">
+          <div class="ir-title">
+            <span>&#x1F4C8; 141A トライアルHD</span>
+            <span id="ir-status">&#x2014;</span>
+          </div>
+          <div id="ir-price-main" class="ir-price-main">&#x2014;</div>
+          <div id="ir-price-change" class="ir-price-change">&#x2014;</div>
+          <canvas id="ir-sparkline" height="56"></canvas>
+        </div>
+        <div class="ir-section">
+          <div class="ir-title"><span>&#x6642;&#x4FA1;&#x7DCF;&#x984D;&#x30FB;&#x682A;&#x4FA1;&#x60C5;&#x5831;</span></div>
+          <div class="ir-kv-row"><span class="k">&#x6642;&#x4FA1;&#x7DCF;&#x984D;</span><span class="v" id="ir-mktcap">&#x2014;</span></div>
+          <div class="ir-kv-row"><span class="k">52&#x9031;&#x9AD8;&#x5024;</span><span class="v" id="ir-52h">&#x2014;</span></div>
+          <div class="ir-kv-row"><span class="k">52&#x9031;&#x5B89;&#x5024;</span><span class="v" id="ir-52l">&#x2014;</span></div>
+          <div class="ir-kv-row"><span class="k">&#x51FA;&#x6765;&#x9AD8;</span><span class="v" id="ir-vol">&#x2014;</span></div>
+        </div>
+        <div class="ir-section">
+          <div class="ir-title"><span>&#x30D0;&#x30EA;&#x30E5;&#x30A8;&#x30FC;&#x30B7;&#x30E7;&#x30F3;</span></div>
+          <div class="ir-kv-row"><span class="k">PER&#xFF08;&#x5B9F;&#x7E3E;&#xFF09;</span><span class="v" id="ir-per">&#x2014;</span></div>
+          <div class="ir-kv-row"><span class="k">PER&#xFF08;&#x4E88;&#x60F3;&#xFF09;</span><span class="v" id="ir-fper">&#x2014;</span></div>
+          <div class="ir-kv-row"><span class="k">PBR</span><span class="v" id="ir-pbr">&#x2014;</span></div>
+          <div class="ir-kv-row"><span class="k">EV/EBITDA</span><span class="v" id="ir-evebitda">&#x2014;</span></div>
+          <div class="ir-kv-row"><span class="k">PSR</span><span class="v" id="ir-psr">&#x2014;</span></div>
+        </div>
+        <div class="ir-section">
+          <div class="ir-title"><span>&#x8CA1;&#x52D9;&#x30CF;&#x30A4;&#x30E9;&#x30A4;&#x30C8;&#xFF08;&#x76F4;&#x8FD1;&#x901A;&#x671F;&#xFF09;</span></div>
+          <div class="ir-kv-row"><span class="k">&#x58F2;&#x4E0A;&#x9AD8;</span><span class="v" id="ir-rev">&#x2014;</span></div>
+          <div class="ir-kv-row"><span class="k">EBITDA</span><span class="v" id="ir-ebitda">&#x2014;</span></div>
+          <div class="ir-kv-row"><span class="k">EBITDA&#x30DE;&#x30FC;&#x30B8;&#x30F3;</span><span class="v" id="ir-ebitdam">&#x2014;</span></div>
+          <div class="ir-kv-row"><span class="k">FCF</span><span class="v" id="ir-fcf">&#x2014;</span></div>
+          <div class="ir-kv-row"><span class="k">ROE</span><span class="v" id="ir-roe">&#x2014;</span></div>
+        </div>
+        <div class="ir-section">
+          <div class="ir-title"><span>&#x30A2;&#x30CA;&#x30EA;&#x30B9;&#x30C8;&#x8A55;&#x4FA1;</span></div>
+          <canvas id="ir-analyst-chart" height="32"></canvas>
+          <div id="ir-analyst-legend" style="margin-top:4px;font-size:10px;color:#8b949e"></div>
+          <div class="ir-kv-row" style="margin-top:6px"><span class="k">&#x76EE;&#x6A19;&#x682A;&#x4FA1; &#x5E73;&#x5747;</span><span class="v" id="ir-tgt-mean">&#x2014;</span></div>
+          <div class="ir-kv-row"><span class="k">&#x76EE;&#x6A19;&#x682A;&#x4FA1; &#x30EC;&#x30F3;&#x30B8;</span><span class="v" id="ir-tgt-range">&#x2014;</span></div>
+        </div>
+        <div class="ir-section">
+          <div class="ir-title"><span>&#x6700;&#x65B0;&#x30CB;&#x30E5;&#x30FC;&#x30B9;</span></div>
+          <ul id="ir-news-list"><li class="ir-loading">&#x8AAD;&#x307F;&#x8FBC;&#x307F;&#x4E2D;...</li></ul>
+        </div>
+      </div><!-- end ir-panel -->
+</div><!-- end outer-ir -->
 <!-- RESORT CONTENT -->
 <div class="outer-content" id="outer-resort">
   <div class="resort-header">
@@ -8740,6 +8742,16 @@ document.getElementById('import-btn').addEventListener('click', openPasteDialog)
       // Price
       var cur = p.current;
       var chg = p.change, chgPct = p.changePct;
+      // chart fallback: Yahoo Finance が realtime price を返さない場合 chart の最終値を使用
+      var _chart = data.chart || [];
+      if (cur == null && _chart.length > 0) {
+        cur = _chart[_chart.length - 1].close;
+        if (_chart.length > 1 && chg == null) {
+          var _prev = _chart[_chart.length - 2].close;
+          chg = cur - _prev;
+          chgPct = _prev > 0 ? chg / _prev : 0;
+        }
+      }
       document.getElementById('ir-price-main').textContent = cur ? '¥'+Math.round(cur).toLocaleString() : '—';
       var chgEl = document.getElementById('ir-price-change');
       if (chg != null) {
@@ -8808,12 +8820,12 @@ document.getElementById('import-btn').addEventListener('click', openPasteDialog)
     // TOPタブが表示されたときに初期化
     document.querySelectorAll('.outer-tab-btn, [data-outer]').forEach(function(btn) {
       btn.addEventListener('click', function() {
-        if (btn.dataset.outer === 'top-report') { setTimeout(initIR, 100); }
+        if (btn.dataset.outer === 'ir') { setTimeout(initIR, 100); }
       });
     });
     // 既にTOPが表示されている場合は即時初期化
-    var topContent = document.getElementById('outer-top-report');
-    if (topContent && topContent.classList.contains('active')) { setTimeout(initIR, 500); }
+    var irContent = document.getElementById('outer-ir');
+    if (irContent && irContent.classList.contains('active')) { setTimeout(initIR, 500); }
     window._fetchIR = fetchIR;
   })();
 
