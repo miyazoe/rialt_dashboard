@@ -23,6 +23,11 @@ function doGet(e) {
   try {
     const cb = (e.parameter.callback || '').replace(/[^a-zA-Z0-9_]/g, '');
 
+    // ── ir=1: 株価・財務・アナリスト・ニュースを返す ──
+    if (e.parameter.ir) {
+      return fetchIRData();
+    }
+
     if (e.parameter.debug) {
       const facilityName = e.parameter.facility || FACILITIES[0].name;
       const month = e.parameter.month || getCurrentMonth();
@@ -195,4 +200,122 @@ function jsonResponse(obj) {
 }
 function jsonpResponse(obj, callback) {
   return ContentService.createTextOutput(callback + '(' + JSON.stringify(obj, null, 2) + ');').setMimeType(ContentService.MimeType.JAVASCRIPT);
+}
+
+// ── IR データ取得 (Yahoo Finance + Google News) ──────────────
+function fetchIRData() {
+  try {
+    var ticker = '141A.T';
+    var opts = { headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36' }, muteHttpExceptions: true };
+
+    // Quote Summary (price / valuation / financial / analyst)
+    var summaryUrl = 'https://query2.finance.yahoo.com/v10/finance/quoteSummary/' + ticker
+      + '?modules=price,defaultKeyStatistics,financialData,recommendationTrend';
+    var summaryResp = UrlFetchApp.fetch(summaryUrl, opts);
+    var summaryJson = JSON.parse(summaryResp.getContentText());
+    var result0 = (summaryJson.quoteSummary && summaryJson.quoteSummary.result && summaryJson.quoteSummary.result[0]) || {};
+    var price    = result0.price || {};
+    var keyStats = result0.defaultKeyStatistics || {};
+    var fin      = result0.financialData || {};
+    var recTrend = (result0.recommendationTrend && result0.recommendationTrend.trend && result0.recommendationTrend.trend[0]) || {};
+
+    // Chart data (90 days sparkline)
+    var chartUrl = 'https://query1.finance.yahoo.com/v8/finance/chart/' + ticker + '?interval=1d&range=3mo';
+    var chartResp = UrlFetchApp.fetch(chartUrl, opts);
+    var chartJson = JSON.parse(chartResp.getContentText());
+    var chartResult = (chartJson.chart && chartJson.chart.result && chartJson.chart.result[0]) || {};
+    var closes     = (chartResult.indicators && chartResult.indicators.quote && chartResult.indicators.quote[0] && chartResult.indicators.quote[0].close) || [];
+    var timestamps = chartResult.timestamp || [];
+    var chartData  = [];
+    for (var i = 0; i < timestamps.length; i++) {
+      if (closes[i] != null) {
+        var d = new Date(timestamps[i] * 1000);
+        chartData.push({
+          date: d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'),
+          close: closes[i]
+        });
+      }
+    }
+
+    // Google News RSS
+    var newsUrl = 'https://news.google.com/rss/search?q=%E3%83%88%E3%83%A9%E3%82%A4%E3%82%A2%E3%83%AB%E3%83%9B%E3%83%BC%E3%83%AB%E3%83%87%E3%82%A3%E3%83%B3%E3%82%B0%E3%82%B9&hl=ja&gl=JP&ceid=JP%3Aja';
+    var newsItems = [];
+    try {
+      var newsResp = UrlFetchApp.fetch(newsUrl, opts);
+      var newsXml  = newsResp.getContentText();
+      var itemRe   = /<item>([\s\S]*?)<\/item>/g;
+      var match;
+      var count = 0;
+      while ((match = itemRe.exec(newsXml)) !== null && count < 5) {
+        var item    = match[1];
+        var titleM  = item.match(/<title><!\[CDATA\[(.*?)\]\]><\/title>/) || item.match(/<title>(.*?)<\/title>/);
+        var linkM   = item.match(/<link>(.*?)<\/link>/);
+        var dateM   = item.match(/<pubDate>(.*?)<\/pubDate>/);
+        newsItems.push({
+          title:   titleM ? titleM[1].replace(/ - .*$/, '') : '',
+          link:    linkM  ? linkM[1].trim()  : '',
+          pubDate: dateM  ? dateM[1].trim()  : '',
+        });
+        count++;
+      }
+    } catch(newsErr) {}
+
+    function raw(obj, key) { return obj[key] && obj[key].raw !== undefined ? obj[key].raw : null; }
+
+    return jsonResponse({
+      generated: new Date().toISOString(),
+      ticker: ticker,
+      price: {
+        current:    raw(price, 'regularMarketPrice'),
+        change:     raw(price, 'regularMarketChange'),
+        changePct:  raw(price, 'regularMarketChangePercent'),
+        open:       raw(price, 'regularMarketOpen'),
+        high:       raw(price, 'regularMarketDayHigh'),
+        low:        raw(price, 'regularMarketDayLow'),
+        volume:     raw(price, 'regularMarketVolume'),
+        marketCap:  raw(price, 'marketCap'),
+        week52High: raw(price, 'fiftyTwoWeekHigh'),
+        week52Low:  raw(price, 'fiftyTwoWeekLow'),
+        currency:   price.currency || 'JPY',
+        marketState: price.marketState || '',
+      },
+      valuation: {
+        per:        raw(keyStats, 'trailingPE'),
+        forwardPer: raw(keyStats, 'forwardPE'),
+        pbr:        raw(keyStats, 'priceToBook'),
+        psr:        raw(keyStats, 'priceToSalesTrailing12Months'),
+        ev:         raw(keyStats, 'enterpriseValue'),
+        evEbitda:   raw(keyStats, 'enterpriseToEbitda'),
+        evRevenue:  raw(keyStats, 'enterpriseToRevenue'),
+      },
+      financial: {
+        revenue:          raw(fin, 'totalRevenue'),
+        ebitda:           raw(fin, 'ebitda'),
+        ebitdaMargin:     raw(fin, 'ebitdaMargins'),
+        grossMargin:      raw(fin, 'grossMargins'),
+        operatingMargin:  raw(fin, 'operatingMargins'),
+        freeCashFlow:     raw(fin, 'freeCashflow'),
+        totalDebt:        raw(fin, 'totalDebt'),
+        totalCash:        raw(fin, 'totalCash'),
+        returnOnEquity:   raw(fin, 'returnOnEquity'),
+        targetMeanPrice:  raw(fin, 'targetMeanPrice'),
+        targetHighPrice:  raw(fin, 'targetHighPrice'),
+        targetLowPrice:   raw(fin, 'targetLowPrice'),
+        recommendationKey: fin.recommendationKey || null,
+        numberOfAnalystOpinions: raw(fin, 'numberOfAnalystOpinions'),
+      },
+      analysts: {
+        strongBuy:  recTrend.strongBuy  || 0,
+        buy:        recTrend.buy        || 0,
+        hold:       recTrend.hold       || 0,
+        sell:       recTrend.sell       || 0,
+        strongSell: recTrend.strongSell || 0,
+        period:     recTrend.period     || '0m',
+      },
+      chart: chartData,
+      news:  newsItems,
+    });
+  } catch(err) {
+    return jsonResponse({ ir: true, error: err.message, stack: err.stack });
+  }
 }
