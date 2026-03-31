@@ -7932,7 +7932,10 @@ document.getElementById('import-btn').addEventListener('click', openPasteDialog)
         occ_a: avg('客室稼働率_実績'), occ_b: avg('稼働率_予算'),
         adr_a: avg('ADR_実績'), adr_b: avg('ADR_予算'),
         rvp_a: avg('RevPAR_実績'), rvp_b: avg('RevPAR_予算'),
-        pax_a: s('販売客室数_実績'), pax_b: s('来場客数_予算'),
+        pax_a: (function() {
+          var fGY = RESORT_FACS.find(function(f) { return (f.tableKey || f.pl) === facName; });
+          return (fGY && fGY.type === 'golf') ? s('来場客数_実績') : s('販売客室数_実績');
+        })(), pax_b: s('来場客数_予算'),
         spd_a: avg('客単価_実績'), spd_b: avg('客単価_予算')
       };
       // YTD: GAS月次合計で補完
@@ -8013,6 +8016,11 @@ document.getElementById('import-btn').addEventListener('click', openPasteDialog)
       pax_a: nv(d['販売客室数_実績']), pax_b: nv(d['来場客数_予算']),
       spd_a: nv(d['客単価_実績']), spd_b: nv(d['客単価_予算'])
     };
+    var facObjG = RESORT_FACS.find(function(f) { return (f.tableKey || f.pl) === facName; });
+    if (facObjG && facObjG.type === 'golf') {
+      var paxGolf = nv(d['来場客数_実績']);
+      if (paxGolf != null) ret.pax_a = paxGolf;
+    }
     var m2 = suppFromGas(facName, ym, ret);
     // ADR実績フォールバック: GASにadr_aがない場合、spd_a x pax_a / (rooms x days x occ_a)で導出
     if (m2.adr_a == null && m2.spd_a != null && m2.pax_a != null && m2.occ_a != null && m2.occ_a > 0) {
