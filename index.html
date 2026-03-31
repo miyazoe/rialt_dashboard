@@ -20,6 +20,11 @@
   --font:     'Noto Sans JP', 'Noto Sans', sans-serif;
   --item-font-size: 12px;
   --font-mono: 'Courier New', 'Consolas', monospace;
+  --th-header: #080c10;
+  --th-border: #0d1f12;
+  --th-accent: #4da6ff;
+  --th-accent2: #3fb950;
+  --th-muted:  #7a90a4;
 }
 
 body {
@@ -44,69 +49,70 @@ body {
 /* ===== HEADER ===== */
 .top-bar {
   height: 36px;
-  background: #080c10;
-  border-bottom: 1px solid #0d1f12;
+  background: var(--th-header, #080c10);
+  border-bottom: 1px solid var(--th-border, #0d1f12);
   display: flex; align-items: center; justify-content: space-between;
   padding: 0 12px 0 14px;
   flex-shrink: 0;
   position: relative;
 }
+/* テーマはCSS変数(--th-*)で一元管理 */
 .top-bar::after {
   content: '';
   position: absolute; bottom: 0; left: 0; right: 0; height: 1px;
-  background: linear-gradient(90deg, transparent, #2a5a35, #1a4060, transparent);
+  background: linear-gradient(90deg, transparent, var(--th-accent2, #2a5a35), var(--th-accent, #1a4060), transparent);
 }
 .header-left { display: flex; align-items: center; gap: 14px; }
 .sys-badge {
-  font-size: 9px; letter-spacing: 2px; color: #3fb950;
-  border: 1px solid #1a3a20; padding: 2px 7px; border-radius: 1px;
+  font-size: 9px; letter-spacing: 2px; color: var(--th-accent2, #3fb950);
+  border: 1px solid var(--th-border, #1a3a20); padding: 2px 7px; border-radius: 1px;
   font-family: var(--font-mono);
 }
 .sys-badge::before { content: '[ '; } .sys-badge::after { content: ' ]'; }
 .report-title { font-size: 11px; letter-spacing: 1px; }
-#header-title { color: #4da6ff; }
-#header-owner { color: #556677; margin-left: 8px; }
+#header-title { color: var(--th-accent, #4da6ff); }
+#header-owner { color: var(--th-muted, #556677); margin-left: 8px; }
 .top-bar-right { display: flex; align-items: center; gap: 12px; }
 #header-period { font-size: 9px; color: var(--dim); letter-spacing: 1px; }
-#clock { font-size: 11px; color: #3fb950; letter-spacing: 2px; min-width: 148px; text-align: right; font-variant-numeric: tabular-nums; font-family: var(--font-mono); }
+#clock { font-size: 11px; color: var(--th-accent2, #3fb950); letter-spacing: 2px; min-width: 148px; text-align: right; font-variant-numeric: tabular-nums; font-family: var(--font-mono); }
 .settings-btn {
-  background: none; border: 1px solid #2a4030; color: #7a90a4;
+  background: none; border: 1px solid var(--th-border, #2a4030); color: var(--th-muted, #7a90a4);
   border-radius: 1px; width: 24px; height: 20px; font-size: 12px;
   cursor: pointer; display: flex; align-items: center; justify-content: center;
   transition: all 0.2s;
 }
-.settings-btn:hover { color: #3fb950; border-color: #3fb950; box-shadow: 0 0 6px rgba(63,185,80,0.3); }
+.settings-btn:hover { color: var(--th-accent2, #3fb950); border-color: var(--th-accent2, #3fb950); box-shadow: 0 0 6px rgba(63,185,80,0.3); }
 .week-select {
   background: transparent;
-  border: 1px solid #1a3020;
-  color: #4da6ff;
+  border: 1px solid var(--th-border, #1a3020);
+  color: var(--th-accent, #4da6ff);
   font-size: 9px;
   font-family: var(--font-mono);
   padding: 2px 6px;
   cursor: pointer;
   letter-spacing: 1px;
 }
-.week-select:focus { outline: none; border-color: #4da6ff; }
+.week-select:focus { outline: none; border-color: var(--th-accent, #4da6ff); }
 .search-input {
   background: transparent;
-  border: 1px solid #1a3020;
-  color: #c5cdd7;
+  border: 1px solid var(--th-border, #1a3020);
+  color: var(--text, #c5cdd7);
   font-size: 9px;
   font-family: var(--font-mono);
   padding: 2px 8px;
   letter-spacing: 1px;
   width: 130px;
 }
-.search-input:focus { outline: none; border-color: #4da6ff; }
+.search-input:focus { outline: none; border-color: var(--th-accent, #4da6ff); }
 .search-input::placeholder { color: #2e3d4a; }
 .search-input.active { border-color: #4da6ff; color: #4da6ff; }
 .import-btn {
-  background: none; border: 1px solid #1a3040; color: #7a90a4;
+  background: none; border: 1px solid var(--th-border, #1a3040); color: var(--th-muted, #7a90a4);
   border-radius: 1px; width: 24px; height: 20px; font-size: 13px;
   cursor: pointer; display: flex; align-items: center; justify-content: center;
   transition: all 0.2s;
 }
-.import-btn:hover { color: #4da6ff; border-color: #4da6ff; box-shadow: 0 0 6px rgba(77,166,255,0.3); }
+.import-btn:hover { color: var(--th-accent, #4da6ff); border-color: var(--th-accent, #4da6ff); box-shadow: 0 0 6px rgba(77,166,255,0.3); }
 .prompt-btn {
   background: none; border: 1px solid #2a3010; color: #7a9060;
   border-radius: 1px; height: 20px; padding: 0 7px;
@@ -134,8 +140,8 @@ body {
 /* ===== TAB NAV ===== */
 .tab-nav {
   height: 34px;
-  background: #080c10;
-  border-bottom: 1px solid #0d2010;
+  background: var(--th-header, #080c10);
+  border-bottom: 1px solid var(--th-border, #0d2010);
   display: flex;
   align-items: center;
   padding: 0 14px;
@@ -144,8 +150,8 @@ body {
 }
 .tab-btn {
   background: none;
-  border: 1px solid #1a3020;
-  color: #adbfd0;
+  border: 1px solid var(--th-border, #1a3020);
+  color: var(--text, #adbfd0);
   font-size: 10px;
   letter-spacing: 1.5px;
   padding: 4px 16px;
@@ -154,18 +160,18 @@ body {
   border-radius: 2px;
   transition: all 0.15s;
 }
-.tab-btn:hover { color: #dde8f0; border-color: #2a5a35; background: rgba(63,185,80,0.04); }
+.tab-btn:hover { color: var(--text, #dde8f0); border-color: var(--th-accent2, #2a5a35); background: rgba(63,185,80,0.04); }
 .tab-btn.active {
   background: rgba(63,185,80,0.08);
-  color: #3fb950;
-  border-color: #1a4020;
+  color: var(--th-accent2, #3fb950);
+  border-color: var(--th-border, #1a4020);
   box-shadow: 0 0 8px rgba(63,185,80,0.12);
 }
 .tab-num {
-  color: #7090a4;
+  color: var(--th-muted, #7090a4);
   margin-right: 4px;
 }
-.tab-btn.active .tab-num { color: #3fb950; opacity: 0.5; }
+.tab-btn.active .tab-num { color: var(--th-accent2, #3fb950); opacity: 0.5; }
 
 /* ===== TAB CONTENT ===== */
 .tab-content {
@@ -404,23 +410,23 @@ body {
 }
 .modal-overlay.open { display: flex; }
 .modal-box {
-  background: #0b0f15; border: 1px solid #1a3020;
+  background: var(--panel-bg, #0b0f15); border: 1px solid var(--th-border, #1a3020);
   border-radius: 2px; width: 340px; font-family: var(--font);
   box-shadow: 0 0 40px rgba(63,185,80,0.08);
 }
 .modal-head {
   display: flex; align-items: center; justify-content: space-between;
-  padding: 10px 14px; border-bottom: 1px solid #1a3020;
+  padding: 10px 14px; border-bottom: 1px solid var(--th-border, #1a3020);
 }
-.modal-head-title { font-size: 9px; letter-spacing: 2px; color: #3fb950; }
+.modal-head-title { font-size: 9px; letter-spacing: 2px; color: var(--th-accent2, #3fb950); }
 .modal-close { background: none; border: none; color: var(--dim); font-size: 14px; cursor: pointer; }
 .modal-close:hover { color: var(--text); }
-.modal-body { padding: 10px 14px; display: flex; flex-direction: column; gap: 7px; }
+.modal-body { padding: 0; display: block; }
 .setting-row { display: flex; align-items: center; justify-content: space-between; }
 .setting-label { display: flex; align-items: center; gap: 8px; font-size: 9px; letter-spacing: 1.5px; color: var(--text); }
 .setting-label .dot { animation: none; box-shadow: none; }
 .setting-select {
-  background: #070a0e; border: 1px solid #1a3020; color: var(--text);
+  background: var(--bg, #070a0e); border: 1px solid var(--th-border, #1a3020); color: var(--text);
   font-size: 9px; font-family: var(--font); border-radius: 1px;
   padding: 2px 5px; cursor: pointer; width: 80px; letter-spacing: 1px;
 }
@@ -429,8 +435,20 @@ body {
   font-size: 8px; color: var(--dim); letter-spacing: 2px;
   font-family: var(--font-mono); padding: 2px 0;
 }
-.modal-divider { border: none; border-top: 1px solid #1a3020; margin: 2px 0; }
+.modal-divider { border: none; border-top: 1px solid var(--th-border, #1a3020); margin: 2px 0; }
 .modal-foot { display: flex; align-items: center; justify-content: space-between; padding: 8px 14px 12px; }
+.modal-tabs { display:flex; border-bottom:1px solid var(--th-border, #1a3020); padding:0 6px; }
+.modal-tab-btn {
+  background:none; border:none; color:var(--dim);
+  font-size:9px; letter-spacing:1.5px; font-family:var(--font);
+  padding:7px 10px; cursor:pointer;
+  border-bottom:2px solid transparent; margin-bottom:-1px;
+  transition:color .15s;
+}
+.modal-tab-btn:hover { color:var(--text); }
+.modal-tab-btn.active { color:var(--th-accent2, #3fb950); border-bottom-color:var(--th-accent2, #3fb950); }
+.modal-tab-panel { display:none; padding:10px 14px; flex-direction:column; gap:7px; }
+.modal-tab-panel.active { display:flex; }
 .btn-reset {
   background: none; border: 1px solid #1a3020; color: var(--dim);
   font-size: 9px; font-family: var(--font); padding: 4px 10px;
@@ -438,7 +456,7 @@ body {
 }
 .btn-reset:hover { border-color: #3fb950; color: #3fb950; }
 .btn-save {
-  background: #0d2010; border: 1px solid #3fb950; color: #3fb950;
+  background: var(--bg, #0d2010); border: 1px solid var(--th-accent2, #3fb950); color: var(--th-accent2, #3fb950);
   font-size: 9px; font-family: var(--font); padding: 4px 14px;
   border-radius: 1px; cursor: pointer; letter-spacing: 1px;
 }
@@ -479,21 +497,21 @@ body {
 
 /* ===== OUTER TABS (RIALT / TOP報告) ===== */
 .outer-tab-nav {
-  height: 30px; background: #040608;
-  border-bottom: 2px solid #0d2410;
+  height: 30px; background: var(--th-header, #040608);
+  border-bottom: 2px solid var(--th-border, #0d2410);
   display: flex; align-items: center; padding: 0 14px; gap: 4px;
   flex-shrink: 0;
 }
 .outer-tab-btn {
-  background: none; border: 1px solid #1a3020; color: #7a90a4;
+  background: none; border: 1px solid var(--th-border, #1a3020); color: var(--th-muted, #7a90a4);
   font-size: 11px; letter-spacing: 2px; padding: 3px 20px;
   cursor: pointer; border-radius: 1px; transition: all 0.15s;
   font-family: var(--font);
 }
-.outer-tab-btn:hover { color: #dde8f0; border-color: #2a5a35; }
+.outer-tab-btn:hover { color: var(--text, #dde8f0); border-color: var(--th-accent2, #2a5a35); }
 .outer-tab-btn.active {
-  background: rgba(63,185,80,0.12); color: #3fb950;
-  border-color: #1a5020;
+  background: rgba(63,185,80,0.12); color: var(--th-accent2, #3fb950);
+  border-color: var(--th-border, #1a5020);
   text-shadow: 0 0 10px rgba(63,185,80,0.4);
 }
 .outer-content { display: none; flex: 1; min-height: 0; flex-direction: column; }
@@ -1399,9 +1417,9 @@ body.public-mode .private-only { display: none !important; }
   /* ── IR Tab (outer) ── */
   /* デフォルトテーマ変数（テーマ未設定時のダーク） */
   #outer-ir {
-    --rb:#0d1117; --rc:#161b22; --rce:#21262d; --rbr:6px;
-    --rd:#21262d; --rt:#e6edf3; --rts:#8b949e; --rtm:#6e7681;
-    --ra:#58a6ff; --rp:#3fb950; --rn:#f85149; --rw:#e3b341;
+    --rb:#f4f6f9; --rc:#ffffff; --rce:#ffffff; --rbr:8px;
+    --rd:#e2e8f0; --rt:#1f2937; --rts:#475569; --rtm:#94a3b8;
+    --ra:#2563eb; --rp:#16a34a; --rn:#dc2626; --rw:#ca8a04;
   }
   /* Theme A: ダーク */
   #outer-ir.theme-a {
@@ -1432,7 +1450,7 @@ body.public-mode .private-only { display: none !important; }
     overflow-y: auto;
     padding: 8px;
     box-sizing: border-box;
-    font-family: 'Courier New', monospace;
+    font-family: var(--font-mono);
   }
   #ir-panel .ir-section {
     background: var(--rc);
@@ -2188,34 +2206,72 @@ body.public-mode .private-only { display: none !important; }
 <div class="modal-overlay" id="modal-overlay">
   <div class="modal-box">
     <div class="modal-head">
-      <span class="modal-head-title">// CONFIG : UPDATE_INTERVAL</span>
+      <span class="modal-head-title">// CONFIG</span>
       <button class="modal-close" id="modal-close">✕</button>
     </div>
+    <div class="modal-tabs">
+      <button class="modal-tab-btn active" data-mtab="display">DISPLAY</button>
+      <button class="modal-tab-btn" data-mtab="interval">INTERVAL</button>
+      <button class="modal-tab-btn" data-mtab="ai">AI</button>
+    </div>
     <div class="modal-body">
-      <div class="modal-section-label">// DISPLAY</div>
-      <div class="setting-row">
-        <span class="setting-label">FONT_SIZE</span>
-        <select class="setting-select" id="sel-fontsize"></select>
-      </div>
-      <div class="setting-row">
-        <span class="setting-label">PANEL_ITEMS</span>
-        <select class="setting-select" id="sel-displaycount"></select>
-      </div>
-      <hr class="modal-divider">
-      <div class="modal-section-label">// TAB 2 : 実務</div>
-      <div class="setting-row"><span class="setting-label"><span class="dot" style="background:#79c0ff;box-shadow:0 0 4px #79c0ff"></span>RESORT</span><select class="setting-select" id="sel-resort"></select></div>
-      <div class="setting-row"><span class="setting-label"><span class="dot" style="background:#bc8cff;box-shadow:0 0 4px #bc8cff"></span>APPAREL</span><select class="setting-select" id="sel-apparel"></select></div>
-      <div class="setting-row"><span class="setting-label"><span class="dot" style="background:#ff9bce;box-shadow:0 0 4px #ff9bce"></span>SECRETARY</span><select class="setting-select" id="sel-secretary"></select></div>
-      <div class="setting-row"><span class="setting-label"><span class="dot" style="background:#00e5cc;box-shadow:0 0 4px #00e5cc"></span>AI</span><select class="setting-select" id="sel-ai"></select></div>
-      <hr class="modal-divider">
-      <div class="modal-section-label">// TAB 3 : トピック</div>
-      <div class="setting-row"><span class="setting-label"><span class="dot" style="background:#58a6ff;box-shadow:0 0 4px #58a6ff"></span>TRENDS</span><select class="setting-select" id="sel-trends"></select></div>
-      <div class="setting-row"><span class="setting-label"><span class="dot" style="background:#f0883e;box-shadow:0 0 4px #f0883e"></span>NUMBERS</span><select class="setting-select" id="sel-numbers"></select></div>
-      <div class="setting-row"><span class="setting-label"><span class="dot" style="background:#f85149;box-shadow:0 0 4px #f85149"></span>ANOMALIES</span><select class="setting-select" id="sel-anomalies"></select></div>
-      <hr class="modal-divider">
-      <div class="modal-section-label">// TAB 4 : プライベート</div>
-      <div class="setting-row"><span class="setting-label"><span class="dot" style="background:#8b949e"></span>PRIVATE</span><select class="setting-select" id="sel-private"></select></div>
-      <hr class="modal-divider">
+      <!-- DISPLAY タブ -->
+      <div class="modal-tab-panel active" id="mtab-display">
+        <div class="setting-row">
+          <span class="setting-label">TOP_FONT</span>
+          <select class="setting-select" id="sel-fontsize"></select>
+        </div>
+        <div class="setting-row">
+          <span class="setting-label">RIALT_FONT</span>
+          <select class="setting-select" id="sel-rialt-fontsize"></select>
+        </div>
+        <div class="setting-row">
+          <span class="setting-label">IR_FONT</span>
+          <select class="setting-select" id="sel-ir-fontsize"></select>
+        </div>
+        <div class="setting-row">
+          <span class="setting-label">PANEL_ITEMS</span>
+          <select class="setting-select" id="sel-displaycount"></select>
+        </div>
+        <hr class="modal-divider">
+        <div class="modal-section-label">// THEME</div>
+        <div class="setting-row" style="gap:8px;flex-wrap:wrap;">
+          <button class="rialt-theme-btn" data-t="default" onclick="applyRialtTheme('default')"
+            style="padding:5px 11px;border:2px solid #e2e8f0;border-radius:6px;background:#f8fafc;color:#374151;cursor:pointer;font-size:10px;font-weight:600;">
+            デフォルト
+          </button>
+          <button class="rialt-theme-btn" data-t="a" onclick="applyRialtTheme('a')"
+            style="padding:5px 11px;border:2px solid #2d3148;border-radius:6px;background:#1a1d27;color:#00e5cc;cursor:pointer;font-size:10px;font-weight:600;">
+            A:ダーク
+          </button>
+          <button class="rialt-theme-btn" data-t="b" onclick="applyRialtTheme('b')"
+            style="padding:5px 11px;border:2px solid #c7d2fe;border-radius:6px;background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#fff;cursor:pointer;font-size:10px;font-weight:600;border-radius:20px;">
+            B:SaaS
+          </button>
+          <button class="rialt-theme-btn" data-t="c" onclick="applyRialtTheme('c')"
+            style="padding:5px 11px;border:2px solid #1e3a5f;border-radius:6px;background:#132338;color:#38bdf8;cursor:pointer;font-size:10px;font-weight:600;">
+            C:ネイビー
+          </button>
+        </div>
+      </div><!-- end mtab-display -->
+      <!-- INTERVAL タブ -->
+      <div class="modal-tab-panel" id="mtab-interval">
+        <div class="modal-section-label">// TAB 2 : 実務</div>
+        <div class="setting-row"><span class="setting-label"><span class="dot" style="background:#79c0ff;box-shadow:0 0 4px #79c0ff"></span>RESORT</span><select class="setting-select" id="sel-resort"></select></div>
+        <div class="setting-row"><span class="setting-label"><span class="dot" style="background:#bc8cff;box-shadow:0 0 4px #bc8cff"></span>APPAREL</span><select class="setting-select" id="sel-apparel"></select></div>
+        <div class="setting-row"><span class="setting-label"><span class="dot" style="background:#ff9bce;box-shadow:0 0 4px #ff9bce"></span>SECRETARY</span><select class="setting-select" id="sel-secretary"></select></div>
+        <div class="setting-row"><span class="setting-label"><span class="dot" style="background:#00e5cc;box-shadow:0 0 4px #00e5cc"></span>AI</span><select class="setting-select" id="sel-ai"></select></div>
+        <hr class="modal-divider">
+        <div class="modal-section-label">// TAB 3 : トピック</div>
+        <div class="setting-row"><span class="setting-label"><span class="dot" style="background:#58a6ff;box-shadow:0 0 4px #58a6ff"></span>TRENDS</span><select class="setting-select" id="sel-trends"></select></div>
+        <div class="setting-row"><span class="setting-label"><span class="dot" style="background:#f0883e;box-shadow:0 0 4px #f0883e"></span>NUMBERS</span><select class="setting-select" id="sel-numbers"></select></div>
+        <div class="setting-row"><span class="setting-label"><span class="dot" style="background:#f85149;box-shadow:0 0 4px #f85149"></span>ANOMALIES</span><select class="setting-select" id="sel-anomalies"></select></div>
+        <hr class="modal-divider">
+        <div class="modal-section-label">// TAB 4 : プライベート</div>
+        <div class="setting-row"><span class="setting-label"><span class="dot" style="background:#8b949e"></span>PRIVATE</span><select class="setting-select" id="sel-private"></select></div>
+      </div><!-- end mtab-interval -->
+      <!-- AI タブ -->
+      <div class="modal-tab-panel" id="mtab-ai">
       <div class="modal-section-label">// AI ANALYSIS</div>
       <div class="setting-row">
         <span class="setting-label">AI プロバイダー</span>
@@ -2279,32 +2335,12 @@ body.public-mode .private-only { display: none !important; }
         </div>
       </div>
       <hr class="modal-divider">
-      <div class="modal-section-label">// RIALT THEME</div>
-      <div class="setting-row" style="gap:8px;flex-wrap:wrap;">
-        <button class="rialt-theme-btn" data-t="default" onclick="applyRialtTheme('default')"
-          style="padding:6px 14px;border:2px solid #e2e8f0;border-radius:6px;background:#f8fafc;color:#374151;cursor:pointer;font-size:11px;font-weight:600;">
-          デフォルト
-        </button>
-        <button class="rialt-theme-btn" data-t="a" onclick="applyRialtTheme('a')"
-          style="padding:6px 14px;border:2px solid #2d3148;border-radius:6px;background:#1a1d27;color:#00e5cc;cursor:pointer;font-size:11px;font-weight:600;">
-          A：ダーク
-        </button>
-        <button class="rialt-theme-btn" data-t="b" onclick="applyRialtTheme('b')"
-          style="padding:6px 14px;border:2px solid #c7d2fe;border-radius:6px;background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#fff;cursor:pointer;font-size:11px;font-weight:600;border-radius:20px;">
-          B：SaaS
-        </button>
-        <button class="rialt-theme-btn" data-t="c" onclick="applyRialtTheme('c')"
-          style="padding:6px 14px;border:2px solid #1e3a5f;border-radius:6px;background:#132338;color:#38bdf8;cursor:pointer;font-size:11px;font-weight:600;">
-          C：ネイビー
-        </button>
-      </div>
-      <hr class="modal-divider">
       <div class="modal-section-label">// SYSTEM PROMPT</div>
       <div class="setting-row" style="flex-direction:column;align-items:stretch;gap:6px;">
         <span class="setting-label" style="font-size:10px;color:#8b949e;">AI質問タブに常時送信される指示。内容は自由に編集可能。</span>
         <textarea class="setting-textarea" id="inp-system-prompt"></textarea>
-      </div>
-    </div>
+      </div><!-- end mtab-ai -->
+    </div><!-- end modal-body -->
     <div class="modal-foot">
       <button class="btn-reset" id="btn-reset">RESET</button>
       <button class="btn-save" id="btn-save">APPLY &amp; CLOSE</button>
@@ -2333,6 +2369,15 @@ body.public-mode .private-only { display: none !important; }
   if (!PUBLIC_MODE) {
     var _ds = document.createElement('script');
     _ds.src = 'data.js';
+    _ds.onload = function() {
+      // data.js ロード完了後に初回描画を再実行
+      var d = getData();
+      if (!d) return;
+      renderHeader(d.report);
+      Object.keys(REFRESH).forEach(function(k){ REFRESH[k](); });
+      updateUnreadCounts();
+      populateWeekSelect();
+    };
     document.head.appendChild(_ds);
   }
 
@@ -2353,6 +2398,25 @@ body.public-mode .private-only { display: none !important; }
     document.querySelectorAll('.rialt-theme-btn').forEach(function(b){
       b.style.outline = b.dataset.t === (t||'default') ? '2px solid #2563eb' : 'none';
     });
+    // .top-bar theme
+    var topBar = document.querySelector('.top-bar');
+    if (topBar) {
+      topBar.classList.remove('theme-a','theme-b','theme-c');
+      if (t && t !== 'default') topBar.classList.add('theme-' + t);
+    }
+    // グローバルテーマ変数を更新（TOP報告タブなど全体に適用）
+    var _bodyThemes = {
+      'default': {'--bg':'#f4f6f9','--panel-bg':'#ffffff','--text':'#1f2937','--gap':'#e2e8f0','--dim':'#cbd5e1',
+                  '--th-header':'#ffffff','--th-border':'#e5e7eb','--th-accent':'#2563eb','--th-accent2':'#059669','--th-muted':'#6b7280'},
+      'a':       {'--bg':'#0f1117','--panel-bg':'#141720','--text':'#e2e8f0','--gap':'#1e2330','--dim':'#2d3148',
+                  '--th-header':'#080b10','--th-border':'#2d3148','--th-accent':'#00e5cc','--th-accent2':'#3fb950','--th-muted':'#64748b'},
+      'b':       {'--bg':'#f0f4ff','--panel-bg':'#ffffff','--text':'#1f2937','--gap':'#e2e8f0','--dim':'#cbd5e1',
+                  '--th-header':'#f0f4ff','--th-border':'#c7d2fe','--th-accent':'#6366f1','--th-accent2':'#8b5cf6','--th-muted':'#94a3b8'},
+      'c':       {'--bg':'#0c1929','--panel-bg':'#132338','--text':'#e2e8f0','--gap':'#1e3a5f','--dim':'#1e3a5f',
+                  '--th-header':'#091422','--th-border':'#1e3a5f','--th-accent':'#38bdf8','--th-accent2':'#34d399','--th-muted':'#64748b'}
+    };
+    var _bv = _bodyThemes[t||'default'] || _bodyThemes['default'];
+    Object.keys(_bv).forEach(function(k){ document.documentElement.style.setProperty(k, _bv[k]); });
   }
   function applyRialtTheme(t) {
     _applyRialtThemeClass(t);
@@ -2366,7 +2430,7 @@ body.public-mode .private-only { display: none !important; }
   }
   function loadRialtTheme() {
     // ページロード時はクラスのみ先に適用（initRialtの前に呼ぶこと）
-    try { var t = localStorage.getItem(_RIALT_THEME_KEY); if (t) _applyRialtThemeClass(t); } catch(e) {}
+    try { var t = localStorage.getItem(_RIALT_THEME_KEY); _applyRialtThemeClass(t || 'default'); } catch(e) { _applyRialtThemeClass('default'); }
   }
   // Canvas チャート用テーマカラー取得
   function _rialtChartBg() {
@@ -2418,7 +2482,8 @@ var DEFAULTS = {
   'exec-ishibashi': 60, 'exec-nagata': 60, 'exec-makikusa': 60, 'exec-uchiyama': 60,
   resort: 60, apparel: 60, secretary: 120, ai: 60,
   trends: 60, numbers: 60, anomalies: 10, private: 120,
-  fontSize: 12, displayCount: 4
+  fontSize: 12, displayCount: 4,
+  rialtFontSize: 12, irFontSize: 12
 };
 var PRESETS       = [5, 10, 20, 30, 60, 120, 300];
 var COUNT_PRESETS = [2, 3, 4, 5, 6, 8];
@@ -2427,6 +2492,14 @@ var MODAL_KEYS  = ['resort', 'apparel', 'secretary', 'ai', 'trends', 'numbers', 
 
 function applyFontSize(px) {
   document.documentElement.style.setProperty('--item-font-size', px + 'px');
+}
+function applyRialtFontSize(px) {
+  var el = document.getElementById('outer-rialt');
+  if (el) el.style.fontSize = px + 'px';
+}
+function applyIrFontSize(px) {
+  var el = document.getElementById('outer-ir');
+  if (el) el.style.fontSize = px + 'px';
 }
 
 // ===== 週別データ =====
@@ -2870,8 +2943,8 @@ function buildSel(id, val){
     sel.appendChild(o);
   });
 }
-function buildFontSizeSel(val) {
-  var sel = document.getElementById('sel-fontsize');
+function buildFontSizeSel(val, id) {
+  var sel = document.getElementById(id || 'sel-fontsize');
   if (!sel) return;
   sel.innerHTML = '';
   FONT_SIZES.forEach(function(s){
@@ -2892,9 +2965,27 @@ function buildCountSel(val) {
     sel.appendChild(o);
   });
 }
+function switchModalTab(name) {
+  document.querySelectorAll('.modal-tab-btn').forEach(function(b){
+    b.classList.toggle('active', b.dataset.mtab === name);
+  });
+  document.querySelectorAll('.modal-tab-panel').forEach(function(p){
+    p.classList.toggle('active', p.id === 'mtab-' + name);
+  });
+}
+document.querySelectorAll('.modal-tabs').forEach(function(nav){
+  nav.addEventListener('click', function(e){
+    var btn = e.target.closest('.modal-tab-btn');
+    if (btn) switchModalTab(btn.dataset.mtab);
+  });
+});
 function openModal(){
-  buildFontSizeSel(cfg.fontSize || 12);
+  buildFontSizeSel(cfg.fontSize || 12, 'sel-fontsize');
+  buildFontSizeSel(cfg.rialtFontSize || 12, 'sel-rialt-fontsize');
+  buildFontSizeSel(cfg.irFontSize || 12, 'sel-ir-fontsize');
   buildCountSel(cfg.displayCount || 4);
+  // デフォルトタブ(DISPLAY)をアクティブに戻す
+  switchModalTab('display');
   MODAL_KEYS.forEach(function(k){ buildSel('sel-'+k, cfg[k]); });
   document.getElementById('modal-overlay').classList.add('open');
 }
@@ -2923,7 +3014,9 @@ document.getElementById('modal-close').addEventListener('click', closeModal);
 document.getElementById('modal-overlay').addEventListener('click', function(e){ if(e.target===this) closeModal(); });
 document.getElementById('btn-reset').addEventListener('click', function(){
   cfg = Object.assign({}, DEFAULTS);
-  buildFontSizeSel(cfg.fontSize);
+  buildFontSizeSel(cfg.fontSize, 'sel-fontsize');
+  buildFontSizeSel(cfg.rialtFontSize, 'sel-rialt-fontsize');
+  buildFontSizeSel(cfg.irFontSize, 'sel-ir-fontsize');
   buildCountSel(cfg.displayCount);
   MODAL_KEYS.forEach(function(k){ buildSel('sel-'+k, cfg[k]); });
 });
@@ -2950,6 +3043,10 @@ document.getElementById('btn-save').addEventListener('click', function(){
   if (_spEl) { try { localStorage.setItem('aichat_system_prompt_v1', _spEl.value); } catch(e){} }
   var fsEl = document.getElementById('sel-fontsize');
   if (fsEl) { cfg.fontSize = parseInt(fsEl.value, 10); applyFontSize(cfg.fontSize); }
+  var rfsEl = document.getElementById('sel-rialt-fontsize');
+  if (rfsEl) { cfg.rialtFontSize = parseInt(rfsEl.value, 10); applyRialtFontSize(cfg.rialtFontSize); }
+  var ifsEl = document.getElementById('sel-ir-fontsize');
+  if (ifsEl) { cfg.irFontSize = parseInt(ifsEl.value, 10); applyIrFontSize(cfg.irFontSize); }
   var dcEl = document.getElementById('sel-displaycount');
   if (dcEl) cfg.displayCount = parseInt(dcEl.value, 10);
   MODAL_KEYS.forEach(function(k){
@@ -2991,6 +3088,8 @@ updateUnreadCounts();
 
 // フォントサイズ適用
 applyFontSize(cfg.fontSize || 12);
+applyRialtFontSize(cfg.rialtFontSize || 12);
+applyIrFontSize(cfg.irFontSize || 12);
 
 // 週選択初期化
 populateWeekSelect();
@@ -7698,12 +7797,12 @@ document.getElementById('import-btn').addEventListener('click', openPasteDialog)
   // 実施設マスタ（合計・本社除く）
   var RESORT_FACS = [
     { pl: '九重久織亭',   gas: '九重久織亭',   type: 'ryokan' },
-    { pl: 'ロッジ虎の湯', gas: '九重虎乃湯',   type: 'ryokan' },
+    { pl: 'ロッジ虎の湯', gas: '九重虎乃湯',   type: 'ryokan', tableKey: '九重虎の湯' },
     { pl: '宮若虎の湯',   gas: '宮若虎の湯',   type: 'ryokan' },
     { pl: '小塚久の葉',   gas: '小塚久の葉',   type: 'ryokan' },
     { pl: '仙石原久の葉', gas: '仙石原久の葉', type: 'ryokan' },
     { pl: '古民家煉り',   gas: '古民家煉り',   type: 'ryokan' },
-    { pl: 'TSMART',       gas: 'Tsmart',        type: 'ryokan' },
+    { pl: 'TSMART',       gas: 'Tsmart',        type: 'ryokan', tableKey: 'Tsmart' },
     { pl: '若宮コース',   gas: '若宮コース',   type: 'golf' },
     { pl: '大分コース',   gas: '大分コース',   type: 'golf' },
     { pl: '阿蘇コース',   gas: '阿蘇コース',   type: 'golf' },
@@ -7714,7 +7813,7 @@ document.getElementById('import-btn').addEventListener('click', openPasteDialog)
 
   // GAS施設名取得（PL名 → GAS名）
   function facGasName(plName) {
-    var f = RESORT_FACS.find(function(x) { return x.pl === plName; });
+    var f = RESORT_FACS.find(function(x) { return x.pl === plName || x.tableKey === plName; });
     return f ? f.gas : plName;
   }
   // GAS月次データでnull指標を補完
@@ -7818,10 +7917,10 @@ document.getElementById('import-btn').addEventListener('click', openPasteDialog)
         gp_a: s('売上総利益_実績'),
         op_a: s('営業利益_実績'), op_b: s('営業利益_予算'),
         lc_a: s('人件費_実績'), lc_b: s('人件費_予算'),
-        occ_a: avg('稼働率_実績'), occ_b: avg('稼働率_予算'),
+        occ_a: avg('客室稼働率_実績'), occ_b: avg('稼働率_予算'),
         adr_a: avg('ADR_実績'), adr_b: avg('ADR_予算'),
         rvp_a: avg('RevPAR_実績'), rvp_b: avg('RevPAR_予算'),
-        pax_a: s('来場客数_実績'), pax_b: s('来場客数_予算'),
+        pax_a: s('販売客室数_実績'), pax_b: s('来場客数_予算'),
         spd_a: avg('客単価_実績'), spd_b: avg('客単価_予算')
       };
       // YTD: GAS月次合計で補完
@@ -7855,18 +7954,19 @@ document.getElementById('import-btn').addEventListener('click', openPasteDialog)
       gp_a: nv(d['売上総利益_実績']),
       op_a: nv(d['営業利益_実績']), op_b: nv(d['営業利益_予算']),
       lc_a: nv(d['人件費_実績']), lc_b: nv(d['人件費_予算']),
-      occ_a: nv(d['稼働率_実績']), occ_b: nv(d['稼働率_予算']),
+      occ_a: nv(d['客室稼働率_実績']), occ_b: nv(d['稼働率_予算']),
       adr_a: nv(d['ADR_実績']), adr_b: nv(d['ADR_予算']),
       rvp_a: nv(d['RevPAR_実績']), rvp_b: nv(d['RevPAR_予算']),
-      pax_a: nv(d['来場客数_実績']), pax_b: nv(d['来場客数_予算']),
+      pax_a: nv(d['販売客室数_実績']), pax_b: nv(d['来場客数_予算']),
       spd_a: nv(d['客単価_実績']), spd_b: nv(d['客単価_予算'])
     };
     return suppFromGas(facName, ym, ret);
   }
   function calcRow(fac, ym, mode) {
-    var m = getM(fac.pl, ym, mode);
+    var _tk = fac.tableKey || fac.pl;
+    var m = getM(_tk, ym, mode);
     if (!m) return { fac: fac, noData: true };
-    var py = getM(fac.pl, prevYM(ym), mode === 'ytd' ? 'ytd' : 'single');
+    var py = getM(_tk, prevYM(ym), mode === 'ytd' ? 'ytd' : 'single');
     var r = m.rev_a, b = m.rev_b;
     var rate  = (b != null && b > 0) ? r / b * 100 : null;
     var yoy   = (py && py.rev_a != null && py.rev_a > 0) ? r / py.rev_a * 100 : null;
@@ -7999,7 +8099,7 @@ document.getElementById('import-btn').addEventListener('click', openPasteDialog)
     // Unified row (14 cols)
     function trRow(row, isAgg) {
       if (!row) return '';
-      var nm = isAgg ? (row.fac.label||row.fac.pl) : row.fac.pl;
+      var nm = row.fac.label || row.fac.pl;
       var css = isAgg ? 'resort-agg-row' : 'resort-fac-row';
       var nc = isAgg ? '<td class="resort-fac-name resort-agg-name">'+nm+'</td>' : '<td class="resort-fac-name">'+nm+'</td>';
       var attr = isAgg ? '' : ' data-fac="'+row.fac.pl+'"';
@@ -8090,13 +8190,14 @@ document.getElementById('import-btn').addEventListener('click', openPasteDialog)
   }
 
   function renderL2(facObj, ym) {
-    var d = getPlRow(facObj.pl, ym);
+    var _ftk = facObj.tableKey || facObj.pl;
+    var d = getPlRow(_ftk, ym);
     var kEl = document.getElementById('resort-l2-kpi');
     if (d) {
       var rev_a = nv(d['売上高合計_実績']), rev_b = nv(d['売上高合計_予算']);
       var gp_a  = nv(d['売上総利益_実績']);
       var op_a  = nv(d['営業利益_実績']), op_b = nv(d['営業利益_予算']);
-      var py_d  = getPlRow(facObj.pl, prevYM(ym));
+      var py_d  = getPlRow(_ftk, prevYM(ym));
       var py_rev = py_d ? nv(py_d['売上高合計_実績']) : null;
       var rate   = (rev_b != null && rev_b > 0) ? rev_a / rev_b * 100 : null;
       var yoy    = (py_rev != null && py_rev > 0) ? rev_a / py_rev * 100 : null;
@@ -8115,7 +8216,7 @@ document.getElementById('import-btn').addEventListener('click', openPasteDialog)
       kEl.innerHTML = '<div style="color:#9ca3af;padding:8px">PLデータなし</div>';
     }
     switchTab('daily');
-    renderPlTable(facObj.pl, ym);
+    renderPlTable(_ftk, ym);
     setTimeout(function() { renderMonthChart(facObj); }, 50);
 
     document.getElementById('resort-breakdown').innerHTML = '';
@@ -8201,7 +8302,7 @@ document.getElementById('import-btn').addEventListener('click', openPasteDialog)
     var allM = availMonths().slice(0, 12).reverse();
     var rev_a = [], rev_b = [], op_a = [];
     allM.forEach(function(ym) {
-      var d = getPlRow(facObj.pl, ym);
+      var d = getPlRow(facObj.tableKey || facObj.pl, ym);
       rev_a.push(d ? nv(d['売上高合計_実績']) : null);
       rev_b.push(d ? nv(d['売上高合計_予算']) : null);
       op_a.push(d  ? nv(d['営業利益_実績'])        : null);
