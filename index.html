@@ -1478,7 +1478,10 @@ body.public-mode .private-only { display: none !important; }
   #ir-panel .ir-kv-row .v { color: var(--rt); font-weight: 600; }
   #ir-panel .ir-kv-row .v.up { color: var(--rp); }
   #ir-panel .ir-kv-row .v.down { color: var(--rn); }
-  #ir-panel canvas#ir-sparkline { width: 100%; height: 56px; display: block; }
+  #ir-panel canvas#ir-sparkline { width: 100%; height: 80px; display: block; }
+  #ir-panel .ir-section.ir-span2 { grid-column: 1 / -1; }
+  #ir-panel .ir-section.ir-span2 { grid-column: span 2; }
+  #ir-chart-labels { display:flex; justify-content:space-between; font-size:9px; color:var(--rtm); margin-top:2px; }
   #ir-analyst-chart { width: 100%; height: 32px; display: block; }
   #ir-news-list { list-style: none; margin: 0; padding: 0; }
   #ir-news-list li { padding: 5px 0; border-bottom: 1px solid var(--rd); }
@@ -2113,47 +2116,72 @@ body.public-mode .private-only { display: none !important; }
 <!-- IR CONTENT -->
 <div class="outer-content" id="outer-ir">
       <div id="ir-panel">
-        <div class="ir-section">
+        <!-- 株価ヘッダー（全幅） -->
+        <div class="ir-section ir-span2">
           <div class="ir-title">
-            <span>&#x1F4C8; 141A トライアルHD</span>
+            <span>&#x1F4C8; 141A &#x30C8;&#x30E9;&#x30A4;&#x30A2;&#x30EBHD&#xFF08;&#x6771;&#x8A3C;&#x30D7;&#x30E9;&#x30A4;&#x30E0;&#xFF09;</span>
             <span id="ir-status">&#x2014;</span>
           </div>
-          <div id="ir-price-main" class="ir-price-main">&#x2014;</div>
-          <div id="ir-price-change" class="ir-price-change">&#x2014;</div>
-          <canvas id="ir-sparkline" height="56"></canvas>
+          <div style="display:flex;align-items:baseline;gap:14px;margin-bottom:4px;flex-wrap:wrap">
+            <div id="ir-price-main" class="ir-price-main">&#x2014;</div>
+            <div id="ir-price-change" class="ir-price-change">&#x2014;</div>
+            <div id="ir-day-range" style="font-size:10px;color:var(--rts)"></div>
+          </div>
+          <canvas id="ir-sparkline" height="80"></canvas>
+          <div id="ir-chart-labels"></div>
         </div>
+        <!-- 市場情報 -->
         <div class="ir-section">
-          <div class="ir-title"><span>&#x6642;&#x4FA1;&#x7DCF;&#x984D;&#x30FB;&#x682A;&#x4FA1;&#x60C5;&#x5831;</span></div>
+          <div class="ir-title"><span>&#x5E02;&#x5834;&#x60C5;&#x5831;</span></div>
           <div class="ir-kv-row"><span class="k">&#x6642;&#x4FA1;&#x7DCF;&#x984D;</span><span class="v" id="ir-mktcap">&#x2014;</span></div>
+          <div class="ir-kv-row"><span class="k">&#x51FA;&#x6765;&#x9AD8;</span><span class="v" id="ir-vol">&#x2014;</span></div>
+          <div class="ir-kv-row"><span class="k">&#x5E73;&#x5747;&#x51FA;&#x6765;&#x9AD8;(10&#x65E5;)</span><span class="v" id="ir-avgvol">&#x2014;</span></div>
           <div class="ir-kv-row"><span class="k">52&#x9031;&#x9AD8;&#x5024;</span><span class="v" id="ir-52h">&#x2014;</span></div>
           <div class="ir-kv-row"><span class="k">52&#x9031;&#x5B89;&#x5024;</span><span class="v" id="ir-52l">&#x2014;</span></div>
-          <div class="ir-kv-row"><span class="k">&#x51FA;&#x6765;&#x9AD8;</span><span class="v" id="ir-vol">&#x2014;</span></div>
+          <div class="ir-kv-row"><span class="k">Beta</span><span class="v" id="ir-beta">&#x2014;</span></div>
+          <div class="ir-kv-row"><span class="k">&#x914D;&#x5F53;&#x5229;&#x56DE;&#x308A;</span><span class="v" id="ir-div">&#x2014;</span></div>
+          <div class="ir-kv-row"><span class="k">EPS&#xFF08;&#x5B9F;&#x7E3E;&#xFF09;</span><span class="v" id="ir-eps">&#x2014;</span></div>
+          <div class="ir-kv-row"><span class="k">EPS&#xFF08;&#x4E88;&#x60F3;&#xFF09;</span><span class="v" id="ir-feps">&#x2014;</span></div>
         </div>
+        <!-- バリュエーション -->
         <div class="ir-section">
           <div class="ir-title"><span>&#x30D0;&#x30EA;&#x30E5;&#x30A8;&#x30FC;&#x30B7;&#x30E7;&#x30F3;</span></div>
           <div class="ir-kv-row"><span class="k">PER&#xFF08;&#x5B9F;&#x7E3E;&#xFF09;</span><span class="v" id="ir-per">&#x2014;</span></div>
           <div class="ir-kv-row"><span class="k">PER&#xFF08;&#x4E88;&#x60F3;&#xFF09;</span><span class="v" id="ir-fper">&#x2014;</span></div>
           <div class="ir-kv-row"><span class="k">PBR</span><span class="v" id="ir-pbr">&#x2014;</span></div>
-          <div class="ir-kv-row"><span class="k">EV/EBITDA</span><span class="v" id="ir-evebitda">&#x2014;</span></div>
           <div class="ir-kv-row"><span class="k">PSR</span><span class="v" id="ir-psr">&#x2014;</span></div>
+          <div class="ir-kv-row"><span class="k">EV/EBITDA</span><span class="v" id="ir-evebitda">&#x2014;</span></div>
+          <div class="ir-kv-row"><span class="k">EV/Revenue</span><span class="v" id="ir-evrev">&#x2014;</span></div>
         </div>
+        <!-- 財務ハイライト -->
         <div class="ir-section">
-          <div class="ir-title"><span>&#x8CA1;&#x52D9;&#x30CF;&#x30A4;&#x30E9;&#x30A4;&#x30C8;&#xFF08;&#x76F4;&#x8FD1;&#x901A;&#x671F;&#xFF09;</span></div>
+          <div class="ir-title"><span>&#x8CA1;&#x52D9;&#x30CF;&#x30A4;&#x30E9;&#x30A4;&#x30C8;</span></div>
           <div class="ir-kv-row"><span class="k">&#x58F2;&#x4E0A;&#x9AD8;</span><span class="v" id="ir-rev">&#x2014;</span></div>
+          <div class="ir-kv-row"><span class="k">&#x7C97;&#x5229;&#x7387;</span><span class="v" id="ir-gm">&#x2014;</span></div>
+          <div class="ir-kv-row"><span class="k">&#x55B6;&#x696D;&#x5229;&#x76CA;&#x7387;</span><span class="v" id="ir-om">&#x2014;</span></div>
           <div class="ir-kv-row"><span class="k">EBITDA</span><span class="v" id="ir-ebitda">&#x2014;</span></div>
           <div class="ir-kv-row"><span class="k">EBITDA&#x30DE;&#x30FC;&#x30B8;&#x30F3;</span><span class="v" id="ir-ebitdam">&#x2014;</span></div>
           <div class="ir-kv-row"><span class="k">FCF</span><span class="v" id="ir-fcf">&#x2014;</span></div>
           <div class="ir-kv-row"><span class="k">ROE</span><span class="v" id="ir-roe">&#x2014;</span></div>
+          <div class="ir-kv-row"><span class="k">&#x73FE;&#x91D1;&#x30FB;&#x540C;&#x7B49;&#x7269;</span><span class="v" id="ir-cash">&#x2014;</span></div>
+          <div class="ir-kv-row"><span class="k">&#x6709;&#x5229;&#x5B50;&#x8CA0;&#x50B5;</span><span class="v" id="ir-debt">&#x2014;</span></div>
+          <div class="ir-kv-row"><span class="k">&#x30CD;&#x30C3;&#x30C8;&#x30C7;&#x30C3;&#x30C8;</span><span class="v" id="ir-netdebt">&#x2014;</span></div>
         </div>
+        <!-- アナリスト評価 -->
         <div class="ir-section">
           <div class="ir-title"><span>&#x30A2;&#x30CA;&#x30EA;&#x30B9;&#x30C8;&#x8A55;&#x4FA1;</span></div>
           <canvas id="ir-analyst-chart" height="32"></canvas>
           <div id="ir-analyst-legend" style="margin-top:4px;font-size:10px;color:#8b949e"></div>
           <div class="ir-kv-row" style="margin-top:6px"><span class="k">&#x76EE;&#x6A19;&#x682A;&#x4FA1; &#x5E73;&#x5747;</span><span class="v" id="ir-tgt-mean">&#x2014;</span></div>
           <div class="ir-kv-row"><span class="k">&#x76EE;&#x6A19;&#x682A;&#x4FA1; &#x30EC;&#x30F3;&#x30B8;</span><span class="v" id="ir-tgt-range">&#x2014;</span></div>
+          <div class="ir-kv-row"><span class="k">&#x63A8;&#x5968;</span><span class="v" id="ir-recommend">&#x2014;</span></div>
         </div>
-        <div class="ir-section">
-          <div class="ir-title"><span>&#x6700;&#x65B0;&#x30CB;&#x30E5;&#x30FC;&#x30B9;</span></div>
+        <!-- ニュース（全幅） -->
+        <div class="ir-section ir-span2">
+          <div class="ir-title">
+            <span>&#x6700;&#x65B0;&#x30CB;&#x30E5;&#x30FC;&#x30B9;</span>
+            <span id="ir-news-count" style="font-size:9px;color:var(--rtm)"></span>
+          </div>
           <ul id="ir-news-list"><li class="ir-loading">&#x8AAD;&#x307F;&#x8FBC;&#x307F;&#x4E2D;...</li></ul>
         </div>
       </div><!-- end ir-panel -->
@@ -8844,58 +8872,68 @@ document.getElementById('import-btn').addEventListener('click', openPasteDialog)
   // ── IR Panel ─────────────────────────────────────────────
   (function() {
     var IR_GAS_URL = 'https://script.google.com/a/macros/retail-ai.jp/s/AKfycbwggw9i2KD2JzxcXSSFayAxAYMT1HUJ5MpLklrY-NRJjiT8hdhNSnhx4Dn8MQbuNiemSg/exec';
-    var _irData = null;
-    var _irTimer = null;
+    var _irData = null, _irTimer = null;
 
     function fmtBn(v) {
-      if (v == null) return '—';
+      if (v == null) return '\u2014';
       var b = v / 1e8;
-      return b >= 1000 ? Math.round(b/100)/10 + '兆' : Math.round(b*10)/10 + '億';
+      return (v >= 1e12) ? (v/1e12).toFixed(1)+'\u5146' : Math.round(b*10)/10+'\u5104';
     }
-    function fmtPct(v) { return v == null ? '—' : (v*100).toFixed(1)+'%'; }
-    function fmtX(v, d) { return v == null ? '—' : (Math.round(v*(d||10))/(d||10))+'x'; }
-    function fmtNum(v) { return v == null ? '—' : Math.round(v).toLocaleString(); }
-    function fmtYen(v) { return v == null ? '—' : '¥'+Math.round(v).toLocaleString(); }
+    function fmtPct(v) { return v == null ? '\u2014' : (v*100).toFixed(1)+'%'; }
+    function fmtX(v) { return v == null ? '\u2014' : v.toFixed(1)+'\u500d'; }
+    function fmtYen(v) { return v == null ? '\u2014' : '\u00a5'+Math.round(v).toLocaleString(); }
     function fmtVol(v) {
-      if (v == null) return '—';
-      return v >= 10000 ? Math.round(v/1000)+'千株' : v+'株';
+      if (v == null) return '\u2014';
+      if (v >= 1e7) return Math.round(v/1e4)+'\u4e07\u682a';
+      if (v >= 1e4) return Math.round(v/1e3)+'\u5343\u682a';
+      return v+'\u682a';
     }
+    function _set(id, val) { var el = document.getElementById(id); if (el) el.textContent = val || '\u2014'; }
 
     function drawSparkline(chartData) {
       var canvas = document.getElementById('ir-sparkline');
       if (!canvas || !chartData || !chartData.length) return;
-      var W = canvas.parentElement.clientWidth || 300;
-      canvas.width = W; canvas.height = 56;
+      var W = canvas.parentElement.clientWidth || 400;
+      canvas.width = W; canvas.height = 80;
       var ctx = canvas.getContext('2d');
-      ctx.clearRect(0, 0, W, 56);
-      var prices = chartData.map(function(d){ return d.close; }).filter(function(v){ return v != null; });
+      ctx.clearRect(0, 0, W, 80);
+      var prices = chartData.map(function(d){ return d.close; }).filter(function(v){ return v!=null; });
       if (!prices.length) return;
       var mn = Math.min.apply(null, prices), mx = Math.max.apply(null, prices);
       var rng = mx - mn || 1;
       var n = prices.length;
-      var pL=4, pR=4, pT=4, pB=4;
-      var cW = W-pL-pR, cH = 56-pT-pB;
+      var pL=8, pR=8, pT=6, pB=22;
+      var cW = W-pL-pR, cH = 80-pT-pB;
       function tx(i){ return pL + i/(n-1)*cW; }
       function ty(v){ return pT + (1-(v-mn)/rng)*cH; }
       var last = prices[prices.length-1], first = prices[0];
       var lineColor = last >= first ? '#3fb950' : '#f85149';
-      // gradient fill
-      var grad = ctx.createLinearGradient(0, pT, 0, 56-pB);
-      grad.addColorStop(0, last >= first ? 'rgba(63,185,80,0.3)' : 'rgba(248,81,73,0.3)');
+      var grad = ctx.createLinearGradient(0, pT, 0, 80-pB);
+      grad.addColorStop(0, last >= first ? 'rgba(63,185,80,0.25)' : 'rgba(248,81,73,0.25)');
       grad.addColorStop(1, 'rgba(0,0,0,0)');
       ctx.beginPath();
       ctx.moveTo(tx(0), ty(prices[0]));
       for (var i=1; i<n; i++) ctx.lineTo(tx(i), ty(prices[i]));
-      ctx.lineTo(tx(n-1), 56-pB); ctx.lineTo(tx(0), 56-pB); ctx.closePath();
+      ctx.lineTo(tx(n-1), 80-pB); ctx.lineTo(tx(0), 80-pB); ctx.closePath();
       ctx.fillStyle = grad; ctx.fill();
-      // line
       ctx.beginPath(); ctx.strokeStyle = lineColor; ctx.lineWidth = 1.5;
       ctx.moveTo(tx(0), ty(prices[0]));
       for (var i=1; i<n; i++) ctx.lineTo(tx(i), ty(prices[i]));
       ctx.stroke();
+      // current price dashed horizontal
+      ctx.setLineDash([3,3]);
+      ctx.beginPath(); ctx.strokeStyle = 'rgba(139,148,158,0.35)'; ctx.lineWidth = 1;
+      ctx.moveTo(pL, ty(last)); ctx.lineTo(W-pR, ty(last)); ctx.stroke();
+      ctx.setLineDash([]);
       // last dot
       ctx.beginPath(); ctx.fillStyle = lineColor;
-      ctx.arc(tx(n-1), ty(prices[n-1]), 3, 0, Math.PI*2); ctx.fill();
+      ctx.arc(tx(n-1), ty(last), 3, 0, Math.PI*2); ctx.fill();
+      // x-axis date labels
+      var labelEl = document.getElementById('ir-chart-labels');
+      if (labelEl && chartData.length > 0) {
+        function sd(s){ return s ? s.slice(5) : ''; }
+        labelEl.innerHTML = '<span>'+sd(chartData[0].date)+'</span><span>'+sd(chartData[Math.floor(n/2)].date)+'</span><span>'+sd(chartData[n-1].date)+'</span>';
+      }
     }
 
     function drawAnalystChart(analysts) {
@@ -8906,139 +8944,191 @@ document.getElementById('import-btn').addEventListener('click', openPasteDialog)
       canvas.width = W; canvas.height = 32;
       var ctx = canvas.getContext('2d');
       ctx.clearRect(0, 0, W, 32);
-      var sb = analysts.strongBuy||0, b = analysts.buy||0, h = analysts.hold||0;
-      var s = analysts.sell||0, ss = analysts.strongSell||0;
+      var sb=analysts.strongBuy||0, b=analysts.buy||0, h=analysts.hold||0, s=analysts.sell||0, ss=analysts.strongSell||0;
       var total = sb+b+h+s+ss;
-      if (!total) return;
-      var segs = [
-        { v: sb, color: '#1a7f37', label: '強買' },
-        { v: b,  color: '#3fb950', label: '買い' },
-        { v: h,  color: '#d29922', label: '中立' },
-        { v: s,  color: '#f0883e', label: '売り' },
-        { v: ss, color: '#f85149', label: '強売' },
-      ].filter(function(s){ return s.v > 0; });
-      var x = 0, H = 20, y = 6, r = 3;
-      segs.forEach(function(seg, i) {
-        var w = seg.v/total*W;
-        ctx.beginPath();
-        if (i===0 && i===segs.length-1) {
-          ctx.roundRect(x, y, w, H, r);
-        } else if (i===0) {
-          ctx.roundRect(x, y, w, H, [r,0,0,r]);
-        } else if (i===segs.length-1) {
-          ctx.roundRect(x, y, w, H, [0,r,r,0]);
-        } else {
-          ctx.rect(x, y, w, H);
-        }
-        ctx.fillStyle = seg.color; ctx.fill();
-        x += w;
-      });
-      if (legend) {
-        legend.innerHTML = segs.map(function(seg){
-          return '<span style="margin-right:8px"><span style="color:'+seg.color+'">■</span> '+seg.label+' '+seg.v+'</span>';
-        }).join('');
+      if (!total) { if (legend) legend.textContent='\u30c7\u30fc\u30bf\u306a\u3057'; return; }
+      var colors=['#3fb950','#52c41a','#f0883e','#f85149','#b91c1c'];
+      var vals=[sb,b,h,s,ss], labels=['\u5f37\u8cb7','\u8cb7','\u4e2d\u7acb','\u58f2','\u5f37\u58f2'];
+      var x=0;
+      vals.forEach(function(v,i){ if(!v)return; var w=v/total*W; ctx.fillStyle=colors[i]; ctx.fillRect(x,0,w,32); x+=w; });
+      if (legend) legend.innerHTML = vals.map(function(v,i){ return v?'<span style="color:'+colors[i]+';margin-right:8px">'+labels[i]+':'+v+'</span>':''; }).join('');
+    }
+
+    function _renderIRNews(news) {
+      var ul = document.getElementById('ir-news-list');
+      var countEl = document.getElementById('ir-news-count');
+      if (!ul) return;
+      if (!news || !news.length) {
+        ul.innerHTML = '<li style="color:#6e7681;font-size:10px;padding:6px 0">GAS\u518d\u30c7\u30d7\u30ed\u30a4\u5f85\u3061</li>';
+        return;
       }
+      if (countEl) countEl.textContent = news.length+'\u4ef6';
+      ul.innerHTML = news.map(function(n) {
+        var d = n.pubDate ? new Date(n.pubDate).toLocaleDateString('ja-JP',{month:'numeric',day:'numeric'}) : '';
+        var title = (n.title||'').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+        return '<li><a href="'+n.link+'" target="_blank" rel="noopener">'+title+'</a><div class="ir-news-date">'+d+'</div></li>';
+      }).join('');
+    }
+
+    function _mergeIR(quoteResp, chartResp, summaryResp) {
+      var data = { price:{}, valuation:{}, financial:{}, analysts:{}, chart:[], news:[] };
+      // --- v7/quote ---
+      var q = quoteResp && quoteResp.quoteResponse && quoteResp.quoteResponse.result && quoteResp.quoteResponse.result[0];
+      if (q) {
+        data.price.current    = q.regularMarketPrice;
+        data.price.change     = q.regularMarketChange;
+        data.price.changePct  = q.regularMarketChangePercent != null ? q.regularMarketChangePercent/100 : null;
+        data.price.high       = q.regularMarketDayHigh;
+        data.price.low        = q.regularMarketDayLow;
+        data.price.volume     = q.regularMarketVolume;
+        data.price.avgVolume  = q.averageDailyVolume10Day || q.averageDailyVolume3Month;
+        data.price.marketCap  = q.marketCap;
+        data.price.week52High = q.fiftyTwoWeekHigh;
+        data.price.week52Low  = q.fiftyTwoWeekLow;
+        data.valuation.per        = q.trailingPE;
+        data.valuation.forwardPer = q.forwardPE;
+        data.valuation.pbr        = q.priceToBook;
+        data.valuation.psr        = q.priceToSalesTrailing12Months;
+        data.valuation.beta       = q.beta;
+        data.valuation.dividendYield = q.trailingAnnualDividendYield;
+        data.valuation.eps        = q.epsTrailingTwelveMonths;
+        data.valuation.epsForward = q.epsForward;
+      }
+      // --- v8/chart ---
+      var cr = chartResp && chartResp.chart && chartResp.chart.result && chartResp.chart.result[0];
+      if (cr) {
+        var closes = cr.indicators && cr.indicators.quote && cr.indicators.quote[0] && cr.indicators.quote[0].close || [];
+        var timestamps = cr.timestamp || [];
+        data.chart = [];
+        for (var i=0; i<timestamps.length; i++) {
+          if (closes[i] != null) {
+            var d = new Date(timestamps[i]*1000);
+            data.chart.push({ date: d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'), close: closes[i] });
+          }
+        }
+        if (data.chart.length > 0 && data.price.current == null) {
+          data.price.current = data.chart[data.chart.length-1].close;
+          if (data.chart.length > 1 && data.price.change == null) {
+            var prev = data.chart[data.chart.length-2].close;
+            data.price.change = data.price.current - prev;
+            data.price.changePct = prev > 0 ? data.price.change/prev : 0;
+          }
+        }
+        if (data.price.week52High == null && data.chart.length > 0) {
+          data.price.week52High = Math.max.apply(null, data.chart.map(function(x){return x.close;}));
+          data.price.week52Low  = Math.min.apply(null, data.chart.map(function(x){return x.close;}));
+        }
+      }
+      // --- v10/quoteSummary ---
+      var r0 = summaryResp && summaryResp.quoteSummary && summaryResp.quoteSummary.result && summaryResp.quoteSummary.result[0];
+      if (r0) {
+        function raw(obj, key) { return obj&&obj[key]!=null ? (obj[key].raw!==undefined?obj[key].raw:obj[key]) : null; }
+        var fin = r0.financialData || {}, ks = r0.defaultKeyStatistics || {}, rec = r0.recommendationTrend;
+        data.financial.revenue         = raw(fin,'totalRevenue');
+        data.financial.ebitda          = raw(fin,'ebitda');
+        data.financial.ebitdaMargin    = raw(fin,'ebitdaMargins');
+        data.financial.grossMargin     = raw(fin,'grossMargins');
+        data.financial.operatingMargin = raw(fin,'operatingMargins');
+        data.financial.freeCashFlow    = raw(fin,'freeCashflow');
+        data.financial.totalDebt       = raw(fin,'totalDebt');
+        data.financial.totalCash       = raw(fin,'totalCash');
+        data.financial.returnOnEquity  = raw(fin,'returnOnEquity');
+        data.financial.targetMeanPrice = raw(fin,'targetMeanPrice');
+        data.financial.targetHighPrice = raw(fin,'targetHighPrice');
+        data.financial.targetLowPrice  = raw(fin,'targetLowPrice');
+        data.financial.recommendationKey = fin.recommendationKey || null;
+        data.valuation.evEbitda  = raw(ks,'enterpriseToEbitda');
+        data.valuation.evRevenue = raw(ks,'enterpriseToRevenue');
+        if (data.valuation.pbr == null) data.valuation.pbr = raw(ks,'priceToBook');
+        if (rec && rec.trend && rec.trend[0]) {
+          var rt = rec.trend[0];
+          data.analysts = { strongBuy:rt.strongBuy||0, buy:rt.buy||0, hold:rt.hold||0, sell:rt.sell||0, strongSell:rt.strongSell||0 };
+        }
+      }
+      return data;
     }
 
     function renderIR(data) {
-      if (!data || data.error) {
-        document.getElementById('ir-status').textContent = 'エラー';
-        return;
-      }
+      if (!data) { _set('ir-status', '\u30a8\u30e9\u30fc'); return; }
       _irData = data;
-      var p = data.price || {};
-      var v = data.valuation || {};
-      var f = data.financial || {};
-      var a = data.analysts || {};
-
+      var p = data.price||{}, v = data.valuation||{}, f = data.financial||{}, a = data.analysts||{};
       // Status
       var now = new Date();
-      document.getElementById('ir-status').textContent =
-        now.getHours()+':'+String(now.getMinutes()).padStart(2,'0')+'更新';
-
+      _set('ir-status', now.getHours()+':'+String(now.getMinutes()).padStart(2,'0')+'\u66f4\u65b0');
       // Price
-      var cur = p.current;
-      var chg = p.change, chgPct = p.changePct;
-      // chart fallback: Yahoo Finance が realtime price を返さない場合 chart の最終値を使用
-      var _chart = data.chart || [];
-      if (cur == null && _chart.length > 0) {
-        cur = _chart[_chart.length - 1].close;
-        if (_chart.length > 1 && chg == null) {
-          var _prev = _chart[_chart.length - 2].close;
-          chg = cur - _prev;
-          chgPct = _prev > 0 ? chg / _prev : 0;
+      var cur = p.current, chg = p.change, chgPct = p.changePct;
+      if (cur == null && data.chart && data.chart.length > 0) {
+        cur = data.chart[data.chart.length-1].close;
+        if (data.chart.length > 1 && chg == null) {
+          var prev = data.chart[data.chart.length-2].close;
+          chg = cur - prev; chgPct = prev > 0 ? chg/prev : 0;
         }
       }
-      document.getElementById('ir-price-main').textContent = cur ? '¥'+Math.round(cur).toLocaleString() : '—';
+      _set('ir-price-main', cur ? '\u00a5'+Math.round(cur).toLocaleString() : '\u2014');
       var chgEl = document.getElementById('ir-price-change');
-      if (chg != null) {
+      if (chgEl && chg != null) {
         var sign = chg >= 0 ? '+' : '';
-        chgEl.textContent = sign + Math.round(chg).toLocaleString() + ' (' + sign + (chgPct*100).toFixed(2) + '%)';
-        chgEl.className = 'ir-price-change ' + (chg >= 0 ? 'up' : 'down');
+        chgEl.textContent = sign+Math.round(chg).toLocaleString()+'\uff08'+sign+(chgPct*100).toFixed(2)+'%\uff09';
+        chgEl.className = 'ir-price-change '+(chg>=0?'up':'down');
       }
-
-      // Price info
-      document.getElementById('ir-mktcap').textContent = fmtBn(p.marketCap);
-      document.getElementById('ir-52h').textContent = fmtYen(p.week52High);
-      document.getElementById('ir-52l').textContent = fmtYen(p.week52Low);
-      document.getElementById('ir-vol').textContent = p.volume ? (p.volume/1000).toFixed(0)+'千株' : '—';
-
+      if (p.high && p.low) _set('ir-day-range', '\u672c\u65e5 \u00a5'+Math.round(p.low).toLocaleString()+' \u2014 \u00a5'+Math.round(p.high).toLocaleString());
+      // Market
+      _set('ir-mktcap',  fmtBn(p.marketCap));
+      _set('ir-vol',     fmtVol(p.volume));
+      _set('ir-avgvol',  fmtVol(p.avgVolume));
+      _set('ir-52h',     fmtYen(p.week52High));
+      _set('ir-52l',     fmtYen(p.week52Low));
+      _set('ir-beta',    v.beta != null ? v.beta.toFixed(2) : '\u2014');
+      _set('ir-div',     v.dividendYield != null ? fmtPct(v.dividendYield) : '\u2014');
+      _set('ir-eps',     v.eps != null ? '\u00a5'+v.eps.toFixed(0) : '\u2014');
+      _set('ir-feps',    v.epsForward != null ? '\u00a5'+v.epsForward.toFixed(0) : '\u2014');
       // Valuation
-      document.getElementById('ir-per').textContent    = v.per ? v.per.toFixed(1)+'倍' : '—';
-      document.getElementById('ir-fper').textContent   = v.forwardPer ? v.forwardPer.toFixed(1)+'倍' : '—';
-      document.getElementById('ir-pbr').textContent    = v.pbr ? v.pbr.toFixed(2)+'倍' : '—';
-      document.getElementById('ir-evebitda').textContent = v.evEbitda ? v.evEbitda.toFixed(1)+'倍' : '—';
-      document.getElementById('ir-psr').textContent    = v.psr ? v.psr.toFixed(2)+'倍' : '—';
-
+      _set('ir-per',      fmtX(v.per));
+      _set('ir-fper',     fmtX(v.forwardPer));
+      _set('ir-pbr',      v.pbr != null ? v.pbr.toFixed(2)+'\u500d' : '\u2014');
+      _set('ir-psr',      v.psr != null ? v.psr.toFixed(2)+'\u500d' : '\u2014');
+      _set('ir-evebitda', fmtX(v.evEbitda));
+      _set('ir-evrev',    fmtX(v.evRevenue));
       // Financial
-      document.getElementById('ir-rev').textContent    = fmtBn(f.revenue);
-      document.getElementById('ir-ebitda').textContent = fmtBn(f.ebitda);
-      document.getElementById('ir-ebitdam').textContent= f.ebitdaMargin != null ? (f.ebitdaMargin*100).toFixed(1)+'%' : '—';
-      document.getElementById('ir-fcf').textContent    = fmtBn(f.freeCashFlow);
-      document.getElementById('ir-roe').textContent    = f.returnOnEquity != null ? (f.returnOnEquity*100).toFixed(1)+'%' : '—';
-
+      _set('ir-rev',     fmtBn(f.revenue));
+      _set('ir-gm',      fmtPct(f.grossMargin));
+      _set('ir-om',      fmtPct(f.operatingMargin));
+      _set('ir-ebitda',  fmtBn(f.ebitda));
+      _set('ir-ebitdam', fmtPct(f.ebitdaMargin));
+      _set('ir-fcf',     fmtBn(f.freeCashFlow));
+      _set('ir-roe',     fmtPct(f.returnOnEquity));
+      _set('ir-cash',    fmtBn(f.totalCash));
+      _set('ir-debt',    fmtBn(f.totalDebt));
+      var nd = (f.totalDebt != null && f.totalCash != null) ? f.totalDebt - f.totalCash : null;
+      _set('ir-netdebt', fmtBn(nd));
       // Analyst
       drawAnalystChart(a);
-      document.getElementById('ir-tgt-mean').textContent  = fmtYen(f.targetMeanPrice);
-      document.getElementById('ir-tgt-range').textContent =
-        (f.targetLowPrice && f.targetHighPrice)
-          ? fmtYen(f.targetLowPrice)+'〜'+fmtYen(f.targetHighPrice) : '—';
-
-      // Sparkline
+      _set('ir-tgt-mean',  fmtYen(f.targetMeanPrice));
+      _set('ir-tgt-range', (f.targetLowPrice&&f.targetHighPrice) ? fmtYen(f.targetLowPrice)+'\uff5e'+fmtYen(f.targetHighPrice) : '\u2014');
+      var recMap={strongBuy:'\u5f37\u8cb7\u63a8\u5968',buy:'\u8cb7\u3044\u63a8\u5968',hold:'\u4e2d\u7acb',sell:'\u58f2\u308a',strongSell:'\u5f37\u58f2'};
+      _set('ir-recommend', recMap[f.recommendationKey] || f.recommendationKey || '\u2014');
+      // Chart + News
       drawSparkline(data.chart || []);
-
-      // News
-      var news = data.news || [];
-      var ul = document.getElementById('ir-news-list');
-      if (ul) {
-        if (!news.length) { ul.innerHTML = '<li style="color:#6e7681;font-size:10px;padding:8px 0">ニュースなし</li>'; return; }
-        ul.innerHTML = news.map(function(n) {
-          var d = n.pubDate ? new Date(n.pubDate).toLocaleDateString('ja-JP',{month:'numeric',day:'numeric'}) : '';
-          return '<li><a href="'+n.link+'" target="_blank" rel="noopener">'+n.title+'</a><div class="ir-news-date">'+d+'</div></li>';
-        }).join('');
-      }
+      _renderIRNews(data.news || []);
     }
 
     function fetchIR() {
       var statusEl = document.getElementById('ir-status');
       if (statusEl) statusEl.textContent = '取得中…';
-      // JSONP で CORS を回避
       var cbName = '_irCb' + Date.now();
       var script = document.createElement('script');
       var timer = setTimeout(function() {
-        delete window[cbName];
+        clearTimeout(timer); delete window[cbName];
         if (script.parentNode) script.parentNode.removeChild(script);
         if (statusEl) statusEl.textContent = 'タイムアウト';
       }, 20000);
-      window[cbName] = function(data) {
-        clearTimeout(timer);
-        delete window[cbName];
+      window[cbName] = function(d) {
+        clearTimeout(timer); delete window[cbName];
         if (script.parentNode) script.parentNode.removeChild(script);
-        renderIR(data);
+        renderIR(d);
       };
       script.onerror = function() {
-        clearTimeout(timer);
-        delete window[cbName];
+        clearTimeout(timer); delete window[cbName];
         if (statusEl) statusEl.textContent = 'エラー';
       };
       script.src = IR_GAS_URL + '?ir=1&callback=' + cbName;
@@ -9048,19 +9138,14 @@ document.getElementById('import-btn').addEventListener('click', openPasteDialog)
     function initIR() {
       fetchIR();
       if (_irTimer) clearInterval(_irTimer);
-      _irTimer = setInterval(fetchIR, 5 * 60 * 1000); // 5分ごと
+      _irTimer = setInterval(fetchIR, 5*60*1000);
     }
 
-    // TOPタブが表示されたときに初期化
     document.querySelectorAll('.outer-tab-btn, [data-outer]').forEach(function(btn) {
       btn.addEventListener('click', function() {
         if (btn.dataset.outer === 'ir') { setTimeout(initIR, 100); }
       });
     });
-    // 既にTOPが表示されている場合は即時初期化
-    var irContent = document.getElementById('outer-ir');
-    if (irContent && irContent.classList.contains('active')) { setTimeout(initIR, 500); }
-    window._fetchIR = fetchIR;
   })();
 
 </script>

@@ -92,7 +92,7 @@ function doGet(e) {
   }
 }
 
-// ── IR データ構築 (v17: JSONP対応 / Google News / v10+v7 fallback) ──
+// ── IR データ構築 (v18: price module追加/配当・Beta・EPS/1年チャート/ニュース15件) ──
 function buildIRData() {
   var ticker = '141A.T';
   var ua = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36';
@@ -100,43 +100,50 @@ function buildIRData() {
   var result = { generated: new Date().toISOString(), ticker: ticker };
 
   function raw(obj, key) {
-    return obj[key] && obj[key].raw !== undefined ? obj[key].raw : null;
+    if (!obj || obj[key] == null) return null;
+    return obj[key].raw !== undefined ? obj[key].raw : obj[key];
   }
 
-  // 1. quoteSummary v10 (price / valuation / financial / analyst)
+  // 1. quoteSummary v10 (price + summaryDetail + keyStats + financialData + recommendationTrend)
   try {
     var summaryUrl = 'https://query2.finance.yahoo.com/v10/finance/quoteSummary/' + ticker
-      + '?modules=summaryDetail,defaultKeyStatistics,financialData,recommendationTrend';
+      + '?modules=price,summaryDetail,defaultKeyStatistics,financialData,recommendationTrend';
     var sr = UrlFetchApp.fetch(summaryUrl, opts);
     if (sr.getResponseCode() === 200) {
       var sj = JSON.parse(sr.getContentText());
       var r0 = (sj.quoteSummary && sj.quoteSummary.result && sj.quoteSummary.result[0]) || {};
-      var sumDet   = r0.summaryDetail || {};  // marketCap, volume, PE, PSR
+      var priceM   = r0.price || {};           // regularMarketPrice, change 等
+      var sumDet   = r0.summaryDetail || {};   // marketCap, PE, PSR, beta, dividend
       var keyStats = r0.defaultKeyStatistics || {};
       var fin      = r0.financialData || {};
       var recTrend = (r0.recommendationTrend && r0.recommendationTrend.trend && r0.recommendationTrend.trend[0]) || {};
       result.price = {
-        current:    raw(sumDet, 'regularMarketPrice'),
-        change:     raw(sumDet, 'regularMarketChange'),
-        changePct:  raw(sumDet, 'regularMarketChangePercent'),
-        open:       raw(sumDet, 'regularMarketOpen'),
-        high:       raw(sumDet, 'regularMarketDayHigh'),
-        low:        raw(sumDet, 'regularMarketDayLow'),
-        volume:     raw(sumDet, 'regularMarketVolume'),
-        marketCap:  raw(sumDet, 'marketCap'),
+        current:    raw(priceM, 'regularMarketPrice')  || raw(sumDet, 'regularMarketPrice'),
+        change:     raw(priceM, 'regularMarketChange'),
+        changePct:  raw(priceM, 'regularMarketChangePercent'),
+        open:       raw(priceM, 'regularMarketOpen'),
+        high:       raw(priceM, 'regularMarketDayHigh'),
+        low:        raw(priceM, 'regularMarketDayLow'),
+        volume:     raw(priceM, 'regularMarketVolume') || raw(sumDet, 'regularMarketVolume'),
+        avgVolume:  raw(sumDet, 'averageVolume10days') || raw(sumDet, 'averageVolume'),
+        marketCap:  raw(priceM, 'marketCap')           || raw(sumDet, 'marketCap'),
         week52High: raw(sumDet, 'fiftyTwoWeekHigh'),
         week52Low:  raw(sumDet, 'fiftyTwoWeekLow'),
-        currency:   (sumDet.currency || 'JPY'),
-        marketState: (sumDet.marketState || ''),
+        currency:   (priceM.currency || sumDet.currency || 'JPY'),
+        marketState: (priceM.marketState || ''),
       };
       result.valuation = {
-        per:        raw(sumDet, 'trailingPE'),
-        forwardPer: raw(sumDet, 'forwardPE'),
-        pbr:        raw(keyStats, 'priceToBook'),
-        psr:        raw(sumDet, 'priceToSalesTrailing12Months'),
-        ev:         raw(keyStats, 'enterpriseValue'),
-        evEbitda:   raw(keyStats, 'enterpriseToEbitda'),
-        evRevenue:  raw(keyStats, 'enterpriseToRevenue'),
+        per:          raw(sumDet, 'trailingPE'),
+        forwardPer:   raw(sumDet, 'forwardPE'),
+        pbr:          raw(keyStats, 'priceToBook'),
+        psr:          raw(sumDet, 'priceToSalesTrailing12Months'),
+        ev:           raw(keyStats, 'enterpriseValue'),
+        evEbitda:     raw(keyStats, 'enterpriseToEbitda'),
+        evRevenue:    raw(keyStats, 'enterpriseToRevenue'),
+        beta:         raw(sumDet, 'beta'),
+        dividendYield:raw(sumDet, 'dividendYield') || raw(sumDet, 'trailingAnnualDividendYield'),
+        eps:          raw(keyStats, 'trailingEps'),
+        epsForward:   raw(keyStats, 'forwardEps'),
       };
       result.financial = {
         revenue:          raw(fin, 'totalRevenue'),
@@ -164,8 +171,8 @@ function buildIRData() {
     }
   } catch(e) { result.summaryError = e.message; }
 
-  // 2. Fallback: v7/quote (valuation が空の場合)
-  var hasValuation = result.valuation && (result.valuation.per != null || result.valuation.pbr != null) && result.price && result.price.marketCap != null;
+  // 2. Fallback: v7/quote (price/valuationが空の場合)
+  var hasValuation = result.valuation && (result.valuation.per != null || result.valuation.pbr != null) && result.price && result.price.marketCap != null && result.price.current != null;
   if (!hasValuation) {
     try {
       var qUrl = 'https://query1.finance.yahoo.com/v7/finance/quote?symbols=' + ticker;
@@ -189,14 +196,20 @@ function buildIRData() {
         if (!result.financial) result.financial = {};
         if (result.financial.returnOnEquity == null && q.returnOnEquity)  result.financial.returnOnEquity = q.returnOnEquity;
         if (result.financial.revenue        == null && q.totalRevenue)    result.financial.revenue        = q.totalRevenue;
+        if (!result.valuation) result.valuation = {};
+        if (result.valuation.beta          == null && q.beta)                         result.valuation.beta          = q.beta;
+        if (result.valuation.dividendYield == null && q.trailingAnnualDividendYield)  result.valuation.dividendYield = q.trailingAnnualDividendYield;
+        if (result.valuation.eps           == null && q.epsTrailingTwelveMonths)      result.valuation.eps           = q.epsTrailingTwelveMonths;
+        if (result.valuation.epsForward    == null && q.epsForward)                   result.valuation.epsForward    = q.epsForward;
+        if (result.price.avgVolume         == null && q.averageDailyVolume10Day)      result.price.avgVolume         = q.averageDailyVolume10Day;
         result.quoteFallback = true;
       }
     } catch(e) { result.quoteError = e.message; }
   }
 
-  // 3. Chart sparkline (v8/chart 90日)
+  // 3. Chart sparkline (v8/chart 1年)
   try {
-    var chartUrl = 'https://query1.finance.yahoo.com/v8/finance/chart/' + ticker + '?interval=1d&range=3mo';
+    var chartUrl = 'https://query1.finance.yahoo.com/v8/finance/chart/' + ticker + '?interval=1d&range=1y';
     var cr = UrlFetchApp.fetch(chartUrl, opts);
     if (cr.getResponseCode() === 200) {
       var cj = JSON.parse(cr.getContentText());
@@ -239,7 +252,7 @@ function buildIRData() {
       var itemRe = /<item>([\s\S]*?)<\/item>/g;
       var match;
       var count = 0;
-      while ((match = itemRe.exec(nxml)) !== null && count < 10) {
+      while ((match = itemRe.exec(nxml)) !== null && count < 15) {
         var item   = match[1];
         var titleM = item.match(/<title><!\[CDATA\[(.*?)\]\]><\/title>/) || item.match(/<title>(.*?)<\/title>/);
         var linkM  = item.match(/<link>(.*?)<\/link>/);
