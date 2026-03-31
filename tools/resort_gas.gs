@@ -93,6 +93,29 @@ function doGet(e) {
 }
 
 // ── IR データ構築 (v18: price module追加/配当・Beta・EPS/1年チャート/ニュース15件) ──
+// --- kabutan.jp scraper (PER/PBR/mcap/div) ---
+function fetchKabutanData(code) {
+  var kd = {};
+  try {
+    var ua = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/120.0';
+    var resp = UrlFetchApp.fetch('https://kabutan.jp/stock/?code=' + code,
+      { headers: { 'User-Agent': ua }, muteHttpExceptions: true, followRedirects: true });
+    if (resp.getResponseCode() !== 200) { kd.kabutanStatus = resp.getResponseCode(); return kd; }
+    var html = resp.getContentText();
+    // PER, PBR, divYield appear in order: <td>NUM<span class="fs9">倍/％</span>
+    var fs9 = [], re = /<td[^>]*>(\d[\d,]*\.?\d*)<span class="fs9">([^<]*)<\/span>/g, m;
+    while ((m = re.exec(html)) !== null && fs9.length < 4) {
+      fs9.push({ val: parseFloat(m[1].replace(/,/g,'')), unit: m[2] });
+    }
+    if (fs9[0]) kd.per           = fs9[0].val;
+    if (fs9[1]) kd.pbr           = fs9[1].val;
+    if (fs9[2]) kd.dividendYield = fs9[2].val / 100;
+    var mcap = html.match(/(\d[\d,]*)\s*<span>億円<\/span>/);
+    if (mcap) kd.marketCap = parseFloat(mcap[1].replace(/,/g,'')) * 1e8;
+  } catch(e) { kd.kabutanError = e.message; }
+  return kd;
+}
+
 function buildIRData() {
   var ticker = '141A.T';
   var ua = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36';
@@ -266,6 +289,19 @@ function buildIRData() {
       }
     }
   } catch(e) { result.newsError = e.message; }
+
+  // 5. kabutan.jp supplement (PER/PBR/mcap/div)
+  try {
+    var kd = fetchKabutanData('141A');
+    if (!result.price)     result.price     = {};
+    if (!result.valuation) result.valuation = {};
+    if (kd.marketCap     != null && result.price.marketCap         == null) result.price.marketCap         = kd.marketCap;
+    if (kd.per           != null && result.valuation.per           == null) result.valuation.per           = kd.per;
+    if (kd.pbr           != null && result.valuation.pbr           == null) result.valuation.pbr           = kd.pbr;
+    if (kd.dividendYield != null && result.valuation.dividendYield == null) result.valuation.dividendYield = kd.dividendYield;
+    if (kd.kabutanError)  result.kabutanError  = kd.kabutanError;
+    if (kd.kabutanStatus) result.kabutanStatus = kd.kabutanStatus;
+  } catch(e) { result.kabutanError = e.message; }
 
   return result;
 }
