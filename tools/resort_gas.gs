@@ -1,22 +1,11 @@
 // ============================================================
-// リゾート施設 日別売上集約 GAS Web App
+// リゾート施設 日別売上集約 GAS Web App  v6
 // ============================================================
-// 使い方:
-//   1. script.google.com で新規プロジェクトを作成
-//   2. このコードをペースト
-//   3. [デプロイ] → [新しいデプロイ] → 種類:ウェブアプリ
-//      実行ユーザー: 自分 / アクセス: 全員
-//   4. デプロイURLをダッシュボードの RESORT_GAS_URL に設定
-//
-// エンドポイント:
-//   GET {URL}?all=1                          → 全期間・全施設データ（月次集計のみ）
-//   GET {URL}?month=2025-07                  → 全施設の当月データ（日別含む）
-//   GET {URL}?month=2025-07&facility=宮若虎の湯 → 1施設のみ
-// ============================================================
+// 予算KPI行 (row 3, index 2):
+// 旅館: B3(1)=稼働率予算 C3(2)=ADR予算 D3(3)=RevPAR予算 E3(4)=宿泊客数予算 F3(5)=客単価予算
+// ゴルフ: B3(1)=稼働率予算 C3(2)=組数予算 D3(3)=来場者数予算 E3(4)=客単価予算 F3(5)=ADR予算
 
-// ── 施設マスタ ──────────────────────────────────────────────
 const FACILITIES = [
-  // 旅館型
   { id: '1TpeXg8S3j3tDY8ifqYAfg_xDW7VGdw-_WtP3lCrT5Ck', name: '宮若虎の湯',    type: 'ryokan' },
   { id: '1FOfNps2-dP0wIrBkJulj-Wn4vdTxftvv8ctVf-y0qEM', name: '古民家煉り',    type: 'ryokan' },
   { id: '1HVpaoPG-riSu0RrtBTgsIeba_7YaDlfzmVLv6qmMCCE', name: 'Tsmart',         type: 'ryokan' },
@@ -25,21 +14,42 @@ const FACILITIES = [
   { id: '1KyL_p0S8Hw0JjRIXJcz5MqjC_Ey9SRnmeC60hhDdk8g', name: '仙石原久の葉', type: 'ryokan' },
   { id: '13PMcODCT0OeQC3rue8YMFNsFRNiM_LsIE0rYufd8_DI', name: '小塚久の葉',    type: 'ryokan' },
   { id: '1Mp5NlAW-5qHZk4zNLzrBetyfwC6gi0jhauqKIsm5WZk', name: '阿蘇ホテル',    type: 'ryokan' },
-  // ゴルフ型
   { id: '1tY4RPS92mYe_FCxaPy5Evqd6khnX7yhSipmOOxQiAWc', name: '大分コース',    type: 'golf' },
   { id: '1xrqIuDqTcw_0DgmXWIhbwzsoKHdjFSKGoEsWwIuiLOk', name: '若宮コース',    type: 'golf' },
   { id: '1u3dNX-qv87m8XI9RI47fbQurYKjMXpvy2ket7RRCmlg', name: '阿蘇コース',    type: 'golf' },
 ];
 
-// ── メインハンドラ ────────────────────────────────────────────
 function doGet(e) {
   try {
     const cb = (e.parameter.callback || '').replace(/[^a-zA-Z0-9_]/g, '');
 
-    // ── all=1: 全期間まとめて返す（月次集計のみ・日別配列なし）──
+    // ── ir=1: 株価・財務・アナリスト・ニュースを返す ──
+    if (e.parameter.ir) {
+      return fetchIRData(cb);
+    }
+
+    if (e.parameter.debug) {
+      const facilityName = e.parameter.facility || FACILITIES[0].name;
+      const month = e.parameter.month || getCurrentMonth();
+      const facility = FACILITIES.find(f => f.name === facilityName);
+      if (!facility) return jsonResponse({ error: 'facility not found' });
+      const ss = SpreadsheetApp.openById(facility.id);
+      const sheetName = monthToSheetName(month);
+      const sheet = ss.getSheetByName(sheetName);
+      if (!sheet) return jsonResponse({ debug: true, facilityName, month, sheetName, error: 'sheet not found' });
+      const rows = sheet.getDataRange().getValues();
+      const rawRows = rows.slice(0, 5).map(row =>
+        row.map((cell, ci) => ({
+          col: String.fromCharCode(65 + ci),
+          raw: cell instanceof Date ? cell.toISOString() : cell,
+          type: cell instanceof Date ? 'Date' : typeof cell,
+        }))
+      );
+      return jsonResponse({ debug: true, facilityName, month, sheetName, totalRows: rows.length, first5rows: rawRows });
+    }
+
     if (e.parameter.all) {
       const result = { all: true, generated: new Date().toISOString(), periods: [] };
-      // 施設ごとにスプレッドシートを1回だけ開き、全シートを走査
       const periodMap = {};
       FACILITIES.forEach(facility => {
         try {
@@ -50,62 +60,28 @@ function doGet(e) {
             const month = m[1] + '-' + m[2].padStart(2, '0');
             if (!periodMap[month]) periodMap[month] = { month, ryokan: [], golf: [] };
             try {
-              // 月次集計のみ取得（日別配列は返さない）
-              const data = facility.type === 'ryokan'
-                ? parseRyokan(sheet, facility.name)
-                : parseGolf(sheet, facility.name);
-              periodMap[month][facility.type].push({
-                facility: data.facility,
-                type:     data.type,
-                monthly:  data.monthly,   // daily は含めない
-              });
-            } catch(err) {
-              pushError(periodMap[month], facility, err.message);
-            }
+              const data = parseSheet(sheet, facility.name, facility.type);
+              periodMap[month][facility.type].push({ facility: data.facility, type: data.type, monthly: data.monthly });
+            } catch(err) { pushError(periodMap[month], facility, err.message); }
           });
-        } catch(err) { /* スプレッドシートにアクセスできない場合はスキップ */ }
+        } catch(err) {}
       });
-      // 降順ソートして配列化
       result.periods = Object.values(periodMap).sort((a, b) => b.month.localeCompare(a.month));
       return cb ? jsonpResponse(result, cb) : jsonResponse(result);
     }
 
-    // ── 通常: 指定月（省略時は当月）──
-    const month      = (e.parameter.month    || getCurrentMonth());
+    const month = (e.parameter.month || getCurrentMonth());
     const filterName = (e.parameter.facility || '');
-    const targets = filterName
-      ? FACILITIES.filter(f => f.name === filterName)
-      : FACILITIES;
-
-    const result = {
-      month:     month,
-      generated: new Date().toISOString(),
-      ryokan:    [],
-      golf:      [],
-    };
-
+    const targets = filterName ? FACILITIES.filter(f => f.name === filterName) : FACILITIES;
+    const result = { month, generated: new Date().toISOString(), ryokan: [], golf: [] };
     targets.forEach(facility => {
       try {
-        const ss        = SpreadsheetApp.openById(facility.id);
-        const sheetName = monthToSheetName(month);
-        const sheet     = ss.getSheetByName(sheetName);
-
-        if (!sheet) {
-          pushError(result, facility, `シート "${sheetName}" が見つかりません`);
-          return;
-        }
-
-        const data = facility.type === 'ryokan'
-          ? parseRyokan(sheet, facility.name)
-          : parseGolf(sheet, facility.name);
-
-        result[facility.type].push(data);
-
-      } catch (err) {
-        pushError(result, facility, err.message);
-      }
+        const ss = SpreadsheetApp.openById(facility.id);
+        const sheet = ss.getSheetByName(monthToSheetName(month));
+        if (!sheet) { pushError(result, facility, 'sheet not found'); return; }
+        result[facility.type].push(parseSheet(sheet, facility.name, facility.type));
+      } catch (err) { pushError(result, facility, err.message); }
     });
-
     return cb ? jsonpResponse(result, cb) : jsonResponse(result);
 
   } catch (outerErr) {
@@ -113,210 +89,244 @@ function doGet(e) {
   }
 }
 
-// ── 旅館型パーサー ────────────────────────────────────────────
-// 列構成 (A〜M):
-//   A:日付  B:曜日
-//   C:総売上_予算  D:総売上_予約  E:総売上_実績
-//   F:泊  G:食  H:売店  I:ドリンク  J:追加食事
-//   K:部屋数_予算  L:部屋数_予約  M:部屋数_実績
-function parseRyokan(sheet, facilityName) {
-  const rows  = sheet.getDataRange().getValues();
+function parseSheet(sheet, facilityName, type) {
+  const rows = sheet.getDataRange().getValues();
   const daily = [];
 
-  let sumRevBudget = 0, sumRevBooking = 0, sumRevActual = 0;
-  let sumRoomBudget = 0, sumRoomBooking = 0, sumRoomActual = 0;
-  let sumStay = 0, sumFood = 0, sumShop = 0;
+  const br = rows.length > 2 ? rows[2] : [];
+  function brNum(idx) { const v = toNum(br[idx]); return v > 0 ? v : null; }
+  function brOcc(idx) {
+    const v = toNum(br[idx]);
+    if (!v) return null;
+    return v > 1 ? v / 100 : v;
+  }
+
+  let kpiBudget;
+  if (type === 'ryokan') {
+    kpiBudget = { occ_b: brOcc(1), adr_b: brNum(2), rvp_b: brNum(3), pax_b: brNum(4), spd_b: brNum(5) };
+  } else {
+    kpiBudget = { occ_b: brOcc(1), unit_b: brNum(2), pax_b: brNum(3), spd_b: brNum(4), adr_b: brNum(5) };
+  }
+
+  let sumRevBudget=0, sumRevBooking=0, sumRevActual=0;
+  let sumUnitBudget=0, sumUnitBooking=0, sumUnitActual=0;
+  let sumPaxBudget=0, sumPaxBooking=0, sumPaxActual=0;
+  let sumAdrActual=0, adrCount=0;
+  let sumStay=0, sumFood=0, sumShop=0;
+  let totalRooms=0, dayCount=0;
 
   rows.forEach(row => {
-    const date = extractDate(row[0]);
-    if (!date) return; // 日付でない行（ヘッダー・合計行等）をスキップ
-
-    const entry = {
-      date:            date,
-      weekday:         String(row[1] || ''),
-      revenue_budget:  toNum(row[2]),
-      revenue_booking: toNum(row[3]),
-      revenue_actual:  toNum(row[4]),
-      stay:            toNum(row[5]),
-      food:            toNum(row[6]),
-      shop:            toNum(row[7]),
-      drink:           toNum(row[8]),
-      extra:           toNum(row[9]),
-      rooms_budget:    toNum(row[10]),
-      rooms_booking:   toNum(row[11]),
-      rooms_actual:    toNum(row[12]),
-    };
-
-    daily.push(entry);
-    sumRevBudget   += entry.revenue_budget;
-    sumRevBooking  += entry.revenue_booking;
-    sumRevActual   += entry.revenue_actual;
-    sumRoomBudget  += entry.rooms_budget;
-    sumRoomBooking += entry.rooms_booking;
-    sumRoomActual  += entry.rooms_actual;
-    sumStay        += entry.stay;
-    sumFood        += entry.food;
-    sumShop        += entry.shop;
-  });
-
-  return {
-    facility: facilityName,
-    type:     'ryokan',
-    daily:    daily,
-    monthly:  {
-      revenue_budget:   sumRevBudget,
-      revenue_booking:  sumRevBooking,
-      revenue_actual:   sumRevActual,
-      rooms_budget:     sumRoomBudget,
-      rooms_booking:    sumRoomBooking,
-      rooms_actual:     sumRoomActual,
-      stay:             sumStay,
-      food:             sumFood,
-      shop:             sumShop,
-      achievement_rate: sumRevBudget > 0
-        ? Math.round(sumRevActual / sumRevBudget * 1000) / 10  // 小数1桁の%
-        : null,
-    },
-  };
-}
-
-// ── ゴルフ型パーサー ─────────────────────────────────────────
-// 列構成 (A〜N前後):
-//   A:日付  B:曜日
-//   C:総売上_予算  D:総売上_予約  E:総売上_実績
-//   F:組数_予算   G:組数_予約   H:組数_実績
-//   I:来場者数_予算 J:来場者数_予約 K:来場者数_実績
-//   L:稼働率  M:組単価  N:客単価
-function parseGolf(sheet, facilityName) {
-  const rows  = sheet.getDataRange().getValues();
-  const daily = [];
-
-  let sumRevBudget = 0, sumRevBooking = 0, sumRevActual = 0;
-  let sumGrpBudget = 0, sumGrpBooking = 0, sumGrpActual = 0;
-  let sumVisBudget = 0, sumVisBooking = 0, sumVisActual = 0;
-
-  rows.forEach(row => {
-    const date = extractDate(row[0]);
+    const date = extractDate(row[1]);
     if (!date) return;
-
-    const entry = {
-      date:              date,
-      weekday:           String(row[1] || ''),
-      revenue_budget:    toNum(row[2]),
-      revenue_booking:   toNum(row[3]),
-      revenue_actual:    toNum(row[4]),
-      groups_budget:     toNum(row[5]),
-      groups_booking:    toNum(row[6]),
-      groups_actual:     toNum(row[7]),
-      visitors_budget:   toNum(row[8]),
-      visitors_booking:  toNum(row[9]),
-      visitors_actual:   toNum(row[10]),
-      occupancy:         toNum(row[11]),
-      group_price:       toNum(row[12]),
-      unit_price:        toNum(row[13]),
-    };
-
-    daily.push(entry);
-    sumRevBudget  += entry.revenue_budget;
-    sumRevBooking += entry.revenue_booking;
-    sumRevActual  += entry.revenue_actual;
-    sumGrpBudget  += entry.groups_budget;
-    sumGrpBooking += entry.groups_booking;
-    sumGrpActual  += entry.groups_actual;
-    sumVisBudget  += entry.visitors_budget;
-    sumVisBooking += entry.visitors_booking;
-    sumVisActual  += entry.visitors_actual;
+    const revActual = toNum(row[5]);
+    const unitActual = toNum(row[13]);
+    const paxActual = toNum(row[16]);
+    const adrActual = toNum(row[19]);
+    const occ = toNum(row[21]);
+    const cap = toNum(row[22]);
+    daily.push({
+      date, weekday: String(row[2] || ''),
+      rev_budget: toNum(row[3]), rev_booking: toNum(row[4]), rev_actual: revActual,
+      stay: toNum(row[6]), food: toNum(row[7]), shop: toNum(row[8]),
+      unit_budget: toNum(row[11]), unit_booking: toNum(row[12]), unit_actual: unitActual,
+      pax_budget: toNum(row[14]), pax_booking: toNum(row[15]), pax_actual: paxActual,
+      adr_budget: toNum(row[17]), adr_booking: toNum(row[18]), adr_actual: adrActual,
+      occupancy: occ, total_rooms: cap,
+    });
+    sumRevBudget += toNum(row[3]); sumRevBooking += toNum(row[4]); sumRevActual += revActual;
+    sumUnitBudget += toNum(row[11]); sumUnitBooking += toNum(row[12]); sumUnitActual += unitActual;
+    sumPaxBudget += toNum(row[14]); sumPaxBooking += toNum(row[15]); sumPaxActual += paxActual;
+    sumStay += toNum(row[6]); sumFood += toNum(row[7]); sumShop += toNum(row[8]);
+    if (adrActual > 0) { sumAdrActual += adrActual; adrCount++; }
+    if (cap > 0) totalRooms = cap;
+    dayCount++;
   });
 
+  const occMonthly = (totalRooms > 0 && dayCount > 0)
+    ? Math.round(sumUnitActual / (totalRooms * dayCount) * 1000) / 10 : null;
+  const adrMonthly = adrCount > 0 ? Math.round(sumAdrActual / adrCount) : null;
+  const revparMonthly = (occMonthly != null && adrMonthly != null)
+    ? Math.round(adrMonthly * occMonthly / 100) : null;
+  const spdMonthly = sumPaxActual > 0 ? Math.round(sumRevActual / sumPaxActual) : null;
+
   return {
-    facility: facilityName,
-    type:     'golf',
-    daily:    daily,
-    monthly:  {
-      revenue_budget:    sumRevBudget,
-      revenue_booking:   sumRevBooking,
-      revenue_actual:    sumRevActual,
-      groups_budget:     sumGrpBudget,
-      groups_booking:    sumGrpBooking,
-      groups_actual:     sumGrpActual,
-      visitors_budget:   sumVisBudget,
-      visitors_booking:  sumVisBooking,
-      visitors_actual:   sumVisActual,
-      achievement_rate:  sumRevBudget > 0
-        ? Math.round(sumRevActual / sumRevBudget * 1000) / 10
-        : null,
+    facility: facilityName, type, daily,
+    monthly: {
+      rev_actual: sumRevActual, rev_budget: sumRevBudget, rev_booking: sumRevBooking,
+      unit_actual: sumUnitActual, unit_budget: sumUnitBudget,
+      pax_actual: sumPaxActual, pax_budget: sumPaxBudget,
+      stay: sumStay, food: sumFood, shop: sumShop,
+      adr: adrMonthly, occupancy: occMonthly, revpar: revparMonthly, spd: spdMonthly,
+      achievement: sumRevBudget > 0 ? Math.round(sumRevActual / sumRevBudget * 1000) / 10 : null,
+      occ_b:  kpiBudget.occ_b,
+      adr_b:  kpiBudget.adr_b,
+      rvp_b:  kpiBudget.rvp_b,
+      pax_b:  kpiBudget.pax_b || (sumPaxBudget > 0 ? sumPaxBudget : null),
+      spd_b:  kpiBudget.spd_b,
+      unit_b: kpiBudget.unit_b || (sumUnitBudget > 0 ? sumUnitBudget : null),
     },
   };
 }
 
-// ── ユーティリティ ────────────────────────────────────────────
-
-/** "2025-07" → "2025.7" */
 function monthToSheetName(month) {
   const [y, m] = month.split('-');
   return y + '.' + parseInt(m, 10);
 }
-
-/** 現在月を "YYYY-MM" 形式で返す */
 function getCurrentMonth() {
   const now = new Date();
-  return now.getFullYear() + '-'
-    + String(now.getMonth() + 1).padStart(2, '0');
+  return now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0');
 }
-
-/**
- * セル値から日付文字列 "YYYY-MM-DD" を抽出。
- * 日付でない（ヘッダー・合計行など）場合は null を返す。
- */
 function extractDate(v) {
   let d;
-  if (v instanceof Date) {
-    d = v;
-  } else if (typeof v === 'number' && v > 40000) {
-    // Sheets の数値シリアル日付 (1900-01-01 基点)
-    d = new Date(Math.round((v - 25569) * 86400 * 1000)); // Unixエポック基点の標準変換
-  } else if (typeof v === 'string' && /^\d{4}[\/\-]\d{1,2}[\/\-]\d{1,2}/.test(v)) {
-    d = new Date(v.replace(/\//g, '-'));
-  } else {
-    return null;
-  }
+  if (v instanceof Date) { d = v; }
+  else if (typeof v === 'number' && v > 40000) { d = new Date(Math.round((v - 25569) * 86400 * 1000)); }
+  else if (typeof v === 'string' && /^\d{4}[\/\-]\d{1,2}[\/\-]\d{1,2}/.test(v)) { d = new Date(v.replace(/\//g, '-')); }
+  else { return null; }
   if (isNaN(d.getTime())) return null;
   const y = d.getFullYear();
-  if (y < 2020 || y > 2035) return null; // 異常値ガード
-  return y + '-'
-    + String(d.getMonth() + 1).padStart(2, '0') + '-'
-    + String(d.getDate()).padStart(2, '0');
+  if (y < 2020 || y > 2035) return null;
+  return y + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
 }
-
-/** 数値変換。空・非数値は 0 */
 function toNum(v) {
   if (v === '' || v === null || v === undefined) return 0;
   const n = Number(v);
   return isNaN(n) ? 0 : n;
 }
-
-/** エラー用エントリをresultに追加 */
 function pushError(result, facility, msg) {
-  result[facility.type].push({
-    facility: facility.name,
-    type:     facility.type,
-    error:    msg,
-    daily:    [],
-    monthly:  {},
-  });
+  result[facility.type].push({ facility: facility.name, type: facility.type, error: msg, daily: [], monthly: {} });
 }
-
-/** JSON レスポンスを返す */
 function jsonResponse(obj) {
-  return ContentService
-    .createTextOutput(JSON.stringify(obj, null, 2))
-    .setMimeType(ContentService.MimeType.JSON);
+  return ContentService.createTextOutput(JSON.stringify(obj, null, 2)).setMimeType(ContentService.MimeType.JSON);
+}
+function jsonpResponse(obj, callback) {
+  return ContentService.createTextOutput(callback + '(' + JSON.stringify(obj, null, 2) + ');').setMimeType(ContentService.MimeType.JAVASCRIPT);
 }
 
-/** JSONP レスポンスを返す（組織内アクセス制限下でのCORS回避用） */
-function jsonpResponse(obj, callback) {
-  const json = JSON.stringify(obj, null, 2);
-  return ContentService
-    .createTextOutput(callback + '(' + json + ');')
-    .setMimeType(ContentService.MimeType.JAVASCRIPT);
+// ── IR データ取得 (Yahoo Finance + Google News) ──────────────
+function fetchIRData(cb) {
+  try {
+    var ticker = '141A.T';
+    var opts = { headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36' }, muteHttpExceptions: true };
+
+    // Quote Summary: summaryDetailにmarketCap/volume/PE/PSR、defaultKeyStatisticsにPBR/EV/EBITDA
+    var summaryUrl = 'https://query2.finance.yahoo.com/v10/finance/quoteSummary/' + ticker
+      + '?modules=summaryDetail,defaultKeyStatistics,financialData,recommendationTrend';
+    var summaryResp = UrlFetchApp.fetch(summaryUrl, opts);
+    var summaryJson = JSON.parse(summaryResp.getContentText());
+    var result0 = (summaryJson.quoteSummary && summaryJson.quoteSummary.result && summaryJson.quoteSummary.result[0]) || {};
+    var sumDet   = result0.summaryDetail || {};       // marketCap, volume, PE, PSR, 52wkH/L
+    var keyStats = result0.defaultKeyStatistics || {}; // PBR, EV/EBITDA
+    var fin      = result0.financialData || {};        // revenue, EBITDA, FCF, ROE, analyst targets
+    var recTrend = (result0.recommendationTrend && result0.recommendationTrend.trend && result0.recommendationTrend.trend[0]) || {};
+
+    // Chart data (90 days sparkline)
+    var chartUrl = 'https://query1.finance.yahoo.com/v8/finance/chart/' + ticker + '?interval=1d&range=3mo';
+    var chartResp = UrlFetchApp.fetch(chartUrl, opts);
+    var chartJson = JSON.parse(chartResp.getContentText());
+    var chartResult = (chartJson.chart && chartJson.chart.result && chartJson.chart.result[0]) || {};
+    var closes     = (chartResult.indicators && chartResult.indicators.quote && chartResult.indicators.quote[0] && chartResult.indicators.quote[0].close) || [];
+    var timestamps = chartResult.timestamp || [];
+    var chartData  = [];
+    for (var i = 0; i < timestamps.length; i++) {
+      if (closes[i] != null) {
+        var d = new Date(timestamps[i] * 1000);
+        chartData.push({
+          date: d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'),
+          close: closes[i]
+        });
+      }
+    }
+
+    // Google News RSS
+    var newsUrl = 'https://news.google.com/rss/search?q=%E3%83%88%E3%83%A9%E3%82%A4%E3%82%A2%E3%83%AB%E3%83%9B%E3%83%BC%E3%83%AB%E3%83%87%E3%82%A3%E3%83%B3%E3%82%B0%E3%82%B9&hl=ja&gl=JP&ceid=JP%3Aja';
+    var newsItems = [];
+    try {
+      var newsResp = UrlFetchApp.fetch(newsUrl, opts);
+      var newsXml  = newsResp.getContentText();
+      var itemRe   = /<item>([\s\S]*?)<\/item>/g;
+      var match;
+      var count = 0;
+      while ((match = itemRe.exec(newsXml)) !== null && count < 5) {
+        var item    = match[1];
+        var titleM  = item.match(/<title><!\[CDATA\[(.*?)\]\]><\/title>/) || item.match(/<title>(.*?)<\/title>/);
+        var linkM   = item.match(/<link>(.*?)<\/link>/);
+        var dateM   = item.match(/<pubDate>(.*?)<\/pubDate>/);
+        newsItems.push({
+          title:   titleM ? titleM[1].replace(/ - .*$/, '') : '',
+          link:    linkM  ? linkM[1].trim()  : '',
+          pubDate: dateM  ? dateM[1].trim()  : '',
+        });
+        count++;
+      }
+    } catch(newsErr) {}
+
+    function raw(obj, key) { return obj[key] && obj[key].raw !== undefined ? obj[key].raw : null; }
+
+    // チャートデータから前日比を計算
+    var filteredCloses = chartData.map(function(d){ return d.close; }).filter(function(v){ return v != null; });
+    var lastClose = filteredCloses.length > 0 ? filteredCloses[filteredCloses.length-1] : null;
+    var prevClose = filteredCloses.length >= 2 ? filteredCloses[filteredCloses.length-2] : null;
+    var chgVal = (lastClose != null && prevClose != null) ? lastClose - prevClose : null;
+    var chgPct = (chgVal != null && prevClose > 0) ? chgVal / prevClose : null;
+
+    // v8/chart メタ（確実に取得可能な値）
+    var chartMeta = chartResult.meta || {};
+
+    var irData = {
+      generated: new Date().toISOString(),
+      ticker: ticker,
+      price: {
+        current:    chartMeta.regularMarketPrice || lastClose,
+        change:     chgVal,
+        changePct:  chgPct,
+        open:       raw(sumDet, 'regularMarketOpen'),
+        high:       raw(sumDet, 'regularMarketDayHigh'),
+        low:        raw(sumDet, 'regularMarketDayLow'),
+        volume:     raw(sumDet, 'regularMarketVolume') || chartMeta.regularMarketVolume,
+        marketCap:  raw(sumDet, 'marketCap'),
+        week52High: raw(sumDet, 'fiftyTwoWeekHigh') || chartMeta.fiftyTwoWeekHigh,
+        week52Low:  raw(sumDet, 'fiftyTwoWeekLow')  || chartMeta.fiftyTwoWeekLow,
+        currency:   (sumDet.currency || 'JPY'),
+      },
+      valuation: {
+        per:        raw(sumDet, 'trailingPE'),       // summaryDetailに存在
+        forwardPer: raw(sumDet, 'forwardPE'),         // summaryDetailに存在
+        pbr:        raw(keyStats, 'priceToBook'),     // defaultKeyStatisticsに存在
+        psr:        raw(sumDet, 'priceToSalesTrailing12Months'), // summaryDetailに存在
+        ev:         raw(keyStats, 'enterpriseValue'),
+        evEbitda:   raw(keyStats, 'enterpriseToEbitda'),
+        evRevenue:  raw(keyStats, 'enterpriseToRevenue'),
+      },
+      financial: {
+        revenue:          raw(fin, 'totalRevenue'),
+        ebitda:           raw(fin, 'ebitda'),
+        ebitdaMargin:     raw(fin, 'ebitdaMargins'),
+        grossMargin:      raw(fin, 'grossMargins'),
+        operatingMargin:  raw(fin, 'operatingMargins'),
+        freeCashFlow:     raw(fin, 'freeCashflow'),
+        totalDebt:        raw(fin, 'totalDebt'),
+        totalCash:        raw(fin, 'totalCash'),
+        returnOnEquity:   raw(fin, 'returnOnEquity'),
+        targetMeanPrice:  raw(fin, 'targetMeanPrice'),
+        targetHighPrice:  raw(fin, 'targetHighPrice'),
+        targetLowPrice:   raw(fin, 'targetLowPrice'),
+        recommendationKey: fin.recommendationKey || null,
+        numberOfAnalystOpinions: raw(fin, 'numberOfAnalystOpinions'),
+      },
+      analysts: {
+        strongBuy:  recTrend.strongBuy  || 0,
+        buy:        recTrend.buy        || 0,
+        hold:       recTrend.hold       || 0,
+        sell:       recTrend.sell       || 0,
+        strongSell: recTrend.strongSell || 0,
+        period:     recTrend.period     || '0m',
+      },
+      chart: chartData,
+      news:  newsItems,
+    };
+    return cb ? jsonpResponse(irData, cb) : jsonResponse(irData);
+  } catch(err) {
+    var errData = { ir: true, error: err.message };
+    return cb ? jsonpResponse(errData, cb) : jsonResponse(errData);
+  }
 }

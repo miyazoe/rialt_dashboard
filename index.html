@@ -1395,6 +1395,81 @@ body.public-mode .private-only { display: none !important; }
 .resort-pl-num { text-align: right; font-variant-numeric: tabular-nums; color: #374151; }
 .resort-pl-bgt { color: #9ca3af; }
 
+
+  /* ── IR Tab (outer) ── */
+  /* デフォルトテーマ変数（テーマ未設定時のダーク） */
+  #outer-ir {
+    --rb:#0d1117; --rc:#161b22; --rce:#21262d; --rbr:6px;
+    --rd:#21262d; --rt:#e6edf3; --rts:#8b949e; --rtm:#6e7681;
+    --ra:#58a6ff; --rp:#3fb950; --rn:#f85149; --rw:#e3b341;
+  }
+  /* Theme A: ダーク */
+  #outer-ir.theme-a {
+    --rb:#0f1117; --rc:#1a1d27; --rce:#222639; --rbr:6px;
+    --rd:#2d3148; --rt:#e2e8f0; --rts:#94a3b8; --rtm:#64748b;
+    --ra:#00e5cc; --rp:#34d399; --rn:#f87171; --rw:#fbbf24;
+  }
+  /* Theme B: ライトSaaS */
+  #outer-ir.theme-b {
+    --rb:#f0f4ff; --rc:#ffffff; --rce:#ffffff; --rbr:12px;
+    --rd:#e2e8f0; --rt:#0f172a; --rts:#475569; --rtm:#94a3b8;
+    --ra:#6366f1; --rp:#10b981; --rn:#ef4444; --rw:#f59e0b;
+  }
+  /* Theme C: プロフェッショナルネイビー */
+  #outer-ir.theme-c {
+    --rb:#0c1929; --rc:#132338; --rce:#1a2f45; --rbr:8px;
+    --rd:#1e3a5f; --rt:#e2e8f0; --rts:#94a3b8; --rtm:#64748b;
+    --ra:#38bdf8; --rp:#34d399; --rn:#fb7185; --rw:#fbbf24;
+  }
+  #outer-ir { background: var(--rb); }
+  #ir-panel {
+    flex: 1;
+    background: var(--rb);
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0;
+    align-content: start;
+    overflow-y: auto;
+    padding: 8px;
+    box-sizing: border-box;
+    font-family: var(--font-mono);
+  }
+  #ir-panel .ir-section {
+    background: var(--rc);
+    border: 1px solid var(--rd);
+    border-radius: var(--rbr, 6px);
+    margin: 4px;
+    padding: 10px 12px;
+    box-sizing: border-box;
+  }
+  #ir-panel .ir-title {
+    font-size: 10px; color: var(--rts); text-transform: uppercase;
+    letter-spacing: 1px; margin-bottom: 6px; display: flex;
+    align-items: center; justify-content: space-between;
+  }
+  #ir-panel .ir-price-main {
+    font-size: 28px; font-weight: 700; color: var(--rt); line-height: 1.1;
+  }
+  #ir-panel .ir-price-change.up { color: var(--rp); }
+  #ir-panel .ir-price-change.down { color: var(--rn); }
+  #ir-panel .ir-kv-row {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 3px 0; font-size: 11px;
+  }
+  #ir-panel .ir-kv-row .k { color: var(--rts); }
+  #ir-panel .ir-kv-row .v { color: var(--rt); font-weight: 600; }
+  #ir-panel .ir-kv-row .v.up { color: var(--rp); }
+  #ir-panel .ir-kv-row .v.down { color: var(--rn); }
+  #ir-panel canvas#ir-sparkline { width: 100%; height: 56px; display: block; }
+  #ir-analyst-chart { width: 100%; height: 32px; display: block; }
+  #ir-news-list { list-style: none; margin: 0; padding: 0; }
+  #ir-news-list li { padding: 5px 0; border-bottom: 1px solid var(--rd); }
+  #ir-news-list li:last-child { border-bottom: none; }
+  #ir-news-list li a { color: var(--ra); font-size: 10px; line-height: 1.4; text-decoration: none; display: block; }
+  #ir-news-list li a:hover { text-decoration: underline; }
+  #ir-news-list li .ir-news-date { color: var(--rtm); font-size: 9px; margin-top: 2px; }
+  #ir-status { font-size: 9px; color: var(--rtm); }
+  .ir-loading { color: var(--rts); font-size: 11px; padding: 20px; text-align: center; }
 </style>
 </head>
 <body>
@@ -1431,6 +1506,7 @@ body.public-mode .private-only { display: none !important; }
   <button class="outer-tab-btn active" data-outer="rialt">RIALT</button>
   <button class="outer-tab-btn" data-outer="resort">TGR</button>
   <button class="outer-tab-btn private-only" data-outer="top-report">TOP</button>
+  <button class="outer-tab-btn private-only" data-outer="ir">IR</button>
 </div>
 
 <!-- PASTE DIALOG -->
@@ -1886,9 +1962,9 @@ body.public-mode .private-only { display: none !important; }
     </div>
   </div>
 
-</div>
+    </div><!-- end tab-top -->
 
-<!-- ===== TAB 2: 実務 ===== -->
+<!-- ===== TAB 2: &#x5B9F;&#x52D9; ===== -->
 <div class="tab-content" id="tab-jitumu">
 
   <div class="panel" id="panel-resort">
@@ -2016,6 +2092,54 @@ body.public-mode .private-only { display: none !important; }
 
 </div>
 </div><!-- end outer-top-report -->
+<!-- IR CONTENT -->
+<div class="outer-content" id="outer-ir">
+      <div id="ir-panel">
+        <div class="ir-section">
+          <div class="ir-title">
+            <span>&#x1F4C8; 141A トライアルHD</span>
+            <span id="ir-status">&#x2014;</span>
+          </div>
+          <div id="ir-price-main" class="ir-price-main">&#x2014;</div>
+          <div id="ir-price-change" class="ir-price-change">&#x2014;</div>
+          <canvas id="ir-sparkline" height="56"></canvas>
+        </div>
+        <div class="ir-section">
+          <div class="ir-title"><span>&#x6642;&#x4FA1;&#x7DCF;&#x984D;&#x30FB;&#x682A;&#x4FA1;&#x60C5;&#x5831;</span></div>
+          <div class="ir-kv-row"><span class="k">&#x6642;&#x4FA1;&#x7DCF;&#x984D;</span><span class="v" id="ir-mktcap">&#x2014;</span></div>
+          <div class="ir-kv-row"><span class="k">52&#x9031;&#x9AD8;&#x5024;</span><span class="v" id="ir-52h">&#x2014;</span></div>
+          <div class="ir-kv-row"><span class="k">52&#x9031;&#x5B89;&#x5024;</span><span class="v" id="ir-52l">&#x2014;</span></div>
+          <div class="ir-kv-row"><span class="k">&#x51FA;&#x6765;&#x9AD8;</span><span class="v" id="ir-vol">&#x2014;</span></div>
+        </div>
+        <div class="ir-section">
+          <div class="ir-title"><span>&#x30D0;&#x30EA;&#x30E5;&#x30A8;&#x30FC;&#x30B7;&#x30E7;&#x30F3;</span></div>
+          <div class="ir-kv-row"><span class="k">PER&#xFF08;&#x5B9F;&#x7E3E;&#xFF09;</span><span class="v" id="ir-per">&#x2014;</span></div>
+          <div class="ir-kv-row"><span class="k">PER&#xFF08;&#x4E88;&#x60F3;&#xFF09;</span><span class="v" id="ir-fper">&#x2014;</span></div>
+          <div class="ir-kv-row"><span class="k">PBR</span><span class="v" id="ir-pbr">&#x2014;</span></div>
+          <div class="ir-kv-row"><span class="k">EV/EBITDA</span><span class="v" id="ir-evebitda">&#x2014;</span></div>
+          <div class="ir-kv-row"><span class="k">PSR</span><span class="v" id="ir-psr">&#x2014;</span></div>
+        </div>
+        <div class="ir-section">
+          <div class="ir-title"><span>&#x8CA1;&#x52D9;&#x30CF;&#x30A4;&#x30E9;&#x30A4;&#x30C8;&#xFF08;&#x76F4;&#x8FD1;&#x901A;&#x671F;&#xFF09;</span></div>
+          <div class="ir-kv-row"><span class="k">&#x58F2;&#x4E0A;&#x9AD8;</span><span class="v" id="ir-rev">&#x2014;</span></div>
+          <div class="ir-kv-row"><span class="k">EBITDA</span><span class="v" id="ir-ebitda">&#x2014;</span></div>
+          <div class="ir-kv-row"><span class="k">EBITDA&#x30DE;&#x30FC;&#x30B8;&#x30F3;</span><span class="v" id="ir-ebitdam">&#x2014;</span></div>
+          <div class="ir-kv-row"><span class="k">FCF</span><span class="v" id="ir-fcf">&#x2014;</span></div>
+          <div class="ir-kv-row"><span class="k">ROE</span><span class="v" id="ir-roe">&#x2014;</span></div>
+        </div>
+        <div class="ir-section">
+          <div class="ir-title"><span>&#x30A2;&#x30CA;&#x30EA;&#x30B9;&#x30C8;&#x8A55;&#x4FA1;</span></div>
+          <canvas id="ir-analyst-chart" height="32"></canvas>
+          <div id="ir-analyst-legend" style="margin-top:4px;font-size:10px;color:#8b949e"></div>
+          <div class="ir-kv-row" style="margin-top:6px"><span class="k">&#x76EE;&#x6A19;&#x682A;&#x4FA1; &#x5E73;&#x5747;</span><span class="v" id="ir-tgt-mean">&#x2014;</span></div>
+          <div class="ir-kv-row"><span class="k">&#x76EE;&#x6A19;&#x682A;&#x4FA1; &#x30EC;&#x30F3;&#x30B8;</span><span class="v" id="ir-tgt-range">&#x2014;</span></div>
+        </div>
+        <div class="ir-section">
+          <div class="ir-title"><span>&#x6700;&#x65B0;&#x30CB;&#x30E5;&#x30FC;&#x30B9;</span></div>
+          <ul id="ir-news-list"><li class="ir-loading">&#x8AAD;&#x307F;&#x8FBC;&#x307F;&#x4E2D;...</li></ul>
+        </div>
+      </div><!-- end ir-panel -->
+</div><!-- end outer-ir -->
 <!-- RESORT CONTENT -->
 <div class="outer-content" id="outer-resort">
   <div class="resort-header">
@@ -2040,10 +2164,13 @@ body.public-mode .private-only { display: none !important; }
       </div>
       <div id="resort-tab-daily">
         <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
-          <button class="resort-gas-fetch-btn" id="resort-gas-fetch-btn">📡 日別データを取得</button>
+          <button class="resort-gas-fetch-btn" id="resort-gas-fetch-btn" style="display:none">📡 日別データを取得</button>
           <span class="resort-gas-cache-info" id="resort-gas-cache-info"></span>
         </div>
-        <div class="resort-chart-wrap"><canvas id="resort-daily-chart"></canvas></div>
+        <div id="resort-daily-top" style="display:flex;gap:12px;align-items:flex-start;margin-bottom:0">
+          <div id="resort-daily-story" style="flex:1;min-width:0"></div>
+          <div class="resort-chart-wrap" style="flex:2;min-width:0"><canvas id="resort-daily-chart"></canvas></div>
+        </div>
         <div id="resort-breakdown"></div>
       </div>
       <div id="resort-tab-monthly" style="display:none">
@@ -2217,6 +2344,12 @@ body.public-mode .private-only { display: none !important; }
     if (!el) return;
     el.classList.remove('theme-a','theme-b','theme-c');
     if (t && t !== 'default') el.classList.add('theme-' + t);
+    // IR タブにも同じテーマを適用
+    var irEl = document.getElementById('outer-ir');
+    if (irEl) {
+      irEl.classList.remove('theme-a','theme-b','theme-c');
+      if (t && t !== 'default') irEl.classList.add('theme-' + t);
+    }
     document.querySelectorAll('.rialt-theme-btn').forEach(function(b){
       b.style.outline = b.dataset.t === (t||'default') ? '2px solid #2563eb' : 'none';
     });
@@ -7404,19 +7537,34 @@ document.getElementById('import-btn').addEventListener('click', openPasteDialog)
     if (!month || !/^\d{4}-\d{2}$/.test(month)) return null;
     var result = {};
     (json.ryokan || []).forEach(function(fac) {
+      if (fac.error) return;
       var mo = fac.monthly || {};
-      var pax_a = mo.rooms_actual > 0 ? mo.rooms_actual : null;
-      var pax_b = mo.rooms_budget > 0 ? mo.rooms_budget : null;
-      var stay  = mo.stay || 0;
-      var adr_a = (stay > 0 && pax_a) ? Math.round(stay / pax_a) : null;
-      if (pax_a != null || pax_b != null || adr_a != null)
-        result[fac.facility] = { pax_a: pax_a, pax_b: pax_b, adr_a: adr_a };
+      var pax_a = mo.pax_actual  > 0 ? mo.pax_actual  : null;
+      var pax_b = mo.pax_budget  > 0 ? mo.pax_budget  : null;
+      var adr_a = mo.adr         > 0 ? mo.adr         : null;
+      var adr_b = mo.adr_b       > 0 ? mo.adr_b       : null;
+      var occ_a = mo.occupancy   > 0 ? mo.occupancy / 100 : null;  // % → 小数
+      var occ_b = mo.occ_b       != null ? (mo.occ_b > 1 ? mo.occ_b / 100 : mo.occ_b) : null;
+      var rvp_a = mo.revpar      > 0 ? mo.revpar      : null;
+      var rvp_b = mo.rvp_b       > 0 ? mo.rvp_b       : null;
+      var spd_a = (mo.pax_actual > 0 && mo.rev_actual > 0) ? Math.round(mo.rev_actual / mo.pax_actual) : null;
+      var spd_b = mo.spd_b       > 0 ? mo.spd_b       : null;
+      if (pax_a != null || adr_a != null || occ_a != null)
+        result[fac.facility] = { pax_a: pax_a, pax_b: pax_b, adr_a: adr_a, adr_b: adr_b, occ_a: occ_a, occ_b: occ_b, rvp_a: rvp_a, rvp_b: rvp_b, spd_a: spd_a, spd_b: spd_b };
     });
     (json.golf || []).forEach(function(fac) {
       if (fac.error) return;
       var mo = fac.monthly || {};
-      var pax_a = (mo.visitors_actual > 0) ? mo.visitors_actual : null;
-      if (pax_a) result[fac.facility] = { pax_a: pax_a };
+      var pax_a = mo.pax_actual  > 0 ? mo.pax_actual  : null;
+      var pax_b = mo.pax_budget  > 0 ? mo.pax_budget  : null;
+      var unit_a = mo.unit_actual > 0 ? mo.unit_actual : null;
+      var unit_b = mo.unit_b     > 0 ? mo.unit_b      : null;
+      var occ_a = mo.occupancy   > 0 ? mo.occupancy / 100 : null;  // % → 小数
+      var occ_b = mo.occ_b       != null ? (mo.occ_b > 1 ? mo.occ_b / 100 : mo.occ_b) : null;
+      var spd_a = (mo.pax_actual > 0 && mo.rev_actual > 0) ? Math.round(mo.rev_actual / mo.pax_actual) : null;
+      var spd_b = mo.spd_b       > 0 ? mo.spd_b       : null;
+      if (pax_a != null || occ_a != null)
+        result[fac.facility] = { pax_a: pax_a, pax_b: pax_b, unit_a: unit_a, unit_b: unit_b, occ_a: occ_a, occ_b: occ_b, spd_a: spd_a, spd_b: spd_b };
     });
     return { month: month, data: result };
   }
@@ -7453,8 +7601,8 @@ document.getElementById('import-btn').addEventListener('click', openPasteDialog)
   }
 
   window._processGasImport = async function(text) {
-    var parsed;
-    try { parsed = parseGasJson(text); }
+    var parsed, rawJson;
+    try { rawJson = stripJsonp(text); parsed = parseGasJson(text); }
     catch(e) { showToast('JSONパースエラー: ' + e.message, 'error'); return; }
 
     // データがある月のみ抽出（全施設0の月はスキップ）
@@ -7497,6 +7645,23 @@ document.getElementById('import-btn').addEventListener('click', openPasteDialog)
       window.GAS_MONTHLY[p.month] = Object.assign(window.GAS_MONTHLY[p.month] || {}, p.data);
     });
 
+    // 日別データもlocalStorageに保存（loadGasが参照するキーに）
+    var rawPeriods = rawJson.all ? rawJson.periods : [rawJson];
+    rawPeriods.forEach(function(rawP) {
+      if (!rawP || !rawP.month) return;
+      var dailyData = {
+        ryokan: (rawP.ryokan || []).map(function(f) {
+          return { facility: f.facility, daily: f.daily || [] };
+        }),
+        golf: (rawP.golf || []).map(function(f) {
+          return { facility: f.facility, daily: f.daily || [] };
+        })
+      };
+      var hasDaily = dailyData.ryokan.some(function(f) { return f.daily.length > 0; })
+                  || dailyData.golf.some(function(f) { return f.daily.length > 0; });
+      if (hasDaily) _saveGasToLS(rawP.month, dailyData);
+    });
+
     var msg = validPeriods.length + 'ヶ月分を gas_data.js に保存しました';
     if (skipped > 0) msg += '（' + skipped + 'ヶ月はデータなしでスキップ）';
     showToast(msg, 'success');
@@ -7532,15 +7697,15 @@ document.getElementById('import-btn').addEventListener('click', openPasteDialog)
 
   // 実施設マスタ（合計・本社除く）
   var RESORT_FACS = [
-    { pl: '宮若虎の湯',   gas: '宮若虎の湯',   type: 'ryokan' },
-    { pl: '古民家煉り',   gas: '古民家煉り',   type: 'ryokan' },
-    { pl: 'Tsmart',       gas: 'Tsmart',        type: 'ryokan' },
     { pl: '九重久織亭',   gas: '九重久織亭',   type: 'ryokan' },
-    { pl: '九重虎の湯',   gas: '九重虎乃湯',   type: 'ryokan' },
-    { pl: '仙石原久の葉', gas: '仙石原久の葉', type: 'ryokan' },
+    { pl: 'ロッジ虎の湯', gas: '九重虎乃湯',   type: 'ryokan' },
+    { pl: '宮若虎の湯',   gas: '宮若虎の湯',   type: 'ryokan' },
     { pl: '小塚久の葉',   gas: '小塚久の葉',   type: 'ryokan' },
-    { pl: '大分コース',   gas: '大分コース',   type: 'golf' },
+    { pl: '仙石原久の葉', gas: '仙石原久の葉', type: 'ryokan' },
+    { pl: '古民家煉り',   gas: '古民家煉り',   type: 'ryokan' },
+    { pl: 'TSMART',       gas: 'Tsmart',        type: 'ryokan' },
     { pl: '若宮コース',   gas: '若宮コース',   type: 'golf' },
+    { pl: '大分コース',   gas: '大分コース',   type: 'golf' },
     { pl: '阿蘇コース',   gas: '阿蘇コース',   type: 'golf' },
   ];
 
@@ -7561,6 +7726,14 @@ document.getElementById('import-btn').addEventListener('click', openPasteDialog)
     if (ret.pax_a == null && gm.pax_a != null) ret.pax_a = gm.pax_a;
     if (ret.pax_b == null && gm.pax_b != null) ret.pax_b = gm.pax_b;
     if (ret.adr_a == null && gm.adr_a != null) ret.adr_a = gm.adr_a;
+    if (ret.occ_a == null && gm.occ_a != null) ret.occ_a = gm.occ_a;
+    if (ret.rvp_a == null && gm.rvp_a != null) ret.rvp_a = gm.rvp_a;
+    if (ret.spd_a == null && gm.spd_a != null) ret.spd_a = gm.spd_a;
+    if (ret.adr_b == null && gm.adr_b != null) ret.adr_b = gm.adr_b;
+    if (ret.occ_b == null && gm.occ_b != null) ret.occ_b = gm.occ_b;
+    if (ret.rvp_b == null && gm.rvp_b != null) ret.rvp_b = gm.rvp_b;
+    if (ret.pax_b == null && gm.pax_b != null) ret.pax_b = gm.pax_b;
+    if (ret.spd_b == null && gm.spd_b != null) ret.spd_b = gm.spd_b;
     return ret;
   }
 
@@ -7569,6 +7742,10 @@ document.getElementById('import-btn').addEventListener('click', openPasteDialog)
     if (v == null || v === '' || isNaN(Number(v))) return '—';
     var n = Math.round(Number(v) / 10000);
     return n.toLocaleString() + '万';
+  }
+  function fmtYen(v) {
+    if (v == null || v === '' || isNaN(Number(v))) return '—';
+    return '¥' + Math.round(Number(v)).toLocaleString();
   }
   function fmtPct(v, dec) {
     if (v == null || isNaN(Number(v))) return '—';
@@ -7641,27 +7818,33 @@ document.getElementById('import-btn').addEventListener('click', openPasteDialog)
         gp_a: s('売上総利益_実績'),
         op_a: s('営業利益_実績'), op_b: s('営業利益_予算'),
         lc_a: s('人件費_実績'), lc_b: s('人件費_予算'),
-        occ_a: avg('稼働率_実績'), occ_b: avg('稼働率_予算'),
+        occ_a: avg('客室稼働率_実績'), occ_b: avg('稼働率_予算'),
         adr_a: avg('ADR_実績'), adr_b: avg('ADR_予算'),
         rvp_a: avg('RevPAR_実績'), rvp_b: avg('RevPAR_予算'),
-        pax_a: s('来場客数_実績'), pax_b: s('来場客数_予算'),
+        pax_a: s('販売客室数_実績'), pax_b: s('来場客数_予算'),
         spd_a: avg('客単価_実績'), spd_b: avg('客単価_予算')
       };
       // YTD: GAS月次合計で補完
       if (window.GAS_MONTHLY) {
         var gn2 = facGasName(facName);
-        var gpa = 0, gpb = 0, gad = 0, gadCnt = 0;
+        var gpa = 0, gpb = 0, gad = 0, gadCnt = 0, gocc = 0, goccCnt = 0, grvp = 0, grvpCnt = 0, gspd = 0, gspdCnt = 0;
         months.forEach(function(mo) {
           var gm = window.GAS_MONTHLY[mo] && window.GAS_MONTHLY[mo][gn2];
           if (gm) {
             if (gm.pax_a != null) gpa += gm.pax_a;
             if (gm.pax_b != null) gpb += gm.pax_b;
             if (gm.adr_a != null) { gad += gm.adr_a; gadCnt++; }
+            if (gm.occ_a != null) { gocc += gm.occ_a; goccCnt++; }
+            if (gm.rvp_a != null) { grvp += gm.rvp_a; grvpCnt++; }
+            if (gm.spd_a != null) { gspd += gm.spd_a; gspdCnt++; }
           }
         });
         if (ytdRet.pax_a == null && gpa > 0) ytdRet.pax_a = gpa;
         if (ytdRet.pax_b == null && gpb > 0) ytdRet.pax_b = gpb;
         if (ytdRet.adr_a == null && gadCnt > 0) ytdRet.adr_a = Math.round(gad / gadCnt);
+        if (ytdRet.occ_a == null && goccCnt > 0) ytdRet.occ_a = gocc / goccCnt;  // 小数平均
+        if (ytdRet.rvp_a == null && grvpCnt > 0) ytdRet.rvp_a = Math.round(grvp / grvpCnt);
+        if (ytdRet.spd_a == null && gspdCnt > 0) ytdRet.spd_a = Math.round(gspd / gspdCnt);
       }
       return ytdRet;
     }
@@ -7672,10 +7855,10 @@ document.getElementById('import-btn').addEventListener('click', openPasteDialog)
       gp_a: nv(d['売上総利益_実績']),
       op_a: nv(d['営業利益_実績']), op_b: nv(d['営業利益_予算']),
       lc_a: nv(d['人件費_実績']), lc_b: nv(d['人件費_予算']),
-      occ_a: nv(d['稼働率_実績']), occ_b: nv(d['稼働率_予算']),
+      occ_a: nv(d['客室稼働率_実績']), occ_b: nv(d['稼働率_予算']),
       adr_a: nv(d['ADR_実績']), adr_b: nv(d['ADR_予算']),
       rvp_a: nv(d['RevPAR_実績']), rvp_b: nv(d['RevPAR_予算']),
-      pax_a: nv(d['来場客数_実績']), pax_b: nv(d['来場客数_予算']),
+      pax_a: nv(d['販売客室数_実績']), pax_b: nv(d['来場客数_予算']),
       spd_a: nv(d['客単価_実績']), spd_b: nv(d['客単価_予算'])
     };
     return suppFromGas(facName, ym, ret);
@@ -7718,7 +7901,7 @@ document.getElementById('import-btn').addEventListener('click', openPasteDialog)
         document.querySelectorAll('.resort-mode-btn').forEach(function(b) { b.classList.remove('active'); });
         btn.classList.add('active');
         _viewMode = btn.dataset.mode;
-        showL1();
+        if (_currentFac) { showL2(_currentFac); } else { showL1(); }
       });
     });
     document.querySelectorAll('.resort-l2-tab').forEach(function(btn) {
@@ -7943,7 +8126,7 @@ document.getElementById('import-btn').addEventListener('click', openPasteDialog)
       if (_cacheInfo) _cacheInfo.textContent = '最終取得: ' + _ts;
       document.getElementById('resort-status').textContent = '';
     } else {
-      if (_cacheInfo) _cacheInfo.textContent = 'キャッシュなし — 「日別データを取得」を押してください';
+      if (_cacheInfo) _cacheInfo.textContent = '日別データなし — GASデータをインポートしてください';
       document.getElementById('resort-status').textContent = '';
     }
     loadGas(ym, function(gasData) {
@@ -7954,7 +8137,7 @@ document.getElementById('import-btn').addEventListener('click', openPasteDialog)
       setTimeout(function() { renderDailyChart(fac ? (fac.daily || []) : [], facObj.type); }, 60);
     }, function() {
       document.getElementById('resort-status').textContent = '';
-      if (_cacheInfo && !_ts) _cacheInfo.textContent = '取得失敗—「日別データを取得」を押してください';
+      if (_cacheInfo && !_ts) _cacheInfo.textContent = '日別データなし — GASデータをインポートしてください';
       setTimeout(function() { renderDailyChart([], facObj.type); }, 60);
     });
   }
@@ -8150,96 +8333,557 @@ document.getElementById('import-btn').addEventListener('click', openPasteDialog)
     var c = document.getElementById(id);
     if (c) c.getContext('2d').clearRect(0, 0, c.width, c.height);
   }
+  // ── 日別ストーリー生成 ──────────────────────────────────────
+  function buildDailyStory(daily, type) {
+    if (!daily || !daily.length) return '';
+    var WD = ['日','月','火','水','木','金','土'];
+    var today = new Date();
+    var todayStr = today.getFullYear() + '-'
+      + String(today.getMonth()+1).padStart(2,'0') + '-'
+      + String(today.getDate()).padStart(2,'0');
+    var rows = daily.filter(function(d) { return d.date <= todayStr && (Number(d.rev_actual)||0) > 0; });
+    if (!rows.length) return '';
+    var totalActual = rows.reduce(function(s,d){return s+(Number(d.rev_actual)||0);},0);
+    var totalBudget = rows.reduce(function(s,d){return s+(Number(d.rev_budget)||0);},0);
+    var sorted = rows.slice().sort(function(a,b){return (Number(b.rev_actual)||0)-(Number(a.rev_actual)||0);});
+    var best = sorted[0], worst = sorted[sorted.length-1];
+    function dayLabel(d) {
+      var wd = d.weekday || WD[new Date(d.date).getDay()];
+      return d.date.slice(5).replace('-','/') + '(' + wd + ')';
+    }
+    var okDays = rows.filter(function(d){
+      var a=Number(d.rev_actual)||0, b=Number(d.rev_budget)||0; return b>0 && a>=b;
+    }).length;
+    var ngDays = rows.filter(function(d){ return (Number(d.rev_budget)||0)>0; }).length - okDays;
+    var wkend = rows.filter(function(d){ var w=new Date(d.date).getDay(); return w===0||w===6; });
+    var wkday = rows.filter(function(d){ var w=new Date(d.date).getDay(); return w>=1&&w<=5; });
+    var wkendAvg = wkend.length ? Math.round(wkend.reduce(function(s,d){return s+(Number(d.rev_actual)||0);},0)/wkend.length) : null;
+    var wkdayAvg = wkday.length ? Math.round(wkday.reduce(function(s,d){return s+(Number(d.rev_actual)||0);},0)/wkday.length) : null;
+    var first  = rows.filter(function(d){ return parseInt(d.date.slice(-2))<=15; });
+    var second = rows.filter(function(d){ return parseInt(d.date.slice(-2))>15; });
+    var firstAvg = first.length  ? Math.round(first.reduce(function(s,d){return s+(Number(d.rev_actual)||0);},0)/first.length)  : null;
+    var secAvg   = second.length ? Math.round(second.reduce(function(s,d){return s+(Number(d.rev_actual)||0);},0)/second.length) : null;
+    var achRate = totalBudget>0 ? Math.round(totalActual/totalBudget*100) : null;
+    var achCol  = achRate==null?'#6b7280':achRate>=100?'#16a34a':achRate>=90?'#d97706':'#dc2626';
+    var trendColor = '#6b7280', trendArrow = '';
+    if (firstAvg && secAvg) {
+      if (secAvg > firstAvg * 1.05) { trendArrow = ' ↑ 後半加速'; trendColor = '#16a34a'; }
+      else if (secAvg < firstAvg * 0.95) { trendArrow = ' ↓ 後半減速'; trendColor = '#dc2626'; }
+      else { trendArrow = ' → 横ばい'; }
+    }
+    function chip(label, val, color) {
+      return '<span style="display:inline-flex;align-items:center;gap:3px;background:#f1f5f9;border-radius:10px;padding:1px 8px;font-size:11px;margin-right:4px">'
+        + '<span style="color:#6b7280">' + label + '</span>'
+        + '<strong style="color:' + color + '">' + val + '</strong></span>';
+    }
+    var extraRows = '';
+    if (type === 'ryokan') {
+      var occRows = rows.filter(function(d){return (Number(d.occupancy)||0)>0;});
+      var adrRows = rows.filter(function(d){return (Number(d.adr_actual)||0)>0;});
+      if (occRows.length) {
+        var occAvg = Math.round(occRows.reduce(function(s,d){return s+(Number(d.occupancy)||0);},0)/occRows.length*1000)/10;
+        var occSorted = occRows.slice().sort(function(a,b){return (Number(b.occupancy)||0)-(Number(a.occupancy)||0);});
+        extraRows += '<tr><td style="padding:7px 12px;color:#6b7280;white-space:nowrap;border-bottom:1px solid #f3f4f6;font-size:11px">稼働率</td>'
+          + '<td style="padding:7px 12px;border-bottom:1px solid #f3f4f6">'
+          + chip('平均', occAvg+'%', '#2563eb')
+          + chip('最高', Math.round((Number(occSorted[0].occupancy)||0)*1000)/10+'% '+dayLabel(occSorted[0]), '#16a34a')
+          + chip('最低', Math.round((Number(occSorted[occSorted.length-1].occupancy)||0)*1000)/10+'% '+dayLabel(occSorted[occSorted.length-1]), '#d97706')
+          + '</td></tr>';
+      }
+      if (adrRows.length) {
+        var adrAvg = Math.round(adrRows.reduce(function(s,d){return s+(Number(d.adr_actual)||0);},0)/adrRows.length);
+        extraRows += '<tr style="background:#fafafa"><td style="padding:7px 12px;color:#6b7280;white-space:nowrap;border-bottom:1px solid #f3f4f6;font-size:11px">ADR</td>'
+          + '<td style="padding:7px 12px;border-bottom:1px solid #f3f4f6">'
+          + chip('平均', '¥'+adrAvg.toLocaleString(), '#374151')
+          + '</td></tr>';
+      }
+    } else if (type === 'golf') {
+      var unitRows = rows.filter(function(d){return (Number(d.unit_actual)||0)>0;});
+      var paxRows  = rows.filter(function(d){return (Number(d.pax_actual)||0)>0;});
+      if (unitRows.length) {
+        var unitTotal = unitRows.reduce(function(s,d){return s+(Number(d.unit_actual)||0);},0);
+        var paxTotal  = paxRows.reduce(function(s,d){return s+(Number(d.pax_actual)||0);},0);
+        var occGRows  = rows.filter(function(d){return (Number(d.occupancy)||0)>0;});
+        var occGAvg   = occGRows.length ? Math.round(occGRows.reduce(function(s,d){return s+(Number(d.occupancy)||0);},0)/occGRows.length*1000)/10 : null;
+        extraRows += '<tr><td style="padding:7px 12px;color:#6b7280;white-space:nowrap;border-bottom:1px solid #f3f4f6;font-size:11px">組数/来場</td>'
+          + '<td style="padding:7px 12px;border-bottom:1px solid #f3f4f6">'
+          + chip('組数', unitTotal+'組', '#374151')
+          + chip('来場者', paxTotal+'名', '#374151')
+          + (occGAvg!=null ? chip('稼働率平均', occGAvg+'%', '#2563eb') : '')
+          + '</td></tr>';
+      }
+    }
+    return '<div style="margin-top:10px;background:#fff;border:1px solid #e2e8f0;border-radius:8px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,0.06)">'
+      + '<div style="background:#f8fafc;border-bottom:2px solid #e2e8f0;padding:8px 12px;display:flex;align-items:center;gap:8px">'
+      + '<span style="font-size:12px;font-weight:700;color:#374151">📊 日別分析サマリー</span>'
+      + '<span style="font-size:11px;color:#9ca3af">実績'+rows.length+'日分</span></div>'
+      + '<table style="width:100%;border-collapse:collapse;font-size:12px">'
+      + '<tr><td style="padding:7px 12px;color:#6b7280;white-space:nowrap;width:80px;border-bottom:1px solid #f3f4f6;font-size:11px">達成状況</td>'
+      + '<td style="padding:7px 12px;border-bottom:1px solid #f3f4f6">'
+      + chip('予算達成', okDays+'日', '#16a34a')
+      + chip('未達', ngDays+'日', '#dc2626')
+      + (achRate!=null ? chip('累計達成率', achRate+'%', achCol) : '')
+      + '</td></tr>'
+      + '<tr style="background:#fafafa"><td style="padding:7px 12px;color:#6b7280;white-space:nowrap;border-bottom:1px solid #f3f4f6;font-size:11px">ベスト日</td>'
+      + '<td style="padding:7px 12px;border-bottom:1px solid #f3f4f6"><strong style="color:#1f2937">'+dayLabel(best)+'</strong>'
+      + ' <span style="color:#374151">'+fmtYen(Number(best.rev_actual))+'</span>'
+      + (Number(best.rev_budget)>0 ? ' <span style="color:#9ca3af;font-size:11px">(予算比'+Math.round(Number(best.rev_actual)/Number(best.rev_budget)*100)+'%)</span>' : '')
+      + '</td></tr>'
+      + '<tr><td style="padding:7px 12px;color:#6b7280;white-space:nowrap;border-bottom:1px solid #f3f4f6;font-size:11px">ワースト日</td>'
+      + '<td style="padding:7px 12px;border-bottom:1px solid #f3f4f6"><strong style="color:#1f2937">'+dayLabel(worst)+'</strong>'
+      + ' <span style="color:#374151">'+fmtYen(Number(worst.rev_actual))+'</span>'
+      + (Number(worst.rev_budget)>0 ? ' <span style="color:#9ca3af;font-size:11px">(予算比'+Math.round(Number(worst.rev_actual)/Number(worst.rev_budget)*100)+'%)</span>' : '')
+      + '</td></tr>'
+      + (wkendAvg&&wkdayAvg
+        ? '<tr style="background:#fafafa"><td style="padding:7px 12px;color:#6b7280;white-space:nowrap;border-bottom:1px solid #f3f4f6;font-size:11px">週末 vs 平日</td>'
+          + '<td style="padding:7px 12px;border-bottom:1px solid #f3f4f6">'
+          + chip('週末平均', fmtYen(wkendAvg), '#374151')
+          + chip('平日平均', fmtYen(wkdayAvg), '#374151')
+          + '<span style="font-size:11px;color:'+(wkendAvg>wkdayAvg?'#16a34a':'#6b7280')+'">週末比'+Math.round(wkendAvg/wkdayAvg*100)+'%</span>'
+          + '</td></tr>' : '')
+      + (firstAvg&&secAvg
+        ? '<tr><td style="padding:7px 12px;color:#6b7280;white-space:nowrap;border-bottom:1px solid #f3f4f6;font-size:11px">月トレンド</td>'
+          + '<td style="padding:7px 12px;border-bottom:1px solid #f3f4f6">'
+          + chip('前半平均', fmtYen(firstAvg), '#374151')
+          + '<span style="color:#9ca3af;margin:0 4px">→</span>'
+          + chip('後半平均', fmtYen(secAvg), trendColor)
+          + '<strong style="color:'+trendColor+';font-size:11px">'+trendArrow+'</strong>'
+          + '</td></tr>' : '')
+      + extraRows
+      + '</table></div>';
+  }
+
+  // ── 日別明細テーブル ─────────────────────────────────────────
+  function buildDailyTable(daily, type) {
+    if (!daily || !daily.length) return '';
+    var today = new Date();
+    var todayStr = today.getFullYear() + '-'
+      + String(today.getMonth()+1).padStart(2,'0') + '-'
+      + String(today.getDate()).padStart(2,'0');
+    var WD = ['日','月','火','水','木','金','土'];
+    var isRyo = type === 'ryokan';
+    var hdrs = isRyo
+      ? ['日','曜','実績','予算','予算比','予約','稼働率','ADR','RevPAR','宿泊客','客単価','泊売上','食売上','売店']
+      : ['日','曜','実績','予算','予算比','予約','稼働率','組数','来場者','客単価'];
+    var th = '<tr>' + hdrs.map(function(h, i) {
+      var align = i < 2 ? 'center' : 'right';
+      return '<th style="padding:6px 10px;text-align:'+align+';background:#f8fafc;color:#6b7280;font-weight:600;font-size:11px;white-space:nowrap;border-bottom:2px solid #e2e8f0;border-right:1px solid #f3f4f6">'+h+'</th>';
+    }).join('') + '</tr>';
+    var rows = '';
+    daily.forEach(function(d, ri) {
+      var isFuture = d.date > todayStr;
+      var rev_a = Number(d.rev_actual)||0;
+      var rev_b = Number(d.rev_budget)||0;
+      var ach   = rev_b>0 ? Math.round(rev_a/rev_b*100) : null;
+      var achCol = ach==null?'#9ca3af':ach>=100?'#16a34a':ach>=90?'#d97706':'#dc2626';
+      var achBold = ach!=null&&ach>=100 ? 'font-weight:700;' : '';
+      var day = parseInt(d.date.slice(8));
+      var wd  = d.weekday || WD[new Date(d.date).getDay()];
+      var wdCol = wd==='土'?'#2563eb':wd==='日'?'#dc2626':'#374151';
+      var isToday = d.date === todayStr;
+      var rowBg = isToday ? '#eff6ff' : (ri%2===0 ? '#fff' : '#fafafa');
+      var rowStyle = 'background:'+rowBg+';'+(isFuture?'opacity:0.45':'');
+      var br = 'border-bottom:1px solid #f3f4f6;border-right:1px solid #f3f4f6;';
+      function td(val, extra) {
+        return '<td style="padding:5px 10px;text-align:right;font-size:12px;'+br+(extra||'')+'">'+val+'</td>';
+      }
+      function tdc(val, extra) {
+        return '<td style="padding:5px 10px;text-align:center;font-size:12px;'+br+(extra||'')+'">'+val+'</td>';
+      }
+      var cells = '';
+      cells += tdc(day, 'color:'+(isToday?'#2563eb':'#374151')+';'+(isToday?'font-weight:700;':''));
+      cells += tdc(wd, 'color:'+wdCol+';font-weight:600');
+      cells += td(isFuture ? '—' : fmtYen(rev_a), 'color:#1f2937;font-weight:600');
+      if (isRyo) {
+        var occ  = Number(d.occupancy)||0;
+        var adr  = Number(d.adr_actual)||0;
+        var pax  = Number(d.pax_actual)||0;
+        var stay = Number(d.stay)||0;
+        var food = Number(d.food)||0;
+        var shop = Number(d.shop)||0;
+        var rvp  = adr>0 && occ>0 ? Math.round(adr * occ) : 0;
+        var spd  = pax>0 && rev_a>0 ? Math.round(rev_a/pax) : 0;
+        cells += td(isFuture ? '—' : fmtYen(rev_b), 'color:#6b7280');
+        cells += td(ach!=null ? ach+'%' : '—', 'color:'+achCol+';'+achBold);
+        cells += td(isFuture ? '—' : (Number(d.rev_booking)||0)>0 ? fmtYen(Number(d.rev_booking)) : '—', 'color:#f59e0b');
+        cells += td(occ>0 ? Math.round(occ*1000)/10+'%' : '—', 'color:#2563eb');
+        cells += td(adr>0 ? '¥'+Math.round(adr).toLocaleString() : '—', 'color:#374151');
+        cells += td(rvp>0 ? '¥'+rvp.toLocaleString() : '—', 'color:#7c3aed');
+        cells += td(pax>0 ? pax+'人' : '—', 'color:#6b7280');
+        cells += td(spd>0 ? '¥'+spd.toLocaleString() : '—', 'color:#0891b2');
+        cells += td(stay>0 ? fmtYen(stay) : '—', 'color:#9ca3af');
+        cells += td(food>0 ? fmtYen(food) : '—', 'color:#9ca3af');
+        cells += td(shop>0 ? fmtYen(shop) : '—', 'color:#9ca3af');
+      } else {
+        var occ2  = Number(d.occupancy)||0;
+        var unit  = Number(d.unit_actual)||0;
+        var pax2  = Number(d.pax_actual)||0;
+        var bk2   = Number(d.rev_booking)||0;
+        var spd2  = unit>0 && rev_a>0 ? Math.round(rev_a/unit) : 0;
+        cells += td(isFuture ? '—' : fmtYen(rev_b), 'color:#6b7280');
+        cells += td(ach!=null ? ach+'%' : '—', 'color:'+achCol+';'+achBold);
+        cells += td(isFuture ? '—' : bk2>0 ? fmtYen(bk2) : '—', 'color:#f59e0b');
+        cells += td(occ2>0 ? Math.round(occ2*1000)/10+'%' : '—', 'color:#2563eb');
+        cells += td(unit>0 ? unit+'組' : '—', 'color:#374151');
+        cells += td(pax2>0 ? pax2+'名' : '—', 'color:#6b7280');
+        cells += td(spd2>0 ? '¥'+spd2.toLocaleString() : '—', 'color:#0891b2');
+      }
+      rows += '<tr style="'+rowStyle+'">'+cells+'</tr>';
+    });
+    return '<div style="margin-top:10px;background:#fff;border:1px solid #e2e8f0;border-radius:8px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,0.06)">'
+      + '<div style="background:#f8fafc;border-bottom:2px solid #e2e8f0;padding:8px 12px">'
+      + '<span style="font-size:12px;font-weight:700;color:#374151">📅 日別明細</span></div>'
+      + '<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;min-width:520px">'
+      + '<thead>'+th+'</thead><tbody>'+rows+'</tbody></table></div></div>';
+  }
+
   function renderDailyChart(daily, type) {
     var wrap = document.querySelector('#resort-tab-daily .resort-chart-wrap');
     var canvas = document.getElementById('resort-daily-chart');
     if (!canvas || !wrap) return;
-    var W = Math.max(wrap.clientWidth - 8, 200), H = 200;
+    var W = Math.max(wrap.clientWidth - 8, 200), H = 220;
     canvas.width = W; canvas.height = H;
     var ctx = canvas.getContext('2d');
     ctx.clearRect(0, 0, W, H);
     if (!daily || !daily.length) {
       ctx.fillStyle = '#9ca3af'; ctx.font = '13px sans-serif';
       ctx.textAlign = 'center';
-      ctx.fillText('日別データなし', W / 2, H / 2);
+      ctx.fillText('日別データなし — GASデータをインポートしてください', W / 2, H / 2);
       return;
     }
-    var budget  = daily.map(function(d) { return Number(d.revenue_budget)  || 0; });
-    var booking = daily.map(function(d) { return Number(d.revenue_booking) || 0; });
-    var actual  = daily.map(function(d) { return Number(d.revenue_actual)  || 0; });
+    var budget  = daily.map(function(d) { return Number(d.rev_budget)  || 0; });
+    var booking = daily.map(function(d) { return Number(d.rev_booking) || 0; });
+    var actual  = daily.map(function(d) { return Number(d.rev_actual)  || 0; });
     var all = budget.concat(booking).concat(actual);
     var maxVal = Math.max.apply(null, all) * 1.12 || 1;
     var n = daily.length;
-    var pL = 54, pR = 10, pT = 28, pB = 36;
+    var pL = 52, pR = 12, pT = 32, pB = 36;
     var cW = W - pL - pR, cH = H - pT - pB;
     function tx(i) { return pL + (i + 0.5) / n * cW; }
     function ty(v) { return pT + (1 - v / maxVal) * cH; }
-    var today = new Date().getDate(), todayIdx = -1;
-    daily.forEach(function(d, i) { if (parseInt(d.date.slice(-2)) === today) todayIdx = i; });
-    ctx.strokeStyle = '#e5e7eb'; ctx.lineWidth = 0.5;
-    for (var gi = 0; gi <= 4; gi++) {
-      var gy = pT + gi / 4 * cH;
-      ctx.beginPath(); ctx.moveTo(pL, gy); ctx.lineTo(W - pR, gy); ctx.stroke();
-      ctx.fillStyle = '#9ca3af'; ctx.font = '9px sans-serif'; ctx.textAlign = 'right';
-      ctx.fillText(Math.round(maxVal * (1 - gi / 4) / 10000) + '万', pL - 4, gy + 3);
-    }
-    if (todayIdx >= 0) {
-      ctx.save(); ctx.strokeStyle = '#9ca3af40'; ctx.lineWidth = 1; ctx.setLineDash([3, 3]);
-      ctx.beginPath(); ctx.moveTo(tx(todayIdx), pT); ctx.lineTo(tx(todayIdx), pT + cH);
-      ctx.stroke(); ctx.restore();
-    }
+    var todayStr = new Date().toISOString().slice(0,10);
+    var todayIdx = -1;
+    daily.forEach(function(d, i) { if (d.date === todayStr) todayIdx = i; });
     var lines = [
-      { vals: budget,  color: '#d1d5db', lbl: '予算', dash: [4, 3] },
-      { vals: booking, color: '#d97706', lbl: '予約', dash: [] },
-      { vals: actual,  color: '#059669', lbl: '実績', dash: [] },
+      { vals: budget,  color: '#cbd5e1', lbl: '予算', dash: [4,3], w: 1.5, skipFuture: false },
+      { vals: booking, color: '#f59e0b', lbl: '予約', dash: [],    w: 2,   skipFuture: false },
+      { vals: actual,  color: '#2563eb', lbl: '実績', dash: [],    w: 2.5, skipFuture: true  },
     ];
-    lines.forEach(function(line) {
-      ctx.save(); ctx.strokeStyle = line.color; ctx.lineWidth = 2;
-      if (line.dash.length) ctx.setLineDash(line.dash);
-      ctx.beginPath(); var s = false;
-      line.vals.forEach(function(v, i) {
-        if (line.lbl === '実績' && v === 0 && i > todayIdx && todayIdx >= 0) return;
-        if (!s) { ctx.moveTo(tx(i), ty(v)); s = true; } else ctx.lineTo(tx(i), ty(v));
+    function drawFrame(progress) {
+      ctx.clearRect(0, 0, W, H);
+      ctx.setLineDash([]);
+      // grid
+      for (var gi = 0; gi <= 4; gi++) {
+        var gy = pT + gi / 4 * cH;
+        ctx.strokeStyle = '#f1f5f9'; ctx.lineWidth = 1;
+        ctx.beginPath(); ctx.moveTo(pL, gy); ctx.lineTo(W - pR, gy); ctx.stroke();
+        ctx.fillStyle = '#9ca3af'; ctx.font = '9px sans-serif'; ctx.textAlign = 'right';
+        ctx.fillText(Math.round(maxVal * (1 - gi / 4) / 10000) + '万', pL - 4, gy + 3);
+      }
+      // today vertical line
+      if (todayIdx >= 0) {
+        ctx.save(); ctx.strokeStyle = '#93c5fd'; ctx.lineWidth = 1; ctx.setLineDash([3,3]);
+        ctx.beginPath(); ctx.moveTo(tx(todayIdx), pT); ctx.lineTo(tx(todayIdx), pT + cH);
+        ctx.stroke(); ctx.restore();
+      }
+      // draw lines with animation
+      lines.forEach(function(line) {
+        var endIdx = Math.round(progress * (n - 1));
+        ctx.save(); ctx.strokeStyle = line.color; ctx.lineWidth = line.w; ctx.setLineDash(line.dash);
+        ctx.beginPath(); var s = false;
+        for (var i = 0; i <= endIdx; i++) {
+          if (line.skipFuture && todayIdx >= 0 && i > todayIdx && line.vals[i] === 0) continue;
+          if (!s) { ctx.moveTo(tx(i), ty(line.vals[i])); s = true; }
+          else ctx.lineTo(tx(i), ty(line.vals[i]));
+        }
+        ctx.stroke();
+        if (s && progress < 1 && endIdx < n) {
+          ctx.fillStyle = line.color; ctx.setLineDash([]);
+          ctx.beginPath(); ctx.arc(tx(endIdx), ty(line.vals[endIdx]), 3, 0, Math.PI*2); ctx.fill();
+        }
+        ctx.restore();
       });
-      ctx.stroke(); ctx.restore();
-    });
-    ctx.fillStyle = '#9ca3af'; ctx.font = '9px sans-serif'; ctx.textAlign = 'center';
-    for (var i = 0; i < n; i += 5) ctx.fillText(daily[i].date.slice(-2), tx(i), H - pB + 14);
-    var lx = pL + 4, ly = 12;
-    lines.forEach(function(line, idx) {
-      ctx.save(); ctx.strokeStyle = line.color; ctx.lineWidth = 2;
-      if (line.dash.length) ctx.setLineDash(line.dash);
-      ctx.beginPath(); ctx.moveTo(lx + idx * 68, ly); ctx.lineTo(lx + idx * 68 + 18, ly);
-      ctx.stroke(); ctx.restore();
-      ctx.fillStyle = line.color; ctx.font = '10px sans-serif'; ctx.textAlign = 'left';
-      ctx.fillText(line.lbl, lx + idx * 68 + 22, ly + 4);
-    });
+      // x-axis labels
+      ctx.setLineDash([]);
+      for (var i = 0; i < n; i += 5) {
+        ctx.fillStyle = daily[i].date === todayStr ? '#2563eb' : '#9ca3af';
+        ctx.font = '9px sans-serif'; ctx.textAlign = 'center';
+        ctx.fillText(daily[i].date.slice(-2), tx(i), H - pB + 14);
+      }
+      // legend
+      var lx = pL, ly = 15;
+      lines.forEach(function(line, li) {
+        ctx.save(); ctx.strokeStyle = line.color; ctx.lineWidth = line.w; ctx.setLineDash(line.dash);
+        ctx.beginPath(); ctx.moveTo(lx + li*66, ly); ctx.lineTo(lx + li*66 + 18, ly);
+        ctx.stroke(); ctx.restore();
+        ctx.fillStyle = line.color; ctx.font = '10px sans-serif'; ctx.textAlign = 'left';
+        ctx.fillText(line.lbl, lx + li*66 + 22, ly + 3);
+      });
+    }
+    var startTs = null, dur = 700;
+    function easeOut(t) { return 1 - Math.pow(1-t, 3); }
+    function animate(ts) {
+      if (!startTs) startTs = ts;
+      var t = Math.min((ts - startTs) / dur, 1);
+      drawFrame(easeOut(t));
+      if (t < 1) requestAnimationFrame(animate);
+      else drawFrame(1);
+    }
+    requestAnimationFrame(animate);
+    // breakdown + story + table
     var bdEl = document.getElementById('resort-breakdown');
+    var bdHtml = '';
     if (type === 'ryokan') {
       var sS = daily.reduce(function(s,d){return s+(Number(d.stay)||0);},0);
       var sF = daily.reduce(function(s,d){return s+(Number(d.food)||0);},0);
       var sSh= daily.reduce(function(s,d){return s+(Number(d.shop)||0);},0);
       var tot = sS + sF + sSh;
       if (tot > 0) {
-        var pc = function(v) { return '(' + Math.round(v/tot*100) + '%)'; };
-        bdEl.innerHTML = '<div class="resort-breakdown">'
-          + '<span class="resort-bd-item"><span style="color:#3b82f6">泊</span>&nbsp;' + fmtM(sS) + '&nbsp;' + pc(sS) + '</span>'
-          + '<span class="resort-bd-item"><span style="color:#f59e0b">食</span>&nbsp;' + fmtM(sF) + '&nbsp;' + pc(sF) + '</span>'
-          + '<span class="resort-bd-item"><span style="color:#8b5cf6">売店</span>&nbsp;' + fmtM(sSh) + '&nbsp;' + pc(sSh) + '</span>'
+        var pc = function(v) { return '<span style="color:#9ca3af;font-size:11px">('+Math.round(v/tot*100)+'%)</span>'; };
+        bdHtml = '<div class="resort-breakdown">'
+          + '<span class="resort-bd-item"><span style="color:#2563eb">泊</span>&nbsp;'+fmtYen(sS)+'&nbsp;'+pc(sS)+'</span>'
+          + '<span class="resort-bd-item"><span style="color:#f59e0b">食</span>&nbsp;'+fmtYen(sF)+'&nbsp;'+pc(sF)+'</span>'
+          + '<span class="resort-bd-item"><span style="color:#8b5cf6">売店</span>&nbsp;'+fmtYen(sSh)+'&nbsp;'+pc(sSh)+'</span>'
           + '</div>';
       }
     } else if (type === 'golf') {
-      var sG = daily.reduce(function(s,d){return s+(Number(d.groups_actual)||0);},0);
-      var sV = daily.reduce(function(s,d){return s+(Number(d.visitors_actual)||0);},0);
-      bdEl.innerHTML = '<div class="resort-breakdown">'
-        + '<span class="resort-bd-item"><span style="color:#3b82f6">組数</span>&nbsp;' + sG + '組</span>'
-        + '<span class="resort-bd-item"><span style="color:#059669">来場者</span>&nbsp;' + sV + '名</span>'
+      var sG = daily.reduce(function(s,d){return s+(Number(d.unit_actual)||0);},0);
+      var sV = daily.reduce(function(s,d){return s+(Number(d.pax_actual)||0);},0);
+      bdHtml = '<div class="resort-breakdown">'
+        + '<span class="resort-bd-item"><span style="color:#2563eb">組数</span>&nbsp;'+sG+'組</span>'
+        + '<span class="resort-bd-item"><span style="color:#16a34a">来場者</span>&nbsp;'+sV+'名</span>'
         + '</div>';
     }
+    var storyEl = document.getElementById('resort-daily-story');
+    if (storyEl) storyEl.innerHTML = buildDailyStory(daily, type);
+    bdEl.innerHTML = bdHtml + buildDailyTable(daily, type);
   }
 
   window._resortInit = function() { if (!_inited) initResort(); };
 })();
+
+
+  // ── IR Panel ─────────────────────────────────────────────
+  (function() {
+    var IR_GAS_URL = 'https://script.google.com/a/macros/retail-ai.jp/s/AKfycbwggw9i2KD2JzxcXSSFayAxAYMT1HUJ5MpLklrY-NRJjiT8hdhNSnhx4Dn8MQbuNiemSg/exec';
+    var _irData = null;
+    var _irTimer = null;
+
+    function fmtBn(v) {
+      if (v == null) return '—';
+      var b = v / 1e8;
+      return b >= 1000 ? Math.round(b/100)/10 + '兆' : Math.round(b*10)/10 + '億';
+    }
+    function fmtPct(v) { return v == null ? '—' : (v*100).toFixed(1)+'%'; }
+    function fmtX(v, d) { return v == null ? '—' : (Math.round(v*(d||10))/(d||10))+'x'; }
+    function fmtNum(v) { return v == null ? '—' : Math.round(v).toLocaleString(); }
+    function fmtYen(v) { return v == null ? '—' : '¥'+Math.round(v).toLocaleString(); }
+    function fmtVol(v) {
+      if (v == null) return '—';
+      return v >= 10000 ? Math.round(v/1000)+'千株' : v+'株';
+    }
+
+    function drawSparkline(chartData) {
+      var canvas = document.getElementById('ir-sparkline');
+      if (!canvas || !chartData || !chartData.length) return;
+      var W = canvas.parentElement.clientWidth || 300;
+      canvas.width = W; canvas.height = 56;
+      var ctx = canvas.getContext('2d');
+      ctx.clearRect(0, 0, W, 56);
+      var prices = chartData.map(function(d){ return d.close; }).filter(function(v){ return v != null; });
+      if (!prices.length) return;
+      var mn = Math.min.apply(null, prices), mx = Math.max.apply(null, prices);
+      var rng = mx - mn || 1;
+      var n = prices.length;
+      var pL=4, pR=4, pT=4, pB=4;
+      var cW = W-pL-pR, cH = 56-pT-pB;
+      function tx(i){ return pL + i/(n-1)*cW; }
+      function ty(v){ return pT + (1-(v-mn)/rng)*cH; }
+      var last = prices[prices.length-1], first = prices[0];
+      var lineColor = last >= first ? '#3fb950' : '#f85149';
+      // gradient fill
+      var grad = ctx.createLinearGradient(0, pT, 0, 56-pB);
+      grad.addColorStop(0, last >= first ? 'rgba(63,185,80,0.3)' : 'rgba(248,81,73,0.3)');
+      grad.addColorStop(1, 'rgba(0,0,0,0)');
+      ctx.beginPath();
+      ctx.moveTo(tx(0), ty(prices[0]));
+      for (var i=1; i<n; i++) ctx.lineTo(tx(i), ty(prices[i]));
+      ctx.lineTo(tx(n-1), 56-pB); ctx.lineTo(tx(0), 56-pB); ctx.closePath();
+      ctx.fillStyle = grad; ctx.fill();
+      // line
+      ctx.beginPath(); ctx.strokeStyle = lineColor; ctx.lineWidth = 1.5;
+      ctx.moveTo(tx(0), ty(prices[0]));
+      for (var i=1; i<n; i++) ctx.lineTo(tx(i), ty(prices[i]));
+      ctx.stroke();
+      // last dot
+      ctx.beginPath(); ctx.fillStyle = lineColor;
+      ctx.arc(tx(n-1), ty(prices[n-1]), 3, 0, Math.PI*2); ctx.fill();
+    }
+
+    function drawAnalystChart(analysts) {
+      var canvas = document.getElementById('ir-analyst-chart');
+      var legend = document.getElementById('ir-analyst-legend');
+      if (!canvas || !analysts) return;
+      var W = canvas.parentElement.clientWidth || 300;
+      canvas.width = W; canvas.height = 32;
+      var ctx = canvas.getContext('2d');
+      ctx.clearRect(0, 0, W, 32);
+      var sb = analysts.strongBuy||0, b = analysts.buy||0, h = analysts.hold||0;
+      var s = analysts.sell||0, ss = analysts.strongSell||0;
+      var total = sb+b+h+s+ss;
+      if (!total) return;
+      var segs = [
+        { v: sb, color: '#1a7f37', label: '強買' },
+        { v: b,  color: '#3fb950', label: '買い' },
+        { v: h,  color: '#d29922', label: '中立' },
+        { v: s,  color: '#f0883e', label: '売り' },
+        { v: ss, color: '#f85149', label: '強売' },
+      ].filter(function(s){ return s.v > 0; });
+      var x = 0, H = 20, y = 6, r = 3;
+      segs.forEach(function(seg, i) {
+        var w = seg.v/total*W;
+        ctx.beginPath();
+        if (i===0 && i===segs.length-1) {
+          ctx.roundRect(x, y, w, H, r);
+        } else if (i===0) {
+          ctx.roundRect(x, y, w, H, [r,0,0,r]);
+        } else if (i===segs.length-1) {
+          ctx.roundRect(x, y, w, H, [0,r,r,0]);
+        } else {
+          ctx.rect(x, y, w, H);
+        }
+        ctx.fillStyle = seg.color; ctx.fill();
+        x += w;
+      });
+      if (legend) {
+        legend.innerHTML = segs.map(function(seg){
+          return '<span style="margin-right:8px"><span style="color:'+seg.color+'">■</span> '+seg.label+' '+seg.v+'</span>';
+        }).join('');
+      }
+    }
+
+    function renderIR(data) {
+      if (!data || data.error) {
+        document.getElementById('ir-status').textContent = 'エラー';
+        return;
+      }
+      _irData = data;
+      var p = data.price || {};
+      var v = data.valuation || {};
+      var f = data.financial || {};
+      var a = data.analysts || {};
+
+      // Status
+      var now = new Date();
+      document.getElementById('ir-status').textContent =
+        now.getHours()+':'+String(now.getMinutes()).padStart(2,'0')+'更新';
+
+      // Price
+      var cur = p.current;
+      var chg = p.change, chgPct = p.changePct;
+      // chart fallback: Yahoo Finance が realtime price を返さない場合 chart の最終値を使用
+      var _chart = data.chart || [];
+      if (cur == null && _chart.length > 0) {
+        cur = _chart[_chart.length - 1].close;
+        if (_chart.length > 1 && chg == null) {
+          var _prev = _chart[_chart.length - 2].close;
+          chg = cur - _prev;
+          chgPct = _prev > 0 ? chg / _prev : 0;
+        }
+      }
+      document.getElementById('ir-price-main').textContent = cur ? '¥'+Math.round(cur).toLocaleString() : '—';
+      var chgEl = document.getElementById('ir-price-change');
+      if (chg != null) {
+        var sign = chg >= 0 ? '+' : '';
+        chgEl.textContent = sign + Math.round(chg).toLocaleString() + ' (' + sign + (chgPct*100).toFixed(2) + '%)';
+        chgEl.className = 'ir-price-change ' + (chg >= 0 ? 'up' : 'down');
+      }
+
+      // Price info
+      document.getElementById('ir-mktcap').textContent = fmtBn(p.marketCap);
+      document.getElementById('ir-52h').textContent = fmtYen(p.week52High);
+      document.getElementById('ir-52l').textContent = fmtYen(p.week52Low);
+      document.getElementById('ir-vol').textContent = p.volume ? (p.volume/1000).toFixed(0)+'千株' : '—';
+
+      // Valuation
+      document.getElementById('ir-per').textContent    = v.per ? v.per.toFixed(1)+'倍' : '—';
+      document.getElementById('ir-fper').textContent   = v.forwardPer ? v.forwardPer.toFixed(1)+'倍' : '—';
+      document.getElementById('ir-pbr').textContent    = v.pbr ? v.pbr.toFixed(2)+'倍' : '—';
+      document.getElementById('ir-evebitda').textContent = v.evEbitda ? v.evEbitda.toFixed(1)+'倍' : '—';
+      document.getElementById('ir-psr').textContent    = v.psr ? v.psr.toFixed(2)+'倍' : '—';
+
+      // Financial
+      document.getElementById('ir-rev').textContent    = fmtBn(f.revenue);
+      document.getElementById('ir-ebitda').textContent = fmtBn(f.ebitda);
+      document.getElementById('ir-ebitdam').textContent= f.ebitdaMargin != null ? (f.ebitdaMargin*100).toFixed(1)+'%' : '—';
+      document.getElementById('ir-fcf').textContent    = fmtBn(f.freeCashFlow);
+      document.getElementById('ir-roe').textContent    = f.returnOnEquity != null ? (f.returnOnEquity*100).toFixed(1)+'%' : '—';
+
+      // Analyst
+      drawAnalystChart(a);
+      document.getElementById('ir-tgt-mean').textContent  = fmtYen(f.targetMeanPrice);
+      document.getElementById('ir-tgt-range').textContent =
+        (f.targetLowPrice && f.targetHighPrice)
+          ? fmtYen(f.targetLowPrice)+'〜'+fmtYen(f.targetHighPrice) : '—';
+
+      // Sparkline
+      drawSparkline(data.chart || []);
+
+      // News
+      var news = data.news || [];
+      var ul = document.getElementById('ir-news-list');
+      if (ul) {
+        if (!news.length) { ul.innerHTML = '<li style="color:#6e7681;font-size:10px;padding:8px 0">ニュースなし</li>'; return; }
+        ul.innerHTML = news.map(function(n) {
+          var d = n.pubDate ? new Date(n.pubDate).toLocaleDateString('ja-JP',{month:'numeric',day:'numeric'}) : '';
+          return '<li><a href="'+n.link+'" target="_blank" rel="noopener">'+n.title+'</a><div class="ir-news-date">'+d+'</div></li>';
+        }).join('');
+      }
+    }
+
+    function fetchIR() {
+      var statusEl = document.getElementById('ir-status');
+      if (statusEl) statusEl.textContent = '取得中…';
+      // JSONP で CORS を回避
+      var cbName = '_irCb' + Date.now();
+      var script = document.createElement('script');
+      var timer = setTimeout(function() {
+        delete window[cbName];
+        if (script.parentNode) script.parentNode.removeChild(script);
+        if (statusEl) statusEl.textContent = 'タイムアウト';
+      }, 20000);
+      window[cbName] = function(data) {
+        clearTimeout(timer);
+        delete window[cbName];
+        if (script.parentNode) script.parentNode.removeChild(script);
+        renderIR(data);
+      };
+      script.onerror = function() {
+        clearTimeout(timer);
+        delete window[cbName];
+        if (statusEl) statusEl.textContent = 'エラー';
+      };
+      script.src = IR_GAS_URL + '?ir=1&callback=' + cbName;
+      document.head.appendChild(script);
+    }
+
+    function initIR() {
+      fetchIR();
+      if (_irTimer) clearInterval(_irTimer);
+      _irTimer = setInterval(fetchIR, 5 * 60 * 1000); // 5分ごと
+    }
+
+    // TOPタブが表示されたときに初期化
+    document.querySelectorAll('.outer-tab-btn, [data-outer]').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        if (btn.dataset.outer === 'ir') { setTimeout(initIR, 100); }
+      });
+    });
+    // 既にTOPが表示されている場合は即時初期化
+    var irContent = document.getElementById('outer-ir');
+    if (irContent && irContent.classList.contains('active')) { setTimeout(initIR, 500); }
+    window._fetchIR = fetchIR;
+  })();
 
 </script>
   <div id="sl-tip"></div>
