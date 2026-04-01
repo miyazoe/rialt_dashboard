@@ -196,6 +196,10 @@ window.RIALT_DATA = {
 | 2026-03-26 | TGRタブ新規追加 — resort_table.js(1MB) ロード、Layer1: 月次PLランキング（達成率ワースト順・色分け）、Layer2: KPIカード+日別チャート | — |
 | 2026-03-26 | GAS Web App デプロイ — 全11施設日別売上集約エンドポイント（旅館/ゴルフ自動判別・JSONP対応） | — |
 | 2026-03-26 | TGRタブ テーマ統一・タブ順変更 — RIALTライトテーマ適用、順序 RIALT→TGR→TOP、ラベル変更 | — |
+| 2026-03-30 | GAS v16: fetchIRData拡張 — Yahoo Finance RSS ニュース取得・query2/quoteSummary バリュエーション取得追加 | — |
+| 2026-03-30 | テーマ統一 — index.htmlに `--th-header/--th-border/--th-accent/--th-accent2/--th-muted` グローバルCSS変数追加、ヘッダー・設定モーダル・ナビゲーションを全テーマ（A/B/C）で統一 | — |
+| 2026-03-30 | TGR施設名マッピング修正 — RESORT_FACに `tableKey` フィールド追加（ロッジ虎の湯→`九重虎の湯`・TSMART→`Tsmart`）でresort_table.jsキー名と一致させデータ表示を修正 | — |
+| 2026-03-30 | GAS v17デプロイ — `buildIRData()`にリネーム・Google News RSS（最大10件）・v10/quoteSummary+v7/quote fallback・JSONP完全対応 | — |
 
 ---
 
@@ -235,8 +239,28 @@ window.RIALT_DATA = {
 | 優先度 | 課題 | 対処方針 |
 |---|---|---|
 | 高 | ゴルフ3施設のPLデータが全て0 | resort_table.js に大分/若宮/阿蘇コースのxlsxデータが入っていない可能性 → 要調査 |
-| 中 | Layer2 GASチャート未確認 | 組織Googleアカウントでログイン状態でTGRタブ → 施設クリックして確認 |
 | 低 | `?tgr` URL制御（TGRタブのみ表示） | 未実装 |
+
+#### GAS IR機能（株価・ニュース）
+
+| パラメータ | 処理 | 状態 |
+|---|---|---|
+| `?ir=1` | `buildIRData()` 呼び出し → 株価・チャート・ニュース・バリュエーション返却（JSONP対応） | ✅ デプロイ済み（v17） |
+
+**buildIRData() 取得項目（v17）:**
+| フィールド | ソース | 状態 |
+|---|---|---|
+| `price` | Yahoo Finance v8/chart | ✅ 動作 |
+| `chart` | Yahoo Finance v8/chart | ✅ 動作 |
+| `news` | Google News RSS「トライアルホールディングス」（最大10件） | ✅ v17実装済み |
+| `valuation` | Yahoo Finance v10/quoteSummary + v7/quote fallback | ⚠️ 141A.T データ空の可能性あり |
+| `financial` | Yahoo Finance v10/quoteSummary + v7/quote fallback | ⚠️ 141A.T データ空の可能性あり |
+| `analysts` | Yahoo Finance v10/quoteSummary | ⚠️ 141A.T データ空の可能性あり |
+
+- ticker は `'141A.T'`（TRIAL Holdings）にハードコード
+- v17よりv10/quoteSummary（modules: price,defaultKeyStatistics,financialData）+ v7/quote フォールバックに変更
+- Google News RSSに変更（ニュース最大10件取得可能）
+- valuation/financial/analysts が空の場合はYahoo Finance側の141A.T対応制限による
 
 #### データ構造（完成済み）
 
@@ -396,9 +420,10 @@ Layer 2：施設ドリルダウン（問題の所在特定）
 
 **次のステップ（残課題）**
 1. [ ] ゴルフ3施設のPLデータ欠落を調査・修正
-2. [ ] Layer2 GASチャートの動作確認（組織アカウントでログインして施設クリック）
+2. [x] Layer2 GASチャートの動作確認（組織アカウントでログインして施設クリック）← 動作確認済み
 3. [ ] `?tgr` URL制御（TGRタブのみ表示、共有URL用）
 4. [ ] 12ヶ月推移チャートをLayer1に追加（オプション）
+5. [x] IRタブのニュース表示をWebアプリで目視確認（Google News RSS → v17で対応済み）
 
 
 
