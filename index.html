@@ -8739,6 +8739,15 @@ document.getElementById('import-btn').addEventListener('click', openPasteDialog)
       // 実株価データセット構築
       var datasets = companies.map(function(co, ci) {
         var items = (co.chart || []).filter(function(d){ return d.close != null && d.close > 0; });
+        // chart が空でも price.current (or open) があれば今日1点を合成
+        if (!items.length) {
+          var synthV = co.price && (co.price.current || co.price.open);
+          if (synthV) {
+            var td = new Date();
+            var ds2 = td.getFullYear()+'-'+String(td.getMonth()+1).padStart(2,'0')+'-'+String(td.getDate()).padStart(2,'0');
+            items = [{ date: ds2, close: synthV }];
+          }
+        }
         if (!items.length) return null;
         return {
           name:   co.name,
@@ -8749,6 +8758,26 @@ document.getElementById('import-btn').addEventListener('click', openPasteDialog)
           ci:     ci
         };
       }).filter(Boolean);
+
+      // --- スケール補正 ---
+      // Yahoo Finance v8/chart の indicators.close が meta.regularMarketPrice と
+      // 乖離している場合 (例: 9983.T が 4000 円で返るが実際は 60000 円) に
+      // 全データを同比率でスケールし、最終値 = price.current に合わせる。
+      datasets.forEach(function(ds) {
+        var co2 = companies[ds.ci];
+        var cur2 = co2 && co2.price && (co2.price.current || co2.price.open);
+        if (cur2 && ds.raw.length > 0) {
+          var lastV = ds.raw[ds.raw.length - 1];
+          if (lastV > 0) {
+            var ratio = cur2 / lastV;
+            // 15% 以上の乖離がある場合のみ補正
+            if (ratio < 0.85 || ratio > 1.15) {
+              ds.raw = ds.raw.map(function(v){ return v * ratio; });
+            }
+          }
+        }
+      });
+
       if (!datasets.length) { ctx.fillStyle=axisClr; ctx.font='12px '+fontFam; ctx.textAlign='center'; ctx.fillText('データなし', W/2, H/2); return; }
 
       // デュアルYスケール判定
@@ -8932,7 +8961,7 @@ document.getElementById('import-btn').addEventListener('click', openPasteDialog)
         var rows = companies.map(function(co) {
           try {
             var p = co.price || {}, v = co.valuation || {}, f = co.financial || {};
-            var cur = p.current;
+            var cur = p.current || p.open; // p.open = minkabu始値をフォールバック
             var chg = p.change, chgPct = p.changePct;
             var _chart = co.chart || [];
             if (cur == null && _chart.length > 0) {
