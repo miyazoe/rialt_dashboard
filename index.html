@@ -20,11 +20,6 @@
   --font:     'Noto Sans JP', 'Noto Sans', sans-serif;
   --item-font-size: 12px;
   --font-mono: 'Courier New', 'Consolas', monospace;
-  --th-header: #080c10;
-  --th-border: #0d1f12;
-  --th-accent: #4da6ff;
-  --th-accent2: #3fb950;
-  --th-muted:  #7a90a4;
 }
 
 body {
@@ -49,70 +44,69 @@ body {
 /* ===== HEADER ===== */
 .top-bar {
   height: 36px;
-  background: var(--th-header, #080c10);
-  border-bottom: 1px solid var(--th-border, #0d1f12);
+  background: #080c10;
+  border-bottom: 1px solid #0d1f12;
   display: flex; align-items: center; justify-content: space-between;
   padding: 0 12px 0 14px;
   flex-shrink: 0;
   position: relative;
 }
-/* テーマはCSS変数(--th-*)で一元管理 */
 .top-bar::after {
   content: '';
   position: absolute; bottom: 0; left: 0; right: 0; height: 1px;
-  background: linear-gradient(90deg, transparent, var(--th-accent2, #2a5a35), var(--th-accent, #1a4060), transparent);
+  background: linear-gradient(90deg, transparent, #2a5a35, #1a4060, transparent);
 }
 .header-left { display: flex; align-items: center; gap: 14px; }
 .sys-badge {
-  font-size: 9px; letter-spacing: 2px; color: var(--th-accent2, #3fb950);
-  border: 1px solid var(--th-border, #1a3a20); padding: 2px 7px; border-radius: 1px;
+  font-size: 9px; letter-spacing: 2px; color: #3fb950;
+  border: 1px solid #1a3a20; padding: 2px 7px; border-radius: 1px;
   font-family: var(--font-mono);
 }
 .sys-badge::before { content: '[ '; } .sys-badge::after { content: ' ]'; }
 .report-title { font-size: 11px; letter-spacing: 1px; }
-#header-title { color: var(--th-accent, #4da6ff); }
-#header-owner { color: var(--th-muted, #556677); margin-left: 8px; }
+#header-title { color: #4da6ff; }
+#header-owner { color: #556677; margin-left: 8px; }
 .top-bar-right { display: flex; align-items: center; gap: 12px; }
 #header-period { font-size: 9px; color: var(--dim); letter-spacing: 1px; }
-#clock { font-size: 11px; color: var(--th-accent2, #3fb950); letter-spacing: 2px; min-width: 148px; text-align: right; font-variant-numeric: tabular-nums; font-family: var(--font-mono); }
+#clock { font-size: 11px; color: #3fb950; letter-spacing: 2px; min-width: 148px; text-align: right; font-variant-numeric: tabular-nums; font-family: var(--font-mono); }
 .settings-btn {
-  background: none; border: 1px solid var(--th-border, #2a4030); color: var(--th-muted, #7a90a4);
+  background: none; border: 1px solid #2a4030; color: #7a90a4;
   border-radius: 1px; width: 24px; height: 20px; font-size: 12px;
   cursor: pointer; display: flex; align-items: center; justify-content: center;
   transition: all 0.2s;
 }
-.settings-btn:hover { color: var(--th-accent2, #3fb950); border-color: var(--th-accent2, #3fb950); box-shadow: 0 0 6px rgba(63,185,80,0.3); }
+.settings-btn:hover { color: #3fb950; border-color: #3fb950; box-shadow: 0 0 6px rgba(63,185,80,0.3); }
 .week-select {
   background: transparent;
-  border: 1px solid var(--th-border, #1a3020);
-  color: var(--th-accent, #4da6ff);
+  border: 1px solid #1a3020;
+  color: #4da6ff;
   font-size: 9px;
   font-family: var(--font-mono);
   padding: 2px 6px;
   cursor: pointer;
   letter-spacing: 1px;
 }
-.week-select:focus { outline: none; border-color: var(--th-accent, #4da6ff); }
+.week-select:focus { outline: none; border-color: #4da6ff; }
 .search-input {
   background: transparent;
-  border: 1px solid var(--th-border, #1a3020);
-  color: var(--text, #c5cdd7);
+  border: 1px solid #1a3020;
+  color: #c5cdd7;
   font-size: 9px;
   font-family: var(--font-mono);
   padding: 2px 8px;
   letter-spacing: 1px;
   width: 130px;
 }
-.search-input:focus { outline: none; border-color: var(--th-accent, #4da6ff); }
+.search-input:focus { outline: none; border-color: #4da6ff; }
 .search-input::placeholder { color: #2e3d4a; }
 .search-input.active { border-color: #4da6ff; color: #4da6ff; }
 .import-btn {
-  background: none; border: 1px solid var(--th-border, #1a3040); color: var(--th-muted, #7a90a4);
+  background: none; border: 1px solid #1a3040; color: #7a90a4;
   border-radius: 1px; width: 24px; height: 20px; font-size: 13px;
   cursor: pointer; display: flex; align-items: center; justify-content: center;
   transition: all 0.2s;
 }
-.import-btn:hover { color: var(--th-accent, #4da6ff); border-color: var(--th-accent, #4da6ff); box-shadow: 0 0 6px rgba(77,166,255,0.3); }
+.import-btn:hover { color: #4da6ff; border-color: #4da6ff; box-shadow: 0 0 6px rgba(77,166,255,0.3); }
 .prompt-btn {
   background: none; border: 1px solid #2a3010; color: #7a9060;
   border-radius: 1px; height: 20px; padding: 0 7px;
@@ -140,8 +134,8 @@ body {
 /* ===== TAB NAV ===== */
 .tab-nav {
   height: 34px;
-  background: var(--th-header, #080c10);
-  border-bottom: 1px solid var(--th-border, #0d2010);
+  background: #080c10;
+  border-bottom: 1px solid #0d2010;
   display: flex;
   align-items: center;
   padding: 0 14px;
@@ -150,8 +144,8 @@ body {
 }
 .tab-btn {
   background: none;
-  border: 1px solid var(--th-border, #1a3020);
-  color: var(--text, #adbfd0);
+  border: 1px solid #1a3020;
+  color: #adbfd0;
   font-size: 10px;
   letter-spacing: 1.5px;
   padding: 4px 16px;
@@ -160,18 +154,18 @@ body {
   border-radius: 2px;
   transition: all 0.15s;
 }
-.tab-btn:hover { color: var(--text, #dde8f0); border-color: var(--th-accent2, #2a5a35); background: rgba(63,185,80,0.04); }
+.tab-btn:hover { color: #dde8f0; border-color: #2a5a35; background: rgba(63,185,80,0.04); }
 .tab-btn.active {
   background: rgba(63,185,80,0.08);
-  color: var(--th-accent2, #3fb950);
-  border-color: var(--th-border, #1a4020);
+  color: #3fb950;
+  border-color: #1a4020;
   box-shadow: 0 0 8px rgba(63,185,80,0.12);
 }
 .tab-num {
-  color: var(--th-muted, #7090a4);
+  color: #7090a4;
   margin-right: 4px;
 }
-.tab-btn.active .tab-num { color: var(--th-accent2, #3fb950); opacity: 0.5; }
+.tab-btn.active .tab-num { color: #3fb950; opacity: 0.5; }
 
 /* ===== TAB CONTENT ===== */
 .tab-content {
@@ -410,23 +404,23 @@ body {
 }
 .modal-overlay.open { display: flex; }
 .modal-box {
-  background: var(--panel-bg, #0b0f15); border: 1px solid var(--th-border, #1a3020);
+  background: #0b0f15; border: 1px solid #1a3020;
   border-radius: 2px; width: 340px; font-family: var(--font);
   box-shadow: 0 0 40px rgba(63,185,80,0.08);
 }
 .modal-head {
   display: flex; align-items: center; justify-content: space-between;
-  padding: 10px 14px; border-bottom: 1px solid var(--th-border, #1a3020);
+  padding: 10px 14px; border-bottom: 1px solid #1a3020;
 }
-.modal-head-title { font-size: 9px; letter-spacing: 2px; color: var(--th-accent2, #3fb950); }
+.modal-head-title { font-size: 9px; letter-spacing: 2px; color: #3fb950; }
 .modal-close { background: none; border: none; color: var(--dim); font-size: 14px; cursor: pointer; }
 .modal-close:hover { color: var(--text); }
-.modal-body { padding: 0; display: block; }
+.modal-body { padding: 10px 14px; display: flex; flex-direction: column; gap: 7px; }
 .setting-row { display: flex; align-items: center; justify-content: space-between; }
 .setting-label { display: flex; align-items: center; gap: 8px; font-size: 9px; letter-spacing: 1.5px; color: var(--text); }
 .setting-label .dot { animation: none; box-shadow: none; }
 .setting-select {
-  background: var(--bg, #070a0e); border: 1px solid var(--th-border, #1a3020); color: var(--text);
+  background: #070a0e; border: 1px solid #1a3020; color: var(--text);
   font-size: 9px; font-family: var(--font); border-radius: 1px;
   padding: 2px 5px; cursor: pointer; width: 80px; letter-spacing: 1px;
 }
@@ -435,20 +429,8 @@ body {
   font-size: 8px; color: var(--dim); letter-spacing: 2px;
   font-family: var(--font-mono); padding: 2px 0;
 }
-.modal-divider { border: none; border-top: 1px solid var(--th-border, #1a3020); margin: 2px 0; }
+.modal-divider { border: none; border-top: 1px solid #1a3020; margin: 2px 0; }
 .modal-foot { display: flex; align-items: center; justify-content: space-between; padding: 8px 14px 12px; }
-.modal-tabs { display:flex; border-bottom:1px solid var(--th-border, #1a3020); padding:0 6px; }
-.modal-tab-btn {
-  background:none; border:none; color:var(--dim);
-  font-size:9px; letter-spacing:1.5px; font-family:var(--font);
-  padding:7px 10px; cursor:pointer;
-  border-bottom:2px solid transparent; margin-bottom:-1px;
-  transition:color .15s;
-}
-.modal-tab-btn:hover { color:var(--text); }
-.modal-tab-btn.active { color:var(--th-accent2, #3fb950); border-bottom-color:var(--th-accent2, #3fb950); }
-.modal-tab-panel { display:none; padding:10px 14px; flex-direction:column; gap:7px; }
-.modal-tab-panel.active { display:flex; }
 .btn-reset {
   background: none; border: 1px solid #1a3020; color: var(--dim);
   font-size: 9px; font-family: var(--font); padding: 4px 10px;
@@ -456,7 +438,7 @@ body {
 }
 .btn-reset:hover { border-color: #3fb950; color: #3fb950; }
 .btn-save {
-  background: var(--bg, #0d2010); border: 1px solid var(--th-accent2, #3fb950); color: var(--th-accent2, #3fb950);
+  background: #0d2010; border: 1px solid #3fb950; color: #3fb950;
   font-size: 9px; font-family: var(--font); padding: 4px 14px;
   border-radius: 1px; cursor: pointer; letter-spacing: 1px;
 }
@@ -497,21 +479,21 @@ body {
 
 /* ===== OUTER TABS (RIALT / TOP報告) ===== */
 .outer-tab-nav {
-  height: 30px; background: var(--th-header, #040608);
-  border-bottom: 2px solid var(--th-border, #0d2410);
+  height: 30px; background: #040608;
+  border-bottom: 2px solid #0d2410;
   display: flex; align-items: center; padding: 0 14px; gap: 4px;
   flex-shrink: 0;
 }
 .outer-tab-btn {
-  background: none; border: 1px solid var(--th-border, #1a3020); color: var(--th-muted, #7a90a4);
+  background: none; border: 1px solid #1a3020; color: #7a90a4;
   font-size: 11px; letter-spacing: 2px; padding: 3px 20px;
   cursor: pointer; border-radius: 1px; transition: all 0.15s;
   font-family: var(--font);
 }
-.outer-tab-btn:hover { color: var(--text, #dde8f0); border-color: var(--th-accent2, #2a5a35); }
+.outer-tab-btn:hover { color: #dde8f0; border-color: #2a5a35; }
 .outer-tab-btn.active {
-  background: rgba(63,185,80,0.12); color: var(--th-accent2, #3fb950);
-  border-color: var(--th-border, #1a5020);
+  background: rgba(63,185,80,0.12); color: #3fb950;
+  border-color: #1a5020;
   text-shadow: 0 0 10px rgba(63,185,80,0.4);
 }
 .outer-content { display: none; flex: 1; min-height: 0; flex-direction: column; }
@@ -1417,9 +1399,9 @@ body.public-mode .private-only { display: none !important; }
   /* ── IR Tab (outer) ── */
   /* デフォルトテーマ変数（テーマ未設定時のダーク） */
   #outer-ir {
-    --rb:#f4f6f9; --rc:#ffffff; --rce:#ffffff; --rbr:8px;
-    --rd:#e2e8f0; --rt:#1f2937; --rts:#475569; --rtm:#94a3b8;
-    --ra:#2563eb; --rp:#16a34a; --rn:#dc2626; --rw:#ca8a04;
+    --rb:#0d1117; --rc:#161b22; --rce:#21262d; --rbr:6px;
+    --rd:#21262d; --rt:#e6edf3; --rts:#8b949e; --rtm:#6e7681;
+    --ra:#58a6ff; --rp:#3fb950; --rn:#f85149; --rw:#e3b341;
   }
   /* Theme A: ダーク */
   #outer-ir.theme-a {
@@ -1443,15 +1425,25 @@ body.public-mode .private-only { display: none !important; }
   #ir-panel {
     flex: 1;
     background: var(--rb);
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 0;
-    align-content: start;
+    display: flex;
+    flex-direction: column;
     overflow-y: auto;
     padding: 8px;
     box-sizing: border-box;
-    font-family: var(--font);
+    font-family: var(--font-mono);
   }
+  .ir-compare-tbl { width:100%; border-collapse:collapse; font-size:11px; }
+  .ir-compare-tbl th { color:var(--rts); font-weight:400; font-size:10px; text-align:right; padding:4px 8px; border-bottom:1px solid var(--rd); white-space:nowrap; }
+  .ir-compare-tbl th:first-child { text-align:left; }
+  .ir-compare-tbl td { padding:5px 8px; text-align:right; border-bottom:1px solid var(--rd); color:var(--rt); white-space:nowrap; }
+  .ir-compare-tbl td:first-child { text-align:left; font-weight:600; }
+  .ir-compare-tbl tr:last-child td { border-bottom:none; }
+  .ir-compare-tbl tr:hover td { background:var(--rce); }
+  .ir-compare-tbl td.up { color:var(--rp); }
+  .ir-compare-tbl td.down { color:var(--rn); }
+  .ir-co-name { color:var(--ra) !important; }
+  .ir-spl-row { display:flex; gap:8px; flex-wrap:wrap; }
+  .ir-spl-item { flex:1; min-width:200px; }
   #ir-panel .ir-section {
     background: var(--rc);
     border: 1px solid var(--rd);
@@ -1478,10 +1470,7 @@ body.public-mode .private-only { display: none !important; }
   #ir-panel .ir-kv-row .v { color: var(--rt); font-weight: 600; }
   #ir-panel .ir-kv-row .v.up { color: var(--rp); }
   #ir-panel .ir-kv-row .v.down { color: var(--rn); }
-  #ir-panel canvas#ir-sparkline { width: 100%; height: 80px; display: block; }
-  #ir-panel .ir-section.ir-span2 { grid-column: 1 / -1; }
-  #ir-panel .ir-section.ir-span2 { grid-column: span 2; }
-  #ir-chart-labels { display:flex; justify-content:space-between; font-size:9px; color:var(--rtm); margin-top:2px; }
+  #ir-panel canvas#ir-sparkline { width: 100%; height: 56px; display: block; }
   #ir-analyst-chart { width: 100%; height: 32px; display: block; }
   #ir-news-list { list-style: none; margin: 0; padding: 0; }
   #ir-news-list li { padding: 5px 0; border-bottom: 1px solid var(--rd); }
@@ -2116,73 +2105,37 @@ body.public-mode .private-only { display: none !important; }
 <!-- IR CONTENT -->
 <div class="outer-content" id="outer-ir">
       <div id="ir-panel">
-        <!-- 株価ヘッダー（全幅） -->
-        <div class="ir-section ir-span2">
+        <!-- ヘッダー -->
+        <div class="ir-section">
           <div class="ir-title">
-            <span>&#x1F4C8; 141A &#x30C8;&#x30E9;&#x30A4;&#x30A2;&#x30EBHD&#xFF08;&#x6771;&#x8A3C;&#x30D7;&#x30E9;&#x30A4;&#x30E0;&#xFF09;</span>
+            <span>&#x1F4C8; IR 競合比較（PPIH / ユニクロ / コスモス薬品 / イオン）</span>
             <span id="ir-status">&#x2014;</span>
           </div>
-          <div style="display:flex;align-items:baseline;gap:14px;margin-bottom:4px;flex-wrap:wrap">
-            <div id="ir-price-main" class="ir-price-main">&#x2014;</div>
-            <div id="ir-price-change" class="ir-price-change">&#x2014;</div>
-            <div id="ir-day-range" style="font-size:10px;color:var(--rts)"></div>
-          </div>
-          <canvas id="ir-sparkline" height="80"></canvas>
-          <div id="ir-chart-labels"></div>
         </div>
-        <!-- 市場情報 -->
+        <!-- 比較テーブル -->
+        <div class="ir-section" style="overflow-x:auto">
+          <div class="ir-title"><span>株価・バリュエーション・財務</span></div>
+          <table class="ir-compare-tbl">
+            <thead>
+              <tr>
+                <th>企業</th><th>株価</th><th>前日比</th><th>時価総額</th>
+                <th>PER</th><th>PBR</th><th>PSR</th><th>売上高</th><th>目標株価</th><th>評価</th>
+              </tr>
+            </thead>
+            <tbody id="ir-compare-body">
+              <tr><td colspan="10" class="ir-loading">読み込み中...</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <!-- スパークライン（各社） -->
         <div class="ir-section">
-          <div class="ir-title"><span>&#x5E02;&#x5834;&#x60C5;&#x5831;</span></div>
-          <div class="ir-kv-row"><span class="k">&#x6642;&#x4FA1;&#x7DCF;&#x984D;</span><span class="v" id="ir-mktcap">&#x2014;</span></div>
-          <div class="ir-kv-row"><span class="k">&#x51FA;&#x6765;&#x9AD8;</span><span class="v" id="ir-vol">&#x2014;</span></div>
-          <div class="ir-kv-row"><span class="k">&#x5E73;&#x5747;&#x51FA;&#x6765;&#x9AD8;(10&#x65E5;)</span><span class="v" id="ir-avgvol">&#x2014;</span></div>
-          <div class="ir-kv-row"><span class="k">52&#x9031;&#x9AD8;&#x5024;</span><span class="v" id="ir-52h">&#x2014;</span></div>
-          <div class="ir-kv-row"><span class="k">52&#x9031;&#x5B89;&#x5024;</span><span class="v" id="ir-52l">&#x2014;</span></div>
-          <div class="ir-kv-row"><span class="k">Beta</span><span class="v" id="ir-beta">&#x2014;</span></div>
-          <div class="ir-kv-row"><span class="k">&#x914D;&#x5F53;&#x5229;&#x56DE;&#x308A;</span><span class="v" id="ir-div">&#x2014;</span></div>
-          <div class="ir-kv-row"><span class="k">EPS&#xFF08;&#x5B9F;&#x7E3E;&#xFF09;</span><span class="v" id="ir-eps">&#x2014;</span></div>
-          <div class="ir-kv-row"><span class="k">EPS&#xFF08;&#x4E88;&#x60F3;&#xFF09;</span><span class="v" id="ir-feps">&#x2014;</span></div>
+          <div class="ir-title"><span>株価推移（90日）</span></div>
+          <div id="ir-sparklines" class="ir-spl-row"></div>
         </div>
-        <!-- バリュエーション -->
+        <!-- ニュース（PPIH） -->
         <div class="ir-section">
-          <div class="ir-title"><span>&#x30D0;&#x30EA;&#x30E5;&#x30A8;&#x30FC;&#x30B7;&#x30E7;&#x30F3;</span></div>
-          <div class="ir-kv-row"><span class="k">PER&#xFF08;&#x5B9F;&#x7E3E;&#xFF09;</span><span class="v" id="ir-per">&#x2014;</span></div>
-          <div class="ir-kv-row"><span class="k">PER&#xFF08;&#x4E88;&#x60F3;&#xFF09;</span><span class="v" id="ir-fper">&#x2014;</span></div>
-          <div class="ir-kv-row"><span class="k">PBR</span><span class="v" id="ir-pbr">&#x2014;</span></div>
-          <div class="ir-kv-row"><span class="k">PSR</span><span class="v" id="ir-psr">&#x2014;</span></div>
-          <div class="ir-kv-row"><span class="k">EV/EBITDA</span><span class="v" id="ir-evebitda">&#x2014;</span></div>
-          <div class="ir-kv-row"><span class="k">EV/Revenue</span><span class="v" id="ir-evrev">&#x2014;</span></div>
-        </div>
-        <!-- 財務ハイライト -->
-        <div class="ir-section">
-          <div class="ir-title"><span>&#x8CA1;&#x52D9;&#x30CF;&#x30A4;&#x30E9;&#x30A4;&#x30C8;</span></div>
-          <div class="ir-kv-row"><span class="k">&#x58F2;&#x4E0A;&#x9AD8;</span><span class="v" id="ir-rev">&#x2014;</span></div>
-          <div class="ir-kv-row"><span class="k">&#x7C97;&#x5229;&#x7387;</span><span class="v" id="ir-gm">&#x2014;</span></div>
-          <div class="ir-kv-row"><span class="k">&#x55B6;&#x696D;&#x5229;&#x76CA;&#x7387;</span><span class="v" id="ir-om">&#x2014;</span></div>
-          <div class="ir-kv-row"><span class="k">EBITDA</span><span class="v" id="ir-ebitda">&#x2014;</span></div>
-          <div class="ir-kv-row"><span class="k">EBITDA&#x30DE;&#x30FC;&#x30B8;&#x30F3;</span><span class="v" id="ir-ebitdam">&#x2014;</span></div>
-          <div class="ir-kv-row"><span class="k">FCF</span><span class="v" id="ir-fcf">&#x2014;</span></div>
-          <div class="ir-kv-row"><span class="k">ROE</span><span class="v" id="ir-roe">&#x2014;</span></div>
-          <div class="ir-kv-row"><span class="k">&#x73FE;&#x91D1;&#x30FB;&#x540C;&#x7B49;&#x7269;</span><span class="v" id="ir-cash">&#x2014;</span></div>
-          <div class="ir-kv-row"><span class="k">&#x6709;&#x5229;&#x5B50;&#x8CA0;&#x50B5;</span><span class="v" id="ir-debt">&#x2014;</span></div>
-          <div class="ir-kv-row"><span class="k">&#x30CD;&#x30C3;&#x30C8;&#x30C7;&#x30C3;&#x30C8;</span><span class="v" id="ir-netdebt">&#x2014;</span></div>
-        </div>
-        <!-- アナリスト評価 -->
-        <div class="ir-section">
-          <div class="ir-title"><span>&#x30A2;&#x30CA;&#x30EA;&#x30B9;&#x30C8;&#x8A55;&#x4FA1;</span></div>
-          <canvas id="ir-analyst-chart" height="32"></canvas>
-          <div id="ir-analyst-legend" style="margin-top:4px;font-size:10px;color:#8b949e"></div>
-          <div class="ir-kv-row" style="margin-top:6px"><span class="k">&#x76EE;&#x6A19;&#x682A;&#x4FA1; &#x5E73;&#x5747;</span><span class="v" id="ir-tgt-mean">&#x2014;</span></div>
-          <div class="ir-kv-row"><span class="k">&#x76EE;&#x6A19;&#x682A;&#x4FA1; &#x30EC;&#x30F3;&#x30B8;</span><span class="v" id="ir-tgt-range">&#x2014;</span></div>
-          <div class="ir-kv-row"><span class="k">&#x63A8;&#x5968;</span><span class="v" id="ir-recommend">&#x2014;</span></div>
-        </div>
-        <!-- ニュース（全幅） -->
-        <div class="ir-section ir-span2">
-          <div class="ir-title">
-            <span>&#x6700;&#x65B0;&#x30CB;&#x30E5;&#x30FC;&#x30B9;</span>
-            <span id="ir-news-count" style="font-size:9px;color:var(--rtm)"></span>
-          </div>
-          <ul id="ir-news-list"><li class="ir-loading">&#x8AAD;&#x307F;&#x8FBC;&#x307F;&#x4E2D;...</li></ul>
+          <div class="ir-title"><span>最新ニュース（PPIH / トライアルHD）</span></div>
+          <ul id="ir-news-list"><li class="ir-loading">読み込み中...</li></ul>
         </div>
       </div><!-- end ir-panel -->
 </div><!-- end outer-ir -->
@@ -2234,72 +2187,34 @@ body.public-mode .private-only { display: none !important; }
 <div class="modal-overlay" id="modal-overlay">
   <div class="modal-box">
     <div class="modal-head">
-      <span class="modal-head-title">// CONFIG</span>
+      <span class="modal-head-title">// CONFIG : UPDATE_INTERVAL</span>
       <button class="modal-close" id="modal-close">✕</button>
     </div>
-    <div class="modal-tabs">
-      <button class="modal-tab-btn active" data-mtab="display">DISPLAY</button>
-      <button class="modal-tab-btn" data-mtab="interval">INTERVAL</button>
-      <button class="modal-tab-btn" data-mtab="ai">AI</button>
-    </div>
     <div class="modal-body">
-      <!-- DISPLAY タブ -->
-      <div class="modal-tab-panel active" id="mtab-display">
-        <div class="setting-row">
-          <span class="setting-label">TOP_FONT</span>
-          <select class="setting-select" id="sel-fontsize"></select>
-        </div>
-        <div class="setting-row">
-          <span class="setting-label">RIALT_FONT</span>
-          <select class="setting-select" id="sel-rialt-fontsize"></select>
-        </div>
-        <div class="setting-row">
-          <span class="setting-label">IR_FONT</span>
-          <select class="setting-select" id="sel-ir-fontsize"></select>
-        </div>
-        <div class="setting-row">
-          <span class="setting-label">PANEL_ITEMS</span>
-          <select class="setting-select" id="sel-displaycount"></select>
-        </div>
-        <hr class="modal-divider">
-        <div class="modal-section-label">// THEME</div>
-        <div class="setting-row" style="gap:8px;flex-wrap:wrap;">
-          <button class="rialt-theme-btn" data-t="default" onclick="applyRialtTheme('default')"
-            style="padding:5px 11px;border:2px solid #e2e8f0;border-radius:6px;background:#f8fafc;color:#374151;cursor:pointer;font-size:10px;font-weight:600;">
-            デフォルト
-          </button>
-          <button class="rialt-theme-btn" data-t="a" onclick="applyRialtTheme('a')"
-            style="padding:5px 11px;border:2px solid #2d3148;border-radius:6px;background:#1a1d27;color:#00e5cc;cursor:pointer;font-size:10px;font-weight:600;">
-            A:ダーク
-          </button>
-          <button class="rialt-theme-btn" data-t="b" onclick="applyRialtTheme('b')"
-            style="padding:5px 11px;border:2px solid #c7d2fe;border-radius:6px;background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#fff;cursor:pointer;font-size:10px;font-weight:600;border-radius:20px;">
-            B:SaaS
-          </button>
-          <button class="rialt-theme-btn" data-t="c" onclick="applyRialtTheme('c')"
-            style="padding:5px 11px;border:2px solid #1e3a5f;border-radius:6px;background:#132338;color:#38bdf8;cursor:pointer;font-size:10px;font-weight:600;">
-            C:ネイビー
-          </button>
-        </div>
-      </div><!-- end mtab-display -->
-      <!-- INTERVAL タブ -->
-      <div class="modal-tab-panel" id="mtab-interval">
-        <div class="modal-section-label">// TAB 2 : 実務</div>
-        <div class="setting-row"><span class="setting-label"><span class="dot" style="background:#79c0ff;box-shadow:0 0 4px #79c0ff"></span>RESORT</span><select class="setting-select" id="sel-resort"></select></div>
-        <div class="setting-row"><span class="setting-label"><span class="dot" style="background:#bc8cff;box-shadow:0 0 4px #bc8cff"></span>APPAREL</span><select class="setting-select" id="sel-apparel"></select></div>
-        <div class="setting-row"><span class="setting-label"><span class="dot" style="background:#ff9bce;box-shadow:0 0 4px #ff9bce"></span>SECRETARY</span><select class="setting-select" id="sel-secretary"></select></div>
-        <div class="setting-row"><span class="setting-label"><span class="dot" style="background:#00e5cc;box-shadow:0 0 4px #00e5cc"></span>AI</span><select class="setting-select" id="sel-ai"></select></div>
-        <hr class="modal-divider">
-        <div class="modal-section-label">// TAB 3 : トピック</div>
-        <div class="setting-row"><span class="setting-label"><span class="dot" style="background:#58a6ff;box-shadow:0 0 4px #58a6ff"></span>TRENDS</span><select class="setting-select" id="sel-trends"></select></div>
-        <div class="setting-row"><span class="setting-label"><span class="dot" style="background:#f0883e;box-shadow:0 0 4px #f0883e"></span>NUMBERS</span><select class="setting-select" id="sel-numbers"></select></div>
-        <div class="setting-row"><span class="setting-label"><span class="dot" style="background:#f85149;box-shadow:0 0 4px #f85149"></span>ANOMALIES</span><select class="setting-select" id="sel-anomalies"></select></div>
-        <hr class="modal-divider">
-        <div class="modal-section-label">// TAB 4 : プライベート</div>
-        <div class="setting-row"><span class="setting-label"><span class="dot" style="background:#8b949e"></span>PRIVATE</span><select class="setting-select" id="sel-private"></select></div>
-      </div><!-- end mtab-interval -->
-      <!-- AI タブ -->
-      <div class="modal-tab-panel" id="mtab-ai">
+      <div class="modal-section-label">// DISPLAY</div>
+      <div class="setting-row">
+        <span class="setting-label">FONT_SIZE</span>
+        <select class="setting-select" id="sel-fontsize"></select>
+      </div>
+      <div class="setting-row">
+        <span class="setting-label">PANEL_ITEMS</span>
+        <select class="setting-select" id="sel-displaycount"></select>
+      </div>
+      <hr class="modal-divider">
+      <div class="modal-section-label">// TAB 2 : 実務</div>
+      <div class="setting-row"><span class="setting-label"><span class="dot" style="background:#79c0ff;box-shadow:0 0 4px #79c0ff"></span>RESORT</span><select class="setting-select" id="sel-resort"></select></div>
+      <div class="setting-row"><span class="setting-label"><span class="dot" style="background:#bc8cff;box-shadow:0 0 4px #bc8cff"></span>APPAREL</span><select class="setting-select" id="sel-apparel"></select></div>
+      <div class="setting-row"><span class="setting-label"><span class="dot" style="background:#ff9bce;box-shadow:0 0 4px #ff9bce"></span>SECRETARY</span><select class="setting-select" id="sel-secretary"></select></div>
+      <div class="setting-row"><span class="setting-label"><span class="dot" style="background:#00e5cc;box-shadow:0 0 4px #00e5cc"></span>AI</span><select class="setting-select" id="sel-ai"></select></div>
+      <hr class="modal-divider">
+      <div class="modal-section-label">// TAB 3 : トピック</div>
+      <div class="setting-row"><span class="setting-label"><span class="dot" style="background:#58a6ff;box-shadow:0 0 4px #58a6ff"></span>TRENDS</span><select class="setting-select" id="sel-trends"></select></div>
+      <div class="setting-row"><span class="setting-label"><span class="dot" style="background:#f0883e;box-shadow:0 0 4px #f0883e"></span>NUMBERS</span><select class="setting-select" id="sel-numbers"></select></div>
+      <div class="setting-row"><span class="setting-label"><span class="dot" style="background:#f85149;box-shadow:0 0 4px #f85149"></span>ANOMALIES</span><select class="setting-select" id="sel-anomalies"></select></div>
+      <hr class="modal-divider">
+      <div class="modal-section-label">// TAB 4 : プライベート</div>
+      <div class="setting-row"><span class="setting-label"><span class="dot" style="background:#8b949e"></span>PRIVATE</span><select class="setting-select" id="sel-private"></select></div>
+      <hr class="modal-divider">
       <div class="modal-section-label">// AI ANALYSIS</div>
       <div class="setting-row">
         <span class="setting-label">AI プロバイダー</span>
@@ -2363,12 +2278,32 @@ body.public-mode .private-only { display: none !important; }
         </div>
       </div>
       <hr class="modal-divider">
+      <div class="modal-section-label">// RIALT THEME</div>
+      <div class="setting-row" style="gap:8px;flex-wrap:wrap;">
+        <button class="rialt-theme-btn" data-t="default" onclick="applyRialtTheme('default')"
+          style="padding:6px 14px;border:2px solid #e2e8f0;border-radius:6px;background:#f8fafc;color:#374151;cursor:pointer;font-size:11px;font-weight:600;">
+          デフォルト
+        </button>
+        <button class="rialt-theme-btn" data-t="a" onclick="applyRialtTheme('a')"
+          style="padding:6px 14px;border:2px solid #2d3148;border-radius:6px;background:#1a1d27;color:#00e5cc;cursor:pointer;font-size:11px;font-weight:600;">
+          A：ダーク
+        </button>
+        <button class="rialt-theme-btn" data-t="b" onclick="applyRialtTheme('b')"
+          style="padding:6px 14px;border:2px solid #c7d2fe;border-radius:6px;background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#fff;cursor:pointer;font-size:11px;font-weight:600;border-radius:20px;">
+          B：SaaS
+        </button>
+        <button class="rialt-theme-btn" data-t="c" onclick="applyRialtTheme('c')"
+          style="padding:6px 14px;border:2px solid #1e3a5f;border-radius:6px;background:#132338;color:#38bdf8;cursor:pointer;font-size:11px;font-weight:600;">
+          C：ネイビー
+        </button>
+      </div>
+      <hr class="modal-divider">
       <div class="modal-section-label">// SYSTEM PROMPT</div>
       <div class="setting-row" style="flex-direction:column;align-items:stretch;gap:6px;">
         <span class="setting-label" style="font-size:10px;color:#8b949e;">AI質問タブに常時送信される指示。内容は自由に編集可能。</span>
         <textarea class="setting-textarea" id="inp-system-prompt"></textarea>
-      </div><!-- end mtab-ai -->
-    </div><!-- end modal-body -->
+      </div>
+    </div>
     <div class="modal-foot">
       <button class="btn-reset" id="btn-reset">RESET</button>
       <button class="btn-save" id="btn-save">APPLY &amp; CLOSE</button>
@@ -2397,15 +2332,6 @@ body.public-mode .private-only { display: none !important; }
   if (!PUBLIC_MODE) {
     var _ds = document.createElement('script');
     _ds.src = 'data.js';
-    _ds.onload = function() {
-      // data.js ロード完了後に初回描画を再実行
-      var d = getData();
-      if (!d) return;
-      renderHeader(d.report);
-      Object.keys(REFRESH).forEach(function(k){ REFRESH[k](); });
-      updateUnreadCounts();
-      populateWeekSelect();
-    };
     document.head.appendChild(_ds);
   }
 
@@ -2426,25 +2352,6 @@ body.public-mode .private-only { display: none !important; }
     document.querySelectorAll('.rialt-theme-btn').forEach(function(b){
       b.style.outline = b.dataset.t === (t||'default') ? '2px solid #2563eb' : 'none';
     });
-    // .top-bar theme
-    var topBar = document.querySelector('.top-bar');
-    if (topBar) {
-      topBar.classList.remove('theme-a','theme-b','theme-c');
-      if (t && t !== 'default') topBar.classList.add('theme-' + t);
-    }
-    // グローバルテーマ変数を更新（TOP報告タブなど全体に適用）
-    var _bodyThemes = {
-      'default': {'--bg':'#f4f6f9','--panel-bg':'#ffffff','--text':'#1f2937','--gap':'#e2e8f0','--dim':'#cbd5e1',
-                  '--th-header':'#ffffff','--th-border':'#e5e7eb','--th-accent':'#2563eb','--th-accent2':'#059669','--th-muted':'#6b7280'},
-      'a':       {'--bg':'#0f1117','--panel-bg':'#141720','--text':'#e2e8f0','--gap':'#1e2330','--dim':'#2d3148',
-                  '--th-header':'#080b10','--th-border':'#2d3148','--th-accent':'#00e5cc','--th-accent2':'#3fb950','--th-muted':'#64748b'},
-      'b':       {'--bg':'#f0f4ff','--panel-bg':'#ffffff','--text':'#1f2937','--gap':'#e2e8f0','--dim':'#cbd5e1',
-                  '--th-header':'#f0f4ff','--th-border':'#c7d2fe','--th-accent':'#6366f1','--th-accent2':'#8b5cf6','--th-muted':'#94a3b8'},
-      'c':       {'--bg':'#0c1929','--panel-bg':'#132338','--text':'#e2e8f0','--gap':'#1e3a5f','--dim':'#1e3a5f',
-                  '--th-header':'#091422','--th-border':'#1e3a5f','--th-accent':'#38bdf8','--th-accent2':'#34d399','--th-muted':'#64748b'}
-    };
-    var _bv = _bodyThemes[t||'default'] || _bodyThemes['default'];
-    Object.keys(_bv).forEach(function(k){ document.documentElement.style.setProperty(k, _bv[k]); });
   }
   function applyRialtTheme(t) {
     _applyRialtThemeClass(t);
@@ -2458,7 +2365,7 @@ body.public-mode .private-only { display: none !important; }
   }
   function loadRialtTheme() {
     // ページロード時はクラスのみ先に適用（initRialtの前に呼ぶこと）
-    try { var t = localStorage.getItem(_RIALT_THEME_KEY); _applyRialtThemeClass(t || 'default'); } catch(e) { _applyRialtThemeClass('default'); }
+    try { var t = localStorage.getItem(_RIALT_THEME_KEY); if (t) _applyRialtThemeClass(t); } catch(e) {}
   }
   // Canvas チャート用テーマカラー取得
   function _rialtChartBg() {
@@ -2510,8 +2417,7 @@ var DEFAULTS = {
   'exec-ishibashi': 60, 'exec-nagata': 60, 'exec-makikusa': 60, 'exec-uchiyama': 60,
   resort: 60, apparel: 60, secretary: 120, ai: 60,
   trends: 60, numbers: 60, anomalies: 10, private: 120,
-  fontSize: 12, displayCount: 4,
-  rialtFontSize: 12, irFontSize: 12
+  fontSize: 12, displayCount: 4
 };
 var PRESETS       = [5, 10, 20, 30, 60, 120, 300];
 var COUNT_PRESETS = [2, 3, 4, 5, 6, 8];
@@ -2520,14 +2426,6 @@ var MODAL_KEYS  = ['resort', 'apparel', 'secretary', 'ai', 'trends', 'numbers', 
 
 function applyFontSize(px) {
   document.documentElement.style.setProperty('--item-font-size', px + 'px');
-}
-function applyRialtFontSize(px) {
-  var el = document.getElementById('outer-rialt');
-  if (el) el.style.fontSize = px + 'px';
-}
-function applyIrFontSize(px) {
-  var el = document.getElementById('outer-ir');
-  if (el) el.style.fontSize = px + 'px';
 }
 
 // ===== 週別データ =====
@@ -2971,8 +2869,8 @@ function buildSel(id, val){
     sel.appendChild(o);
   });
 }
-function buildFontSizeSel(val, id) {
-  var sel = document.getElementById(id || 'sel-fontsize');
+function buildFontSizeSel(val) {
+  var sel = document.getElementById('sel-fontsize');
   if (!sel) return;
   sel.innerHTML = '';
   FONT_SIZES.forEach(function(s){
@@ -2993,27 +2891,9 @@ function buildCountSel(val) {
     sel.appendChild(o);
   });
 }
-function switchModalTab(name) {
-  document.querySelectorAll('.modal-tab-btn').forEach(function(b){
-    b.classList.toggle('active', b.dataset.mtab === name);
-  });
-  document.querySelectorAll('.modal-tab-panel').forEach(function(p){
-    p.classList.toggle('active', p.id === 'mtab-' + name);
-  });
-}
-document.querySelectorAll('.modal-tabs').forEach(function(nav){
-  nav.addEventListener('click', function(e){
-    var btn = e.target.closest('.modal-tab-btn');
-    if (btn) switchModalTab(btn.dataset.mtab);
-  });
-});
 function openModal(){
-  buildFontSizeSel(cfg.fontSize || 12, 'sel-fontsize');
-  buildFontSizeSel(cfg.rialtFontSize || 12, 'sel-rialt-fontsize');
-  buildFontSizeSel(cfg.irFontSize || 12, 'sel-ir-fontsize');
+  buildFontSizeSel(cfg.fontSize || 12);
   buildCountSel(cfg.displayCount || 4);
-  // デフォルトタブ(DISPLAY)をアクティブに戻す
-  switchModalTab('display');
   MODAL_KEYS.forEach(function(k){ buildSel('sel-'+k, cfg[k]); });
   document.getElementById('modal-overlay').classList.add('open');
 }
@@ -3042,9 +2922,7 @@ document.getElementById('modal-close').addEventListener('click', closeModal);
 document.getElementById('modal-overlay').addEventListener('click', function(e){ if(e.target===this) closeModal(); });
 document.getElementById('btn-reset').addEventListener('click', function(){
   cfg = Object.assign({}, DEFAULTS);
-  buildFontSizeSel(cfg.fontSize, 'sel-fontsize');
-  buildFontSizeSel(cfg.rialtFontSize, 'sel-rialt-fontsize');
-  buildFontSizeSel(cfg.irFontSize, 'sel-ir-fontsize');
+  buildFontSizeSel(cfg.fontSize);
   buildCountSel(cfg.displayCount);
   MODAL_KEYS.forEach(function(k){ buildSel('sel-'+k, cfg[k]); });
 });
@@ -3071,10 +2949,6 @@ document.getElementById('btn-save').addEventListener('click', function(){
   if (_spEl) { try { localStorage.setItem('aichat_system_prompt_v1', _spEl.value); } catch(e){} }
   var fsEl = document.getElementById('sel-fontsize');
   if (fsEl) { cfg.fontSize = parseInt(fsEl.value, 10); applyFontSize(cfg.fontSize); }
-  var rfsEl = document.getElementById('sel-rialt-fontsize');
-  if (rfsEl) { cfg.rialtFontSize = parseInt(rfsEl.value, 10); applyRialtFontSize(cfg.rialtFontSize); }
-  var ifsEl = document.getElementById('sel-ir-fontsize');
-  if (ifsEl) { cfg.irFontSize = parseInt(ifsEl.value, 10); applyIrFontSize(cfg.irFontSize); }
   var dcEl = document.getElementById('sel-displaycount');
   if (dcEl) cfg.displayCount = parseInt(dcEl.value, 10);
   MODAL_KEYS.forEach(function(k){
@@ -3116,8 +2990,6 @@ updateUnreadCounts();
 
 // フォントサイズ適用
 applyFontSize(cfg.fontSize || 12);
-applyRialtFontSize(cfg.rialtFontSize || 12);
-applyIrFontSize(cfg.irFontSize || 12);
 
 // 週選択初期化
 populateWeekSelect();
@@ -7824,13 +7696,13 @@ document.getElementById('import-btn').addEventListener('click', openPasteDialog)
 
   // 実施設マスタ（合計・本社除く）
   var RESORT_FACS = [
-    { pl: '九重久織亭',   gas: '九重久織亭',   type: 'ryokan', rooms: 9 },
-    { pl: 'ロッジ虎の湯', gas: '九重虎乃湯',   type: 'ryokan', tableKey: '九重虎の湯' , rooms: 34 },
-    { pl: '宮若虎の湯',   gas: '宮若虎の湯',   type: 'ryokan', rooms: 8 },
-    { pl: '小塚久の葉',   gas: '小塚久の葉',   type: 'ryokan', rooms: 8 },
-    { pl: '仙石原久の葉', gas: '仙石原久の葉', type: 'ryokan', rooms: 9 },
-    { pl: '古民家煉り',   gas: '古民家練り',   type: 'ryokan', rooms: 6 },
-    { pl: 'TSMART',       gas: 'Tsmart',        type: 'ryokan', tableKey: 'Tsmart' },
+    { pl: '九重久織亭',   gas: '九重久織亭',   type: 'ryokan' },
+    { pl: 'ロッジ虎の湯', gas: '九重虎乃湯',   type: 'ryokan' },
+    { pl: '宮若虎の湯',   gas: '宮若虎の湯',   type: 'ryokan' },
+    { pl: '小塚久の葉',   gas: '小塚久の葉',   type: 'ryokan' },
+    { pl: '仙石原久の葉', gas: '仙石原久の葉', type: 'ryokan' },
+    { pl: '古民家煉り',   gas: '古民家煉り',   type: 'ryokan' },
+    { pl: 'TSMART',       gas: 'Tsmart',        type: 'ryokan' },
     { pl: '若宮コース',   gas: '若宮コース',   type: 'golf' },
     { pl: '大分コース',   gas: '大分コース',   type: 'golf' },
     { pl: '阿蘇コース',   gas: '阿蘇コース',   type: 'golf' },
@@ -7841,7 +7713,7 @@ document.getElementById('import-btn').addEventListener('click', openPasteDialog)
 
   // GAS施設名取得（PL名 → GAS名）
   function facGasName(plName) {
-    var f = RESORT_FACS.find(function(x) { return x.pl === plName || x.tableKey === plName; });
+    var f = RESORT_FACS.find(function(x) { return x.pl === plName; });
     return f ? f.gas : plName;
   }
   // GAS月次データでnull指標を補完
@@ -7851,28 +7723,16 @@ document.getElementById('import-btn').addEventListener('click', openPasteDialog)
     var gm = window.GAS_MONTHLY[ym] && window.GAS_MONTHLY[ym][gn];
     if (!gm) return ret;
     if (ret.pax_a == null && gm.pax_a != null) ret.pax_a = gm.pax_a;
+    if (ret.pax_b == null && gm.pax_b != null) ret.pax_b = gm.pax_b;
     if (ret.adr_a == null && gm.adr_a != null) ret.adr_a = gm.adr_a;
     if (ret.occ_a == null && gm.occ_a != null) ret.occ_a = gm.occ_a;
     if (ret.rvp_a == null && gm.rvp_a != null) ret.rvp_a = gm.rvp_a;
     if (ret.spd_a == null && gm.spd_a != null) ret.spd_a = gm.spd_a;
-    // pax_b: GASからの予算人数、またはrvp_b（予算販売客室数）を代用
-    if (ret.pax_b == null && gm.pax_b != null && gm.pax_b > 0) ret.pax_b = Math.round(gm.pax_b);
-    if (ret.pax_b == null && gm.rvp_b != null && gm.rvp_b > 0 && gm.rvp_b < 10000) ret.pax_b = Math.round(gm.rvp_b);
-    // occ_b: 0-1の小数のみ有効
-    if (ret.occ_b == null && gm.occ_b != null && gm.occ_b > 0 && gm.occ_b <= 1) ret.occ_b = gm.occ_b;
-    // adr_b: GASのgm.adr_bは宿泊売上予算総額、gm.rvp_bは予算販売客室数 → 一室。4adr予算を導出
-    if (ret.adr_b == null && gm.adr_b > 0 && gm.rvp_b > 0) {
-      var adrBDerived = Math.round(gm.adr_b / gm.rvp_b);
-      if (adrBDerived >= 1000 && adrBDerived <= 500000) ret.adr_b = adrBDerived;
-    }
-    // rvp_b: ADR予算 × 稼働率予算
-    // rvp_b: ADR予算 x 稼働率予算（occ_bがnullの旅館はspd_bを稼働率として使用）
-    if (ret.rvp_b == null && ret.adr_b != null) {
-      var occ4rvp = (ret.occ_b != null) ? ret.occ_b
-                  : (gm.spd_b != null && gm.spd_b > 0 && gm.spd_b <= 1 ? gm.spd_b : null);
-      if (occ4rvp != null) ret.rvp_b = Math.round(ret.adr_b * occ4rvp);
-    }
-    // spd_b: GASのspd_bは比率値のため使用不可
+    if (ret.adr_b == null && gm.adr_b != null) ret.adr_b = gm.adr_b;
+    if (ret.occ_b == null && gm.occ_b != null) ret.occ_b = gm.occ_b;
+    if (ret.rvp_b == null && gm.rvp_b != null) ret.rvp_b = gm.rvp_b;
+    if (ret.pax_b == null && gm.pax_b != null) ret.pax_b = gm.pax_b;
+    if (ret.spd_b == null && gm.spd_b != null) ret.spd_b = gm.spd_b;
     return ret;
   }
 
@@ -7960,10 +7820,7 @@ document.getElementById('import-btn').addEventListener('click', openPasteDialog)
         occ_a: avg('客室稼働率_実績'), occ_b: avg('稼働率_予算'),
         adr_a: avg('ADR_実績'), adr_b: avg('ADR_予算'),
         rvp_a: avg('RevPAR_実績'), rvp_b: avg('RevPAR_予算'),
-        pax_a: (function() {
-          var fGY = RESORT_FACS.find(function(f) { return (f.tableKey || f.pl) === facName; });
-          return (fGY && fGY.type === 'golf') ? s('来場客数_実績') : s('販売客室数_実績');
-        })(), pax_b: s('来場客数_予算'),
+        pax_a: s('販売客室数_実績'), pax_b: s('来場客数_予算'),
         spd_a: avg('客単価_実績'), spd_b: avg('客単価_予算')
       };
       // YTD: GAS月次合計で補完
@@ -7987,48 +7844,7 @@ document.getElementById('import-btn').addEventListener('click', openPasteDialog)
         if (ytdRet.occ_a == null && goccCnt > 0) ytdRet.occ_a = gocc / goccCnt;  // 小数平均
         if (ytdRet.rvp_a == null && grvpCnt > 0) ytdRet.rvp_a = Math.round(grvp / grvpCnt);
         if (ytdRet.spd_a == null && gspdCnt > 0) ytdRet.spd_a = Math.round(gspd / gspdCnt);
-        // YTD pax_b fallback・adr_b導出（各月のGASデータから）
-        var gn2data = {};
-        months.forEach(function(mo) { var gm2 = window.GAS_MONTHLY[mo] && window.GAS_MONTHLY[mo][gn2]; if (gm2) gn2data[mo] = gm2; });
-        var grvb = 0, gadb_tot = 0, grvb_tot = 0;
-        Object.values(gn2data).forEach(function(gm2) {
-          if (gm2.rvp_b > 0 && gm2.rvp_b < 10000) grvb += gm2.rvp_b;
-          if (gm2.adr_b > 0 && gm2.rvp_b > 0) { gadb_tot += gm2.adr_b; grvb_tot += gm2.rvp_b; }
-        });
-        if (ytdRet.pax_b == null && grvb > 0) ytdRet.pax_b = grvb;
-        if (ytdRet.adr_b == null && grvb_tot > 0) {
-          var adrBytd = Math.round(gadb_tot / grvb_tot);
-          if (adrBytd >= 1000 && adrBytd <= 500000) ytdRet.adr_b = adrBytd;
-        }
-        // ytd rvp_b: adr_b x budget_occ（spd_bを稼働率として使用）
-        if (ytdRet.rvp_b == null && ytdRet.adr_b != null) {
-          var gspdb_sum = 0, gspdb_cnt = 0;
-          Object.values(gn2data).forEach(function(gm3) {
-            if (gm3.spd_b != null && gm3.spd_b > 0 && gm3.spd_b <= 1) { gspdb_sum += gm3.spd_b; gspdb_cnt++; }
-            else if (gm3.occ_b != null && gm3.occ_b > 0) { gspdb_sum += gm3.occ_b; gspdb_cnt++; }
-          });
-          var occ4rvpb = ytdRet.occ_b != null ? ytdRet.occ_b
-                       : (gspdb_cnt > 0 ? gspdb_sum / gspdb_cnt : null);
-          if (occ4rvpb != null) ytdRet.rvp_b = Math.round(ytdRet.adr_b * occ4rvpb);
-        }
       }
-      // ADR実績 YTDフォールバック: spd_a x pax_a / rooms-based room-nights
-      if (ytdRet.adr_a == null && ytdRet.spd_a != null && ytdRet.pax_a != null && ytdRet.occ_a != null && ytdRet.occ_a > 0) {
-        var facObj3 = RESORT_FACS.find(function(f) { return (f.tableKey || f.pl) === facName; });
-        var rooms3 = facObj3 && facObj3.rooms;
-        if (rooms3 > 0) {
-          var ytdRN = 0;
-          months.forEach(function(mo) {
-            var gm4 = window.GAS_MONTHLY && window.GAS_MONTHLY[mo] && window.GAS_MONTHLY[mo][facGasName(facName)];
-            if (gm4 && gm4.occ_a > 0) {
-              var ymP3 = mo.match(/(\d{4})-(\d{2})/);
-              if (ymP3) ytdRN += rooms3 * new Date(+ymP3[1], +ymP3[2], 0).getDate() * gm4.occ_a;
-            }
-          });
-          if (ytdRN > 0) ytdRet.adr_a = Math.round(ytdRet.spd_a * ytdRet.pax_a / ytdRN);
-        }
-      }
-      if (ytdRet.rvp_a == null && ytdRet.adr_a != null && ytdRet.occ_a != null) ytdRet.rvp_a = Math.round(ytdRet.adr_a * ytdRet.occ_a);
       return ytdRet;
     }
     var d = getPlRow(facName, ym);
@@ -8044,34 +7860,12 @@ document.getElementById('import-btn').addEventListener('click', openPasteDialog)
       pax_a: nv(d['販売客室数_実績']), pax_b: nv(d['来場客数_予算']),
       spd_a: nv(d['客単価_実績']), spd_b: nv(d['客単価_予算'])
     };
-    var facObjG = RESORT_FACS.find(function(f) { return (f.tableKey || f.pl) === facName; });
-    if (facObjG && facObjG.type === 'golf') {
-      var paxGolf = nv(d['来場客数_実績']);
-      if (paxGolf != null) ret.pax_a = paxGolf;
-    }
-    var m2 = suppFromGas(facName, ym, ret);
-    // ADR実績フォールバック: GASにadr_aがない場合、spd_a x pax_a / (rooms x days x occ_a)で導出
-    if (m2.adr_a == null && m2.spd_a != null && m2.pax_a != null && m2.occ_a != null && m2.occ_a > 0) {
-      var facObj2 = RESORT_FACS.find(function(f) { return (f.tableKey || f.pl) === facName; });
-      var rooms2 = facObj2 && facObj2.rooms;
-      if (rooms2 > 0) {
-        var ymP = ym.match(/(\d{4})-(\d{2})/);
-        if (ymP) {
-          var daysInMo = new Date(+ymP[1], +ymP[2], 0).getDate();
-          var rn2 = rooms2 * daysInMo * m2.occ_a;
-          if (rn2 > 0) m2.adr_a = Math.round(m2.spd_a * m2.pax_a / rn2);
-        }
-      }
-    }
-    // RevPAR実績フォールバック: ADR x 稼働率
-    if (m2.rvp_a == null && m2.adr_a != null && m2.occ_a != null) m2.rvp_a = Math.round(m2.adr_a * m2.occ_a);
-    return m2;
+    return suppFromGas(facName, ym, ret);
   }
   function calcRow(fac, ym, mode) {
-    var _tk = fac.tableKey || fac.pl;
-    var m = getM(_tk, ym, mode);
+    var m = getM(fac.pl, ym, mode);
     if (!m) return { fac: fac, noData: true };
-    var py = getM(_tk, prevYM(ym), mode === 'ytd' ? 'ytd' : 'single');
+    var py = getM(fac.pl, prevYM(ym), mode === 'ytd' ? 'ytd' : 'single');
     var r = m.rev_a, b = m.rev_b;
     var rate  = (b != null && b > 0) ? r / b * 100 : null;
     var yoy   = (py && py.rev_a != null && py.rev_a > 0) ? r / py.rev_a * 100 : null;
@@ -8204,7 +7998,7 @@ document.getElementById('import-btn').addEventListener('click', openPasteDialog)
     // Unified row (14 cols)
     function trRow(row, isAgg) {
       if (!row) return '';
-      var nm = row.fac.label || row.fac.pl;
+      var nm = isAgg ? (row.fac.label||row.fac.pl) : row.fac.pl;
       var css = isAgg ? 'resort-agg-row' : 'resort-fac-row';
       var nc = isAgg ? '<td class="resort-fac-name resort-agg-name">'+nm+'</td>' : '<td class="resort-fac-name">'+nm+'</td>';
       var attr = isAgg ? '' : ' data-fac="'+row.fac.pl+'"';
@@ -8295,14 +8089,13 @@ document.getElementById('import-btn').addEventListener('click', openPasteDialog)
   }
 
   function renderL2(facObj, ym) {
-    var _ftk = facObj.tableKey || facObj.pl;
-    var d = getPlRow(_ftk, ym);
+    var d = getPlRow(facObj.pl, ym);
     var kEl = document.getElementById('resort-l2-kpi');
     if (d) {
       var rev_a = nv(d['売上高合計_実績']), rev_b = nv(d['売上高合計_予算']);
       var gp_a  = nv(d['売上総利益_実績']);
       var op_a  = nv(d['営業利益_実績']), op_b = nv(d['営業利益_予算']);
-      var py_d  = getPlRow(_ftk, prevYM(ym));
+      var py_d  = getPlRow(facObj.pl, prevYM(ym));
       var py_rev = py_d ? nv(py_d['売上高合計_実績']) : null;
       var rate   = (rev_b != null && rev_b > 0) ? rev_a / rev_b * 100 : null;
       var yoy    = (py_rev != null && py_rev > 0) ? rev_a / py_rev * 100 : null;
@@ -8321,7 +8114,7 @@ document.getElementById('import-btn').addEventListener('click', openPasteDialog)
       kEl.innerHTML = '<div style="color:#9ca3af;padding:8px">PLデータなし</div>';
     }
     switchTab('daily');
-    renderPlTable(_ftk, ym);
+    renderPlTable(facObj.pl, ym);
     setTimeout(function() { renderMonthChart(facObj); }, 50);
 
     document.getElementById('resort-breakdown').innerHTML = '';
@@ -8407,7 +8200,7 @@ document.getElementById('import-btn').addEventListener('click', openPasteDialog)
     var allM = availMonths().slice(0, 12).reverse();
     var rev_a = [], rev_b = [], op_a = [];
     allM.forEach(function(ym) {
-      var d = getPlRow(facObj.tableKey || facObj.pl, ym);
+      var d = getPlRow(facObj.pl, ym);
       rev_a.push(d ? nv(d['売上高合計_実績']) : null);
       rev_b.push(d ? nv(d['売上高合計_予算']) : null);
       op_a.push(d  ? nv(d['営業利益_実績'])        : null);
@@ -8872,263 +8665,152 @@ document.getElementById('import-btn').addEventListener('click', openPasteDialog)
   // ── IR Panel ─────────────────────────────────────────────
   (function() {
     var IR_GAS_URL = 'https://script.google.com/a/macros/retail-ai.jp/s/AKfycbwggw9i2KD2JzxcXSSFayAxAYMT1HUJ5MpLklrY-NRJjiT8hdhNSnhx4Dn8MQbuNiemSg/exec';
-    var _irData = null, _irTimer = null;
+    var _irData = null;
+    var _irTimer = null;
 
     function fmtBn(v) {
-      if (v == null) return '\u2014';
+      if (v == null) return '—';
       var b = v / 1e8;
-      return (v >= 1e12) ? (v/1e12).toFixed(1)+'\u5146' : Math.round(b*10)/10+'\u5104';
+      return b >= 1000 ? Math.round(b/100)/10 + '兆' : Math.round(b*10)/10 + '億';
     }
-    function fmtPct(v) { return v == null ? '\u2014' : (v*100).toFixed(1)+'%'; }
-    function fmtX(v) { return v == null ? '\u2014' : v.toFixed(1)+'\u500d'; }
-    function fmtYen(v) { return v == null ? '\u2014' : '\u00a5'+Math.round(v).toLocaleString(); }
+    function fmtPct(v) { return v == null ? '—' : (v*100).toFixed(1)+'%'; }
+    function fmtX(v, d) { return v == null ? '—' : (Math.round(v*(d||10))/(d||10))+'x'; }
+    function fmtNum(v) { return v == null ? '—' : Math.round(v).toLocaleString(); }
+    function fmtYen(v) { return v == null ? '—' : '¥'+Math.round(v).toLocaleString(); }
     function fmtVol(v) {
-      if (v == null) return '\u2014';
-      if (v >= 1e7) return Math.round(v/1e4)+'\u4e07\u682a';
-      if (v >= 1e4) return Math.round(v/1e3)+'\u5343\u682a';
-      return v+'\u682a';
+      if (v == null) return '—';
+      return v >= 10000 ? Math.round(v/1000)+'千株' : v+'株';
     }
-    function _set(id, val) { var el = document.getElementById(id); if (el) el.textContent = val || '\u2014'; }
 
-    function drawSparkline(chartData) {
-      var canvas = document.getElementById('ir-sparkline');
+    function drawSparkline(canvas, chartData) {
       if (!canvas || !chartData || !chartData.length) return;
-      var W = canvas.parentElement.clientWidth || 400;
-      canvas.width = W; canvas.height = 80;
+      var W = canvas.parentElement.clientWidth || 300;
+      canvas.width = W; canvas.height = 56;
       var ctx = canvas.getContext('2d');
-      ctx.clearRect(0, 0, W, 80);
-      var prices = chartData.map(function(d){ return d.close; }).filter(function(v){ return v!=null; });
+      ctx.clearRect(0, 0, W, 56);
+      var prices = chartData.map(function(d){ return d.close; }).filter(function(v){ return v != null; });
       if (!prices.length) return;
       var mn = Math.min.apply(null, prices), mx = Math.max.apply(null, prices);
       var rng = mx - mn || 1;
       var n = prices.length;
-      var pL=8, pR=8, pT=6, pB=22;
-      var cW = W-pL-pR, cH = 80-pT-pB;
+      var pL=4, pR=4, pT=4, pB=4;
+      var cW = W-pL-pR, cH = 56-pT-pB;
       function tx(i){ return pL + i/(n-1)*cW; }
       function ty(v){ return pT + (1-(v-mn)/rng)*cH; }
       var last = prices[prices.length-1], first = prices[0];
       var lineColor = last >= first ? '#3fb950' : '#f85149';
-      var grad = ctx.createLinearGradient(0, pT, 0, 80-pB);
-      grad.addColorStop(0, last >= first ? 'rgba(63,185,80,0.25)' : 'rgba(248,81,73,0.25)');
+      var grad = ctx.createLinearGradient(0, pT, 0, 56-pB);
+      grad.addColorStop(0, last >= first ? 'rgba(63,185,80,0.3)' : 'rgba(248,81,73,0.3)');
       grad.addColorStop(1, 'rgba(0,0,0,0)');
       ctx.beginPath();
       ctx.moveTo(tx(0), ty(prices[0]));
       for (var i=1; i<n; i++) ctx.lineTo(tx(i), ty(prices[i]));
-      ctx.lineTo(tx(n-1), 80-pB); ctx.lineTo(tx(0), 80-pB); ctx.closePath();
+      ctx.lineTo(tx(n-1), 56-pB); ctx.lineTo(tx(0), 56-pB); ctx.closePath();
       ctx.fillStyle = grad; ctx.fill();
       ctx.beginPath(); ctx.strokeStyle = lineColor; ctx.lineWidth = 1.5;
       ctx.moveTo(tx(0), ty(prices[0]));
       for (var i=1; i<n; i++) ctx.lineTo(tx(i), ty(prices[i]));
       ctx.stroke();
-      // current price dashed horizontal
-      ctx.setLineDash([3,3]);
-      ctx.beginPath(); ctx.strokeStyle = 'rgba(139,148,158,0.35)'; ctx.lineWidth = 1;
-      ctx.moveTo(pL, ty(last)); ctx.lineTo(W-pR, ty(last)); ctx.stroke();
-      ctx.setLineDash([]);
-      // last dot
       ctx.beginPath(); ctx.fillStyle = lineColor;
-      ctx.arc(tx(n-1), ty(last), 3, 0, Math.PI*2); ctx.fill();
-      // x-axis date labels
-      var labelEl = document.getElementById('ir-chart-labels');
-      if (labelEl && chartData.length > 0) {
-        function sd(s){ return s ? s.slice(5) : ''; }
-        labelEl.innerHTML = '<span>'+sd(chartData[0].date)+'</span><span>'+sd(chartData[Math.floor(n/2)].date)+'</span><span>'+sd(chartData[n-1].date)+'</span>';
-      }
-    }
-
-    function drawAnalystChart(analysts) {
-      var canvas = document.getElementById('ir-analyst-chart');
-      var legend = document.getElementById('ir-analyst-legend');
-      if (!canvas || !analysts) return;
-      var W = canvas.parentElement.clientWidth || 300;
-      canvas.width = W; canvas.height = 32;
-      var ctx = canvas.getContext('2d');
-      ctx.clearRect(0, 0, W, 32);
-      var sb=analysts.strongBuy||0, b=analysts.buy||0, h=analysts.hold||0, s=analysts.sell||0, ss=analysts.strongSell||0;
-      var total = sb+b+h+s+ss;
-      if (!total) { if (legend) legend.textContent='\u30c7\u30fc\u30bf\u306a\u3057'; return; }
-      var colors=['#3fb950','#52c41a','#f0883e','#f85149','#b91c1c'];
-      var vals=[sb,b,h,s,ss], labels=['\u5f37\u8cb7','\u8cb7','\u4e2d\u7acb','\u58f2','\u5f37\u58f2'];
-      var x=0;
-      vals.forEach(function(v,i){ if(!v)return; var w=v/total*W; ctx.fillStyle=colors[i]; ctx.fillRect(x,0,w,32); x+=w; });
-      if (legend) legend.innerHTML = vals.map(function(v,i){ return v?'<span style="color:'+colors[i]+';margin-right:8px">'+labels[i]+':'+v+'</span>':''; }).join('');
-    }
-
-    function _renderIRNews(news) {
-      var ul = document.getElementById('ir-news-list');
-      var countEl = document.getElementById('ir-news-count');
-      if (!ul) return;
-      if (!news || !news.length) {
-        ul.innerHTML = '<li style="color:#6e7681;font-size:10px;padding:6px 0">GAS\u518d\u30c7\u30d7\u30ed\u30a4\u5f85\u3061</li>';
-        return;
-      }
-      if (countEl) countEl.textContent = news.length+'\u4ef6';
-      ul.innerHTML = news.map(function(n) {
-        var d = n.pubDate ? new Date(n.pubDate).toLocaleDateString('ja-JP',{month:'numeric',day:'numeric'}) : '';
-        var title = (n.title||'').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-        return '<li><a href="'+n.link+'" target="_blank" rel="noopener">'+title+'</a><div class="ir-news-date">'+d+'</div></li>';
-      }).join('');
-    }
-
-    function _mergeIR(quoteResp, chartResp, summaryResp) {
-      var data = { price:{}, valuation:{}, financial:{}, analysts:{}, chart:[], news:[] };
-      // --- v7/quote ---
-      var q = quoteResp && quoteResp.quoteResponse && quoteResp.quoteResponse.result && quoteResp.quoteResponse.result[0];
-      if (q) {
-        data.price.current    = q.regularMarketPrice;
-        data.price.change     = q.regularMarketChange;
-        data.price.changePct  = q.regularMarketChangePercent != null ? q.regularMarketChangePercent/100 : null;
-        data.price.high       = q.regularMarketDayHigh;
-        data.price.low        = q.regularMarketDayLow;
-        data.price.volume     = q.regularMarketVolume;
-        data.price.avgVolume  = q.averageDailyVolume10Day || q.averageDailyVolume3Month;
-        data.price.marketCap  = q.marketCap;
-        data.price.week52High = q.fiftyTwoWeekHigh;
-        data.price.week52Low  = q.fiftyTwoWeekLow;
-        data.valuation.per        = q.trailingPE;
-        data.valuation.forwardPer = q.forwardPE;
-        data.valuation.pbr        = q.priceToBook;
-        data.valuation.psr        = q.priceToSalesTrailing12Months;
-        data.valuation.beta       = q.beta;
-        data.valuation.dividendYield = q.trailingAnnualDividendYield;
-        data.valuation.eps        = q.epsTrailingTwelveMonths;
-        data.valuation.epsForward = q.epsForward;
-      }
-      // --- v8/chart ---
-      var cr = chartResp && chartResp.chart && chartResp.chart.result && chartResp.chart.result[0];
-      if (cr) {
-        var closes = cr.indicators && cr.indicators.quote && cr.indicators.quote[0] && cr.indicators.quote[0].close || [];
-        var timestamps = cr.timestamp || [];
-        data.chart = [];
-        for (var i=0; i<timestamps.length; i++) {
-          if (closes[i] != null) {
-            var d = new Date(timestamps[i]*1000);
-            data.chart.push({ date: d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'), close: closes[i] });
-          }
-        }
-        if (data.chart.length > 0 && data.price.current == null) {
-          data.price.current = data.chart[data.chart.length-1].close;
-          if (data.chart.length > 1 && data.price.change == null) {
-            var prev = data.chart[data.chart.length-2].close;
-            data.price.change = data.price.current - prev;
-            data.price.changePct = prev > 0 ? data.price.change/prev : 0;
-          }
-        }
-        if (data.price.week52High == null && data.chart.length > 0) {
-          data.price.week52High = Math.max.apply(null, data.chart.map(function(x){return x.close;}));
-          data.price.week52Low  = Math.min.apply(null, data.chart.map(function(x){return x.close;}));
-        }
-      }
-      // --- v10/quoteSummary ---
-      var r0 = summaryResp && summaryResp.quoteSummary && summaryResp.quoteSummary.result && summaryResp.quoteSummary.result[0];
-      if (r0) {
-        function raw(obj, key) { return obj&&obj[key]!=null ? (obj[key].raw!==undefined?obj[key].raw:obj[key]) : null; }
-        var fin = r0.financialData || {}, ks = r0.defaultKeyStatistics || {}, rec = r0.recommendationTrend;
-        data.financial.revenue         = raw(fin,'totalRevenue');
-        data.financial.ebitda          = raw(fin,'ebitda');
-        data.financial.ebitdaMargin    = raw(fin,'ebitdaMargins');
-        data.financial.grossMargin     = raw(fin,'grossMargins');
-        data.financial.operatingMargin = raw(fin,'operatingMargins');
-        data.financial.freeCashFlow    = raw(fin,'freeCashflow');
-        data.financial.totalDebt       = raw(fin,'totalDebt');
-        data.financial.totalCash       = raw(fin,'totalCash');
-        data.financial.returnOnEquity  = raw(fin,'returnOnEquity');
-        data.financial.targetMeanPrice = raw(fin,'targetMeanPrice');
-        data.financial.targetHighPrice = raw(fin,'targetHighPrice');
-        data.financial.targetLowPrice  = raw(fin,'targetLowPrice');
-        data.financial.recommendationKey = fin.recommendationKey || null;
-        data.valuation.evEbitda  = raw(ks,'enterpriseToEbitda');
-        data.valuation.evRevenue = raw(ks,'enterpriseToRevenue');
-        if (data.valuation.pbr == null) data.valuation.pbr = raw(ks,'priceToBook');
-        if (rec && rec.trend && rec.trend[0]) {
-          var rt = rec.trend[0];
-          data.analysts = { strongBuy:rt.strongBuy||0, buy:rt.buy||0, hold:rt.hold||0, sell:rt.sell||0, strongSell:rt.strongSell||0 };
-        }
-      }
-      return data;
+      ctx.arc(tx(n-1), ty(prices[n-1]), 3, 0, Math.PI*2); ctx.fill();
     }
 
     function renderIR(data) {
-      if (!data) { _set('ir-status', '\u30a8\u30e9\u30fc'); return; }
+      if (!data || data.error) {
+        document.getElementById('ir-status').textContent = data && data.error ? ('エラー: '+data.error) : 'エラー';
+        return;
+      }
       _irData = data;
-      var p = data.price||{}, v = data.valuation||{}, f = data.financial||{}, a = data.analysts||{};
-      // Status
       var now = new Date();
-      _set('ir-status', now.getHours()+':'+String(now.getMinutes()).padStart(2,'0')+'\u66f4\u65b0');
-      // Price
-      var cur = p.current, chg = p.change, chgPct = p.changePct;
-      if (cur == null && data.chart && data.chart.length > 0) {
-        cur = data.chart[data.chart.length-1].close;
-        if (data.chart.length > 1 && chg == null) {
-          var prev = data.chart[data.chart.length-2].close;
-          chg = cur - prev; chgPct = prev > 0 ? chg/prev : 0;
-        }
+      document.getElementById('ir-status').textContent =
+        now.getHours()+':'+String(now.getMinutes()).padStart(2,'0')+'更新';
+
+      // 比較テーブル
+      var companies = data.companies || [];
+      var tbody = document.getElementById('ir-compare-body');
+      if (tbody) {
+        tbody.innerHTML = companies.map(function(co) {
+          var p = co.price || {}, v = co.valuation || {}, f = co.financial || {};
+          var cur = p.current;
+          var chg = p.change, chgPct = p.changePct;
+          var _chart = co.chart || [];
+          if (cur == null && _chart.length > 0) {
+            cur = _chart[_chart.length - 1].close;
+            if (_chart.length > 1 && chg == null) {
+              var _prev = _chart[_chart.length - 2].close;
+              chg = cur - _prev;
+              chgPct = _prev > 0 ? chg / _prev : 0;
+            }
+          }
+          var chgCls = chg == null ? '' : (chg >= 0 ? 'up' : 'down');
+          var sign = chg != null && chg >= 0 ? '+' : '';
+          var chgTxt = chg != null
+            ? sign + Math.round(chg).toLocaleString() + '<br><span style="font-size:10px">('+sign+(chgPct*100).toFixed(1)+'%)</span>'
+            : '—';
+          return '<tr>' +
+            '<td class="ir-co-name">' + co.name + '</td>' +
+            '<td>¥' + (cur ? Math.round(cur).toLocaleString() : '—') + '</td>' +
+            '<td class="' + chgCls + '">' + chgTxt + '</td>' +
+            '<td>' + fmtBn(p.marketCap) + '</td>' +
+            '<td>' + (v.per ? v.per.toFixed(1)+'x' : '—') + '</td>' +
+            '<td>' + (v.pbr ? v.pbr.toFixed(2)+'x' : '—') + '</td>' +
+            '<td>' + (v.psr ? v.psr.toFixed(2)+'x' : '—') + '</td>' +
+            '<td>' + fmtBn(f.revenue) + '</td>' +
+            '<td>' + fmtYen(f.targetMeanPrice) + '</td>' +
+            '<td>' + (f.recommendationKey || '—') + '</td>' +
+            '</tr>';
+        }).join('') || '<tr><td colspan="10" style="text-align:center;color:#6e7681">データなし</td></tr>';
       }
-      _set('ir-price-main', cur ? '\u00a5'+Math.round(cur).toLocaleString() : '\u2014');
-      var chgEl = document.getElementById('ir-price-change');
-      if (chgEl && chg != null) {
-        var sign = chg >= 0 ? '+' : '';
-        chgEl.textContent = sign+Math.round(chg).toLocaleString()+'\uff08'+sign+(chgPct*100).toFixed(2)+'%\uff09';
-        chgEl.className = 'ir-price-change '+(chg>=0?'up':'down');
+
+      // スパークライン（各社）
+      var splContainer = document.getElementById('ir-sparklines');
+      if (splContainer) {
+        splContainer.innerHTML = companies.map(function(co) {
+          return '<div class="ir-spl-item">' +
+            '<div style="font-size:10px;color:var(--rts);margin-bottom:2px">' + co.name + ' (' + co.ticker + ')</div>' +
+            '<canvas id="ir-spl-' + co.ticker.replace('.','') + '" height="56" style="width:100%;display:block"></canvas>' +
+            '</div>';
+        }).join('');
+        setTimeout(function() {
+          companies.forEach(function(co) {
+            var canvas = document.getElementById('ir-spl-' + co.ticker.replace('.',''));
+            drawSparkline(canvas, co.chart || []);
+          });
+        }, 50);
       }
-      if (p.high && p.low) _set('ir-day-range', '\u672c\u65e5 \u00a5'+Math.round(p.low).toLocaleString()+' \u2014 \u00a5'+Math.round(p.high).toLocaleString());
-      // Market
-      _set('ir-mktcap',  fmtBn(p.marketCap));
-      _set('ir-vol',     fmtVol(p.volume));
-      _set('ir-avgvol',  fmtVol(p.avgVolume));
-      _set('ir-52h',     fmtYen(p.week52High));
-      _set('ir-52l',     fmtYen(p.week52Low));
-      _set('ir-beta',    v.beta != null ? v.beta.toFixed(2) : '\u2014');
-      _set('ir-div',     v.dividendYield != null ? fmtPct(v.dividendYield) : '\u2014');
-      _set('ir-eps',     v.eps != null ? '\u00a5'+v.eps.toFixed(0) : '\u2014');
-      _set('ir-feps',    v.epsForward != null ? '\u00a5'+v.epsForward.toFixed(0) : '\u2014');
-      // Valuation
-      _set('ir-per',      fmtX(v.per));
-      _set('ir-fper',     fmtX(v.forwardPer));
-      _set('ir-pbr',      v.pbr != null ? v.pbr.toFixed(2)+'\u500d' : '\u2014');
-      _set('ir-psr',      v.psr != null ? v.psr.toFixed(2)+'\u500d' : '\u2014');
-      _set('ir-evebitda', fmtX(v.evEbitda));
-      _set('ir-evrev',    fmtX(v.evRevenue));
-      // Financial
-      _set('ir-rev',     fmtBn(f.revenue));
-      _set('ir-gm',      fmtPct(f.grossMargin));
-      _set('ir-om',      fmtPct(f.operatingMargin));
-      _set('ir-ebitda',  fmtBn(f.ebitda));
-      _set('ir-ebitdam', fmtPct(f.ebitdaMargin));
-      _set('ir-fcf',     fmtBn(f.freeCashFlow));
-      _set('ir-roe',     fmtPct(f.returnOnEquity));
-      _set('ir-cash',    fmtBn(f.totalCash));
-      _set('ir-debt',    fmtBn(f.totalDebt));
-      var nd = (f.totalDebt != null && f.totalCash != null) ? f.totalDebt - f.totalCash : null;
-      _set('ir-netdebt', fmtBn(nd));
-      // Analyst
-      drawAnalystChart(a);
-      _set('ir-tgt-mean',  fmtYen(f.targetMeanPrice));
-      _set('ir-tgt-range', (f.targetLowPrice&&f.targetHighPrice) ? fmtYen(f.targetLowPrice)+'\uff5e'+fmtYen(f.targetHighPrice) : '\u2014');
-      var recMap={strongBuy:'\u5f37\u8cb7\u63a8\u5968',buy:'\u8cb7\u3044\u63a8\u5968',hold:'\u4e2d\u7acb',sell:'\u58f2\u308a',strongSell:'\u5f37\u58f2'};
-      _set('ir-recommend', recMap[f.recommendationKey] || f.recommendationKey || '\u2014');
-      // Chart + News
-      drawSparkline(data.chart || []);
-      _renderIRNews(data.news || []);
+
+      // ニュース
+      var news = data.news || [];
+      var ul = document.getElementById('ir-news-list');
+      if (ul) {
+        if (!news.length) { ul.innerHTML = '<li style="color:#6e7681;font-size:10px;padding:8px 0">ニュースなし</li>'; return; }
+        ul.innerHTML = news.map(function(n) {
+          var d = n.pubDate ? new Date(n.pubDate).toLocaleDateString('ja-JP',{month:'numeric',day:'numeric'}) : '';
+          return '<li><a href="'+n.link+'" target="_blank" rel="noopener">'+n.title+'</a><div class="ir-news-date">'+d+'</div></li>';
+        }).join('');
+      }
     }
 
     function fetchIR() {
       var statusEl = document.getElementById('ir-status');
       if (statusEl) statusEl.textContent = '取得中…';
+      // JSONP で CORS を回避
       var cbName = '_irCb' + Date.now();
       var script = document.createElement('script');
       var timer = setTimeout(function() {
-        clearTimeout(timer); delete window[cbName];
+        delete window[cbName];
         if (script.parentNode) script.parentNode.removeChild(script);
         if (statusEl) statusEl.textContent = 'タイムアウト';
       }, 20000);
-      window[cbName] = function(d) {
-        clearTimeout(timer); delete window[cbName];
+      window[cbName] = function(data) {
+        clearTimeout(timer);
+        delete window[cbName];
         if (script.parentNode) script.parentNode.removeChild(script);
-        renderIR(d);
+        renderIR(data);
       };
       script.onerror = function() {
-        clearTimeout(timer); delete window[cbName];
+        clearTimeout(timer);
+        delete window[cbName];
         if (statusEl) statusEl.textContent = 'エラー';
       };
       script.src = IR_GAS_URL + '?ir=1&callback=' + cbName;
@@ -9138,14 +8820,19 @@ document.getElementById('import-btn').addEventListener('click', openPasteDialog)
     function initIR() {
       fetchIR();
       if (_irTimer) clearInterval(_irTimer);
-      _irTimer = setInterval(fetchIR, 5*60*1000);
+      _irTimer = setInterval(fetchIR, 5 * 60 * 1000); // 5分ごと
     }
 
+    // TOPタブが表示されたときに初期化
     document.querySelectorAll('.outer-tab-btn, [data-outer]').forEach(function(btn) {
       btn.addEventListener('click', function() {
         if (btn.dataset.outer === 'ir') { setTimeout(initIR, 100); }
       });
     });
+    // 既にTOPが表示されている場合は即時初期化
+    var irContent = document.getElementById('outer-ir');
+    if (irContent && irContent.classList.contains('active')) { setTimeout(initIR, 500); }
+    window._fetchIR = fetchIR;
   })();
 
 </script>
