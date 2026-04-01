@@ -202,48 +202,129 @@ function jsonpResponse(obj, callback) {
   return ContentService.createTextOutput(callback + '(' + JSON.stringify(obj, null, 2) + ');').setMimeType(ContentService.MimeType.JAVASCRIPT);
 }
 
-// ── IR データ取得 (Yahoo Finance + Google News) ──────────────
+// ── IR データ取得 (4社比較: PPIH/ユニクロ/コスモス薬品/イオン) ──────────────
 function fetchIRData(cb) {
   try {
-    var ticker = '141A.T';
-    var opts = { headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36' }, muteHttpExceptions: true };
+    var COMPANIES = [
+      { ticker: '141A.T', code: '141A', name: 'PPIH' },
+      { ticker: '9983.T', code: '9983', name: 'ユニクロ' },
+      { ticker: '3349.T', code: '3349', name: 'コスモス薬品' },
+      { ticker: '8267.T', code: '8267', name: 'イオン' },
+    ];
+    var hdrs = { headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36' }, muteHttpExceptions: true };
 
-    // Quote Summary: summaryDetailにmarketCap/volume/PE/PSR、defaultKeyStatisticsにPBR/EV/EBITDA
-    var summaryUrl = 'https://query2.finance.yahoo.com/v10/finance/quoteSummary/' + ticker
-      + '?modules=summaryDetail,defaultKeyStatistics,financialData,recommendationTrend';
-    var summaryResp = UrlFetchApp.fetch(summaryUrl, opts);
-    var summaryJson = JSON.parse(summaryResp.getContentText());
-    var result0 = (summaryJson.quoteSummary && summaryJson.quoteSummary.result && summaryJson.quoteSummary.result[0]) || {};
-    var sumDet   = result0.summaryDetail || {};       // marketCap, volume, PE, PSR, 52wkH/L
-    var keyStats = result0.defaultKeyStatistics || {}; // PBR, EV/EBITDA
-    var fin      = result0.financialData || {};        // revenue, EBITDA, FCF, ROE, analyst targets
-    var recTrend = (result0.recommendationTrend && result0.recommendationTrend.trend && result0.recommendationTrend.trend[0]) || {};
+    // 4社×3リクエスト(chart/minkabu/settlement) + news = 13並列
+    var requests = [];
+    COMPANIES.forEach(function(co) {
+      requests.push({ url: 'https://query1.finance.yahoo.com/v8/finance/chart/' + co.ticker + '?interval=1d&range=3mo', headers: hdrs.headers, muteHttpExceptions: true });
+      requests.push({ url: 'https://minkabu.jp/stock/' + co.code, headers: hdrs.headers, muteHttpExceptions: true });
+      requests.push({ url: 'https://minkabu.jp/stock/' + co.code + '/settlement', headers: hdrs.headers, muteHttpExceptions: true });
+    });
+    // Google News RSS (PPIH)
+    requests.push({ url: 'https://news.google.com/rss/search?q=%E3%83%88%E3%83%A9%E3%82%A4%E3%82%A2%E3%83%AB%E3%83%9B%E3%83%BC%E3%83%AB%E3%83%87%E3%82%A3%E3%83%B3%E3%82%B0%E3%82%B9&hl=ja&gl=JP&ceid=JP%3Aja', headers: hdrs.headers, muteHttpExceptions: true });
 
-    // Chart data (90 days sparkline)
-    var chartUrl = 'https://query1.finance.yahoo.com/v8/finance/chart/' + ticker + '?interval=1d&range=3mo';
-    var chartResp = UrlFetchApp.fetch(chartUrl, opts);
-    var chartJson = JSON.parse(chartResp.getContentText());
-    var chartResult = (chartJson.chart && chartJson.chart.result && chartJson.chart.result[0]) || {};
-    var closes     = (chartResult.indicators && chartResult.indicators.quote && chartResult.indicators.quote[0] && chartResult.indicators.quote[0].close) || [];
-    var timestamps = chartResult.timestamp || [];
-    var chartData  = [];
-    for (var i = 0; i < timestamps.length; i++) {
-      if (closes[i] != null) {
-        var d = new Date(timestamps[i] * 1000);
-        chartData.push({
-          date: d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'),
-          close: closes[i]
-        });
-      }
-    }
+    var responses = UrlFetchApp.fetchAll(requests);
+
+    // 各社データ解析
+    var companies = COMPANIES.map(function(co, ci) {
+      var base = ci * 3;
+
+      // Chart (v8/finance/chart)
+      var chartData = [], chartMeta = {};
+      try {
+        var chartJson = JSON.parse(responses[base].getContentText());
+        var chartResult = (chartJson.chart && chartJson.chart.result && chartJson.chart.result[0]) || {};
+        chartMeta = chartResult.meta || {};
+        var closes = (chartResult.indicators && chartResult.indicators.quote && chartResult.indicators.quote[0] && chartResult.indicators.quote[0].close) || [];
+        var timestamps = chartResult.timestamp || [];
+        for (var i = 0; i < timestamps.length; i++) {
+          if (closes[i] != null) {
+            var d = new Date(timestamps[i] * 1000);
+            chartData.push({
+              date: d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'),
+              close: closes[i]
+            });
+          }
+        }
+      } catch(cErr) {}
+      var filteredCloses = chartData.map(function(d){ return d.close; }).filter(function(v){ return v != null; });
+      var lastClose = filteredCloses.length > 0 ? filteredCloses[filteredCloses.length-1] : null;
+      var prevClose = filteredCloses.length >= 2 ? filteredCloses[filteredCloses.length-2] : null;
+      var chgVal = (lastClose != null && prevClose != null) ? lastClose - prevClose : null;
+      var chgPct = (chgVal != null && prevClose > 0) ? chgVal / prevClose : null;
+
+      // Minkabu メインページ (PER/PBR/PSR/時価総額/始値/目標株価/評価)
+      var minkPer = null, minkPbr = null, minkPsr = null, minkCap = null, minkOpen = null, minkTgtPrice = null, minkRec = null;
+      try {
+        var minkHtml = responses[base + 1].getContentText();
+        var perM  = minkHtml.match(/<th[^>]*>PER[\s\S]*?<\/th>\s*<td[^>]*>([\d.]+)\s*倍/);
+        var pbrM  = minkHtml.match(/<th[^>]*>PBR[\s\S]*?<\/th>\s*<td[^>]*>([\d.]+)\s*倍/);
+        var psrM  = minkHtml.match(/<th[^>]*>PSR[\s\S]*?<\/th>\s*<td[^>]*>([\d.]+)\s*倍/);
+        var capM  = minkHtml.match(/時価総額[\s\S]{0,100}?<td[^>]*>([\d,]+)\s*(億円|百万円|兆円)/);
+        var openM = minkHtml.match(/始値[\s\S]{0,50}?<td[^>]*>([\d,]+\.?\d*)\s*円/);
+        if (perM)  minkPer  = parseFloat(perM[1]);
+        if (pbrM)  minkPbr  = parseFloat(pbrM[1]);
+        if (psrM)  minkPsr  = parseFloat(psrM[1]);
+        if (openM) minkOpen = parseFloat(openM[1].replace(/,/g, ''));
+        if (capM) {
+          var capVal = parseFloat(capM[1].replace(/,/g, ''));
+          var capUnit = capM[2];
+          if (capUnit === '億円')  minkCap = Math.round(capVal * 1e8);
+          else if (capUnit === '兆円') minkCap = Math.round(capVal * 1e12);
+          else minkCap = Math.round(capVal * 1e6);
+        }
+        var tgtPriceM = minkHtml.match(/md_target_box_price">([\d,]+)/);
+        if (tgtPriceM) minkTgtPrice = parseFloat(tgtPriceM[1].replace(/,/g, ''));
+        var recM2 = minkHtml.match(/md_picksPlate theme_\w+ size_n[^>]*><span class="value">([^<]+)<\/span>/);
+        if (recM2) minkRec = recM2[1].trim();
+      } catch(mErr) {}
+
+      // Minkabu settlement: 売上高（meta descriptionから抽出）
+      var minkRev = null;
+      try {
+        var settlHtml = responses[base + 2].getContentText();
+        var revDescM = settlHtml.match(/【売上高】([\d,]+)百万円/);
+        if (revDescM) {
+          var revM = parseFloat(revDescM[1].replace(/,/g, ''));
+          if (revM > 0) minkRev = Math.round(revM * 1e6);
+        }
+      } catch(sErr) {}
+
+      return {
+        ticker: co.ticker,
+        name: co.name,
+        price: {
+          current:    chartMeta.regularMarketPrice || lastClose,
+          change:     chgVal,
+          changePct:  chgPct,
+          open:       minkOpen || chartMeta.regularMarketOpen || null,
+          high:       chartMeta.regularMarketDayHigh || null,
+          low:        chartMeta.regularMarketDayLow  || null,
+          volume:     chartMeta.regularMarketVolume  || null,
+          marketCap:  minkCap || null,
+          week52High: chartMeta.fiftyTwoWeekHigh || null,
+          week52Low:  chartMeta.fiftyTwoWeekLow  || null,
+          currency:   chartMeta.currency || 'JPY',
+        },
+        valuation: {
+          per: minkPer || null,
+          pbr: minkPbr || null,
+          psr: minkPsr || null,
+        },
+        financial: {
+          revenue:           minkRev      || null,
+          targetMeanPrice:   minkTgtPrice || null,
+          recommendationKey: minkRec      || null,
+        },
+        chart: chartData,
+      };
+    });
 
     // Google News RSS
-    var newsUrl = 'https://news.google.com/rss/search?q=%E3%83%88%E3%83%A9%E3%82%A4%E3%82%A2%E3%83%AB%E3%83%9B%E3%83%BC%E3%83%AB%E3%83%87%E3%82%A3%E3%83%B3%E3%82%B0%E3%82%B9&hl=ja&gl=JP&ceid=JP%3Aja';
     var newsItems = [];
     try {
-      var newsResp = UrlFetchApp.fetch(newsUrl, opts);
-      var newsXml  = newsResp.getContentText();
-      var itemRe   = /<item>([\s\S]*?)<\/item>/g;
+      var newsXml = responses[12].getContentText();
+      var itemRe  = /<item>([\s\S]*?)<\/item>/g;
       var match;
       var count = 0;
       while ((match = itemRe.exec(newsXml)) !== null && count < 5) {
@@ -260,69 +341,10 @@ function fetchIRData(cb) {
       }
     } catch(newsErr) {}
 
-    function raw(obj, key) { return obj[key] && obj[key].raw !== undefined ? obj[key].raw : null; }
-
-    // チャートデータから前日比を計算
-    var filteredCloses = chartData.map(function(d){ return d.close; }).filter(function(v){ return v != null; });
-    var lastClose = filteredCloses.length > 0 ? filteredCloses[filteredCloses.length-1] : null;
-    var prevClose = filteredCloses.length >= 2 ? filteredCloses[filteredCloses.length-2] : null;
-    var chgVal = (lastClose != null && prevClose != null) ? lastClose - prevClose : null;
-    var chgPct = (chgVal != null && prevClose > 0) ? chgVal / prevClose : null;
-
-    // v8/chart メタ（確実に取得可能な値）
-    var chartMeta = chartResult.meta || {};
-
     var irData = {
       generated: new Date().toISOString(),
-      ticker: ticker,
-      price: {
-        current:    chartMeta.regularMarketPrice || lastClose,
-        change:     chgVal,
-        changePct:  chgPct,
-        open:       raw(sumDet, 'regularMarketOpen'),
-        high:       raw(sumDet, 'regularMarketDayHigh'),
-        low:        raw(sumDet, 'regularMarketDayLow'),
-        volume:     raw(sumDet, 'regularMarketVolume') || chartMeta.regularMarketVolume,
-        marketCap:  raw(sumDet, 'marketCap'),
-        week52High: raw(sumDet, 'fiftyTwoWeekHigh') || chartMeta.fiftyTwoWeekHigh,
-        week52Low:  raw(sumDet, 'fiftyTwoWeekLow')  || chartMeta.fiftyTwoWeekLow,
-        currency:   (sumDet.currency || 'JPY'),
-      },
-      valuation: {
-        per:        raw(sumDet, 'trailingPE'),       // summaryDetailに存在
-        forwardPer: raw(sumDet, 'forwardPE'),         // summaryDetailに存在
-        pbr:        raw(keyStats, 'priceToBook'),     // defaultKeyStatisticsに存在
-        psr:        raw(sumDet, 'priceToSalesTrailing12Months'), // summaryDetailに存在
-        ev:         raw(keyStats, 'enterpriseValue'),
-        evEbitda:   raw(keyStats, 'enterpriseToEbitda'),
-        evRevenue:  raw(keyStats, 'enterpriseToRevenue'),
-      },
-      financial: {
-        revenue:          raw(fin, 'totalRevenue'),
-        ebitda:           raw(fin, 'ebitda'),
-        ebitdaMargin:     raw(fin, 'ebitdaMargins'),
-        grossMargin:      raw(fin, 'grossMargins'),
-        operatingMargin:  raw(fin, 'operatingMargins'),
-        freeCashFlow:     raw(fin, 'freeCashflow'),
-        totalDebt:        raw(fin, 'totalDebt'),
-        totalCash:        raw(fin, 'totalCash'),
-        returnOnEquity:   raw(fin, 'returnOnEquity'),
-        targetMeanPrice:  raw(fin, 'targetMeanPrice'),
-        targetHighPrice:  raw(fin, 'targetHighPrice'),
-        targetLowPrice:   raw(fin, 'targetLowPrice'),
-        recommendationKey: fin.recommendationKey || null,
-        numberOfAnalystOpinions: raw(fin, 'numberOfAnalystOpinions'),
-      },
-      analysts: {
-        strongBuy:  recTrend.strongBuy  || 0,
-        buy:        recTrend.buy        || 0,
-        hold:       recTrend.hold       || 0,
-        sell:       recTrend.sell       || 0,
-        strongSell: recTrend.strongSell || 0,
-        period:     recTrend.period     || '0m',
-      },
-      chart: chartData,
-      news:  newsItems,
+      companies: companies,
+      news:      newsItems,
     };
     return cb ? jsonpResponse(irData, cb) : jsonResponse(irData);
   } catch(err) {

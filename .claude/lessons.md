@@ -135,3 +135,62 @@ import re
 scripts = re.findall(r'<script[^>]*>(.*?)</script>', src, re.DOTALL)
 with open('_chk.js', 'w', encoding='utf-8') as f: f.write('\n'.join(scripts))
 ```
+
+---
+
+## 失敗11
+### 内容（何が起きたか）
+カレンダーリマインダープロジェクトの `gas/` `pc/` フォルダを 経営ダッシュボード（Desktop/）フォルダの**中に**作成してしまった。
+その状態で `/plan` を実行したため、Dashboard の `.claude/task.md` がカレンダー内容で上書きされた。
+
+### 原因（なぜ起きたか）
+`/plan` コマンドは常に**カレントプロジェクト**の `.claude/task.md` を上書きする。
+別プロジェクトを同一フォルダで作業していたことに気づかなかった。
+
+### 対策（次どうするか）
+- **プロジェクトは必ず独立したフォルダに作る**。既存プロジェクトのサブフォルダには絶対に作らない。
+  ```
+  ✅ C:\Users\00001512\Desktop\Claude\Calendar\    ← 独立フォルダ
+  ❌ C:\Users\00001512\Desktop\Claude\Desktop\Calendar\  ← Dashboardの中に混入
+  ```
+- 新プロジェクト開始時にCWDを確認し、既存プロジェクトのフォルダ内でないことを確かめる
+- `task.md` は定期的に git commit して復元可能にしておく
+---
+
+## 失敗12
+### 内容（何が起きたか）
+施設名マッピング（RESORT_FACS の `pl` フィールド）と resort_table.js のキー名が一致しておらず、ロッジ虎の湯・TSMART のデータが表示されなかった。
+
+### 原因（なぜ起きたか）
+resort_table.js は Excel ファイル上の施設名（「九重虎の湯」「Tsmart」）をそのままキーにするが、UI側の `pl` フィールドは表示名（「ロッジ虎の湯」「TSMART」）を使っており、名称が不一致だった。
+
+### 対策（次どうするか）
+RESORT_FACS の各施設エントリに `tableKey` フィールドを追加し、`getPlRow()` / `calcRow()` 等は常に `fac.tableKey || fac.pl` でキーを引く。
+施設を追加・変更する際は `pl`（表示名）と `tableKey`（resort_table.jsキー）の両方を設定すること。
+
+---
+
+## 失敗13
+### 内容（何が起きたか）
+Claude in Chrome の file:// タブでスクリーンショットが取れず、「Frame with ID 0 is showing error page」エラーが出続けた。
+
+### 原因（なぜ起きたか）
+Chrome拡張は file:// スキームへのアクセスが制限されており、screenshot / get_page_text 等のツールが動作しない。
+
+### 対策（次どうするか）
+file:// ページの動作確認はユーザーに手動で行ってもらう。
+JS構文確認は `node --check _chk.js` で代替する。
+
+---
+
+## 失敗14
+### 内容（何が起きたか）
+GAS コード（18,639文字）を `mcp__Claude_in_Chrome__javascript_tool` で Monaco エディタに注入する際、巨大なBase64文字列を直接 JS に埋め込む必要があった。
+
+### 原因（なぜ起きたか）
+GAS コードには特殊文字・改行が含まれるため、文字列としてそのまま渡すとエラーになる。
+
+### 対策（次どうするか）
+1. Python で GAS コードを Base64 エンコードして `_inject.js` ファイルに書き出す
+2. `_inject.js` の内容を `mcp__Claude_in_Chrome__javascript_tool` の text パラメータに渡す
+3. Monaco 側で `atob(b64)` してデコードし `models[0].setValue(code)` でセットする
