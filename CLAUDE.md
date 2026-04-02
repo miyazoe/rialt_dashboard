@@ -155,6 +155,7 @@ window.RESORT_TABLE = {
   → ヘッダー・設定モーダル・ナビゲーションが全テーマで統一
 - Canvas チャート色: `_rialtChartBg()` / `_rialtAxisColor()` 等のヘルパー関数経由
 - **初期化順序**: `loadRialtTheme()` → `initRialt()` の順（逆にするとチャートが白くなる）
+- **注意**: `_bodyThemes` の `--bg`/`--panel-bg`/`--text`/`--gap`/`--dim` はTOPタブの`:root`ダーク値（`#07090d`等）を維持すること。明色に変えるとTOPタブパネルが白くなる
 
 ---
 
@@ -210,13 +211,17 @@ window.RESORT_TABLE = {
 
 ```
 [outer-ir]
-  ├── .ir-ai-sidebar（左・折りたたみ可）← AI分析サイドバー
+  ├── .ir-ai-sidebar（左・幅480px・折りたたみ可）← AI分析サイドバー
   └── #ir-main-area（右・flex:1）
         ├── .ir-inner-tabs
-        │     ├── [📊 現在データ]  → #ir-panel（既存の比較テーブル・チャート・ニュース）
-        │     └── [📈 時系列履歴] → #ir-history-panel
+        │     ├── [📊 現在データ]  → #ir-panel（比較テーブル・株価チャート）
+        │     ├── [📈 時系列履歴] → #ir-history-panel
+        │     └── [📰 ニュース]   → #ir-news-panel（トライアルHD最新ニュース）
         └── ...
 ```
+
+- ニュースは `#ir-panel` から独立した `#ir-news-panel` に移動（2026/04改修）
+- ニュース削除分のスペースは株価推移チャート（`ir-chart-combined`）が flex:1 で自動拡張
 
 ### IRセクション — 時系列スナップショット記録
 
@@ -228,11 +233,18 @@ window.RESORT_TABLE = {
 
 ### IRセクション — AI分析サイドバー（左）
 
-- 幅320px、折りたたみ可（`◀` ボタン）
-- 「分析を実行」で Gemini API（`gemini_api_key_v1`）を呼び出し
-- プロンプト: 最新データ5社 + 直近30日のトライアル株価変化率 → JSON形式で応答要求
-- 3カード構成: **株価動向・テクニカル** / **バリュエーション比較** / **競争優位性・戦略示唆**
-- 永続キャッシュ（`ir_ai_cache_v1_adv` / `ir_ai_cache_v1_beg`）。再分析ボタンで上書き更新
+- 幅480px、折りたたみ可（`◀` ボタン）
+- **2ボタン構成**:
+  - `📊 詳細分析`（`id="ir-ai-run-btn-adv"`）: 投資家・経営者視点の専門分析
+  - `🌱 初心者向け`（`id="ir-ai-run-btn-beg"`）: 専門用語解説付き・新入社員向け
+- **プロンプト**: 最新データ5社 + 直近30日トライアル株価変化率 → JSON形式で応答要求
+- **2カード構成**（モード共通）:
+  - `trialAnalysis`: トライアルHD単体分析
+  - `comparison`: 競合4社との比較
+- **初心者向け追加カード**: 📖 用語集（PER/PBR/PSR/時価総額 等の正式英語名・解説）
+- **キャッシュ**: 永続キャッシュ（`ir_ai_cache_v1_adv` / `ir_ai_cache_v1_beg`）。再分析まで保持
+- **バッジ**: `✓ YYYY/MM/DD HH:MM 保存済` 形式（RIALT互換）
+- **ページロード時**: キャッシュがあれば新しい方を自動描画（adv/beg タイムスタンプ比較）
 
 ### IRセクション — 表示フォーマット
 
@@ -241,6 +253,34 @@ window.RESORT_TABLE = {
   - `b >= 10000` → 兆表示（`Math.round(b/1000)/10 + '兆'`）
   - それ未満 → 億表示（`Math.round(b*10)/10 + '億'`）
   - **注意**: しきい値は `10000`（1兆=10,000億）。`1000` にすると10倍ズレる
+
+---
+
+## AI分析 共通仕様（今後の追加時もこの仕様に従う）
+
+各画面にGemini AI分析を追加する際の標準仕様。
+
+### キャッシュ
+| 項目 | 仕様 |
+|---|---|
+| **キー形式** | `{section}_ai_cache_v1_{mode}` （日付なし・永続） |
+| **保存タイミング** | API成功後に即 `saveCache(text)` |
+| **読込タイミング** | 画面初期化時に自動描画（タイムスタンプ比較で最新モードを優先） |
+| **クリック動作** | `forceRefresh=false` → キャッシュ優先 → なければAPI呼び出し |
+| **再分析** | キャッシュがある状態で再クリック → 同じくキャッシュ表示（API呼ばない） |
+| **バッジ** | `✓ YYYY/MM/DD HH:MM 保存済`（`fmtTs(c.ts)` 形式） |
+
+### スコープ注意
+- `callGeminiAPI` / `getGeminiKey` / `formatAIText` / `parseAIJson` は **RIALTのIIFE内** で定義
+- IR等の別IIFEから使う場合は `window.callGeminiAPI` 等 `window.*` 経由でアクセスすること
+- RIALT IIFE末尾に `window.getGeminiKey = getGeminiKey;` 等のエクスポートが必要
+
+### JSONレスポンス形式
+```json
+{ "key1": "説明文（N字以内）", "key2": "説明文（N字以内）" }
+```
+- `responseMimeType: 'application/json'` を `generationConfig` に指定
+- `renderAIResult(text, ts, mode)` でパース→カード描画
 
 ---
 
