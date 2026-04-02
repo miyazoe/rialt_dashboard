@@ -178,8 +178,8 @@ window.RESORT_TABLE = {
 → `getPlRow()` は `tableKey` で参照することで名称不一致を回避
 
 ### GAS Web App
-- **デプロイURL**: `https://script.google.com/a/macros/retail-ai.jp/s/AKfycbwggw9i2KD2JzxcXSSFayAxAYMT1HUJ5MpLklrY-NRJjiT8hdhNSnhx4Dn8MQbuNiemSg/exec`
-- **現在のバージョン**: v34（2026/04/01 19:20）
+- **デプロイURL**: `https://script.google.com/a/macros/retail-ai.jp/s/AKfycbwzLMGeJbmiEyJT9606x1AinA4ZAXG2Ebm8dZfztF-pM_U26U4q91fdRA2VIOInVmgvRw/exec`
+- **現在のバージョン**: v35（2026/04/02 13:09）
 - **ルーティング**:
   - `?ir=1[&callback=xxx]` → `fetchIRData()` 呼び出し（4社比較データ、JSONP対応）
   - `?facility=xxx&month=YYYY-MM` → TGR施設日別売上データ
