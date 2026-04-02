@@ -1404,24 +1404,6 @@ body.public-mode .private-only { display: none !important; }
     --rd:#e2e8f0; --rt:#1f2937; --rts:#6b7280; --rtm:#9ca3af;
     --ra:#2563eb; --rp:#059669; --rn:#dc2626; --rw:#d97706;
   }
-  /* Theme A: ダーク */
-  #outer-ir.theme-a {
-    --rb:#0f1117; --rc:#1a1d27; --rce:#222639; --rbr:6px;
-    --rd:#2d3148; --rt:#e2e8f0; --rts:#94a3b8; --rtm:#64748b;
-    --ra:#00e5cc; --rp:#34d399; --rn:#f87171; --rw:#fbbf24;
-  }
-  /* Theme B: ライトSaaS */
-  #outer-ir.theme-b {
-    --rb:#f0f4ff; --rc:#ffffff; --rce:#ffffff; --rbr:12px;
-    --rd:#e2e8f0; --rt:#0f172a; --rts:#475569; --rtm:#94a3b8;
-    --ra:#6366f1; --rp:#10b981; --rn:#ef4444; --rw:#f59e0b;
-  }
-  /* Theme C: プロフェッショナルネイビー */
-  #outer-ir.theme-c {
-    --rb:#0c1929; --rc:#132338; --rce:#1a2f45; --rbr:8px;
-    --rd:#1e3a5f; --rt:#e2e8f0; --rts:#94a3b8; --rtm:#64748b;
-    --ra:#38bdf8; --rp:#34d399; --rn:#fb7185; --rw:#fbbf24;
-  }
   #outer-ir { background: var(--rb); }
   #ir-panel {
     flex: 1;
@@ -1515,18 +1497,6 @@ body.public-mode .private-only { display: none !important; }
   .ir-ai-sidebar.collapsed .ir-ai-sidebar-body { display:none; }
   .ir-ai-sidebar-collapsed-label { display:none; writing-mode:vertical-rl; text-orientation:mixed; font-size:11px; color:#1d4ed8; font-weight:700; font-family:'Noto Sans JP','Noto Sans',sans-serif; padding:8px 0; cursor:pointer; align-items:center; }
   .ir-ai-sidebar.collapsed .ir-ai-sidebar-collapsed-label { display:flex; }
-  /* ── IR テーマ対応（dark/navy） ── */
-  #outer-ir.theme-a .ir-ai-sidebar, #outer-ir.theme-c .ir-ai-sidebar { background:var(--rc); border-right-color:var(--ra); }
-  #outer-ir.theme-a .ir-ai-sidebar-header, #outer-ir.theme-c .ir-ai-sidebar-header { background:var(--rce); border-color:var(--rd); }
-  #outer-ir.theme-a .ir-ai-sidebar-title, #outer-ir.theme-c .ir-ai-sidebar-title { color:var(--ra); }
-  #outer-ir.theme-a .ir-ai-sidebar-toggle, #outer-ir.theme-c .ir-ai-sidebar-toggle { border-color:var(--ra); color:var(--ra); }
-  #outer-ir.theme-a .ir-ai-sidebar-toggle:hover, #outer-ir.theme-c .ir-ai-sidebar-toggle:hover { background:rgba(0,229,204,0.08); }
-  #outer-ir.theme-a .ir-ai-sidebar-collapsed-label, #outer-ir.theme-c .ir-ai-sidebar-collapsed-label { color:var(--ra); }
-  #outer-ir.theme-b .ir-ai-sidebar { background:var(--rc); border-right-color:var(--ra); }
-  #outer-ir.theme-b .ir-ai-sidebar-header { background:var(--rce); border-color:var(--rd); }
-  #outer-ir.theme-b .ir-ai-sidebar-title { color:var(--ra); }
-  #outer-ir.theme-b .ir-ai-sidebar-toggle { border-color:var(--ra); color:var(--ra); }
-  #outer-ir.theme-b .ir-ai-sidebar-collapsed-label { color:var(--ra); }
   /* ── IR 内タブ ── */
   .ir-inner-tabs { display:flex; gap:0; border-bottom:1px solid var(--rd,#e2e8f0); padding:0 8px; background:var(--rb,#f4f6f9); flex-shrink:0; }
   .ir-inner-tab-btn { background:none; border:none; border-bottom:2px solid transparent; color:var(--rts,#6b7280); font-size:11px; font-family:'Noto Sans JP','Noto Sans',sans-serif; padding:7px 12px; cursor:pointer; transition:all 0.15s; }
@@ -7579,6 +7549,9 @@ document.getElementById('import-btn').addEventListener('click', openPasteDialog)
     });
   });
 })();
+  // Gemini helpers for IR IIFE
+  window.getGeminiKey = getGeminiKey;
+  window.callGeminiAPI = callGeminiAPI;
 })();
 
 // ===== GAS IMPORT =====
@@ -9437,9 +9410,8 @@ document.getElementById('import-btn').addEventListener('click', openPasteDialog)
         return;
       }
       var cards=[
-        {key:'stockTrend',icon:'\u{1F4C8}',title:'\u682a\u4fa1\u52d5\u5411\u30fb\u30c6\u30af\u30cb\u30ab\u30eb',cls:'ai-card-yoy'},
-        {key:'valuation',icon:'\u2696\uFE0F',title:'\u30d0\u30ea\u30e5\u30a8\u30fc\u30b7\u30e7\u30f3\u6bd4\u8f03',cls:'ai-card-mkt'},
-        {key:'strategy',icon:'\u{1F3E2}',title:'\u7af6\u4e89\u512a\u4f4d\u6027\u30fb\u6226\u7565\u793a\u5506',cls:'ai-card-bm'},
+        {key:'trialAnalysis',icon:'\u{1F3E2}',title:'\u30c8\u30e9\u30a4\u30a2\u30ebHD \u5358\u4f53\u5206\u6790',cls:'ai-card-yoy'},
+        {key:'comparison',icon:'\u2696\uFE0F',title:'\u7af6\u5408\u4ed64\u793e\u3068\u306e\u6bd4\u8f03\u5206\u6790',cls:'ai-card-mkt'},
       ];
       var html='<div class="ai-result-body">';
       cards.forEach(function(c){
@@ -9452,7 +9424,7 @@ document.getElementById('import-btn').addEventListener('click', openPasteDialog)
       area.innerHTML=html;
     }
     async function runIRAI(forceRefresh){
-      var key=getGeminiKey();
+      var key=(window.getGeminiKey||function(){return '';})();
       if(!key){alert('Gemini\u306eAPI\u30ad\u30fc\u3092\u8a2d\u5b9a\u3057\u3066\u304f\u3060\u3055\u3044\uff08\u8a2d\u5b9a \u2192 AI ANALYSIS\uff09');return;}
       if(!forceRefresh){var cached=loadIRAICache();if(cached){renderIRAIResult(cached.text,cached.ts);updateIRAICacheUI();return;}}
       var runBtn=document.getElementById('ir-ai-run-btn');
@@ -9485,8 +9457,8 @@ document.getElementById('import-btn').addEventListener('click', openPasteDialog)
             histSummary='\n\u300c\u76f4\u8fd1'+recentHist.length+'\u65e5\u9593\u306e\u30c8\u30e9\u30a4\u30a2\u30eb\u682a\u4fa1\u5909\u5316\u300d '+(chg>=0?'+':'')+chg.toFixed(1)+'%';
           }
         }
-        var prompt='\u4ee5\u4e0b\u306f\u65e5\u672c\u306e\u5c0f\u58f2\u696d\u7af6\u5408\u4ed65\u793e\u306e\u682a\u4fa1\u30fb\u8ca1\u52d9\u30c7\u30fc\u30bf\u3067\u3059\u3002\u30c8\u30e9\u30a4\u30a2\u30ebHD\uff08141A\uff09\u306e\u7d4c\u55b6\u8005\u30fb\u6295\u8cc4\u5bb6\u8996\u70b9\u3067\u306e\u6226\u7565\u5206\u6790\u3092\u884c\u3063\u3066\u304f\u3060\u3055\u3044\u3002\n\n\u300c\u6700\u65b0\u30c7\u30fc\u30bf\uff08'+_irTodayStr()+'\uff09\u300d\n'+coLines+histSummary+'\n\n\u4ee5\u4e0b\u306eJSON\u5f62\u5f0f\u306e\u307f\u3067\u56de\u7b54\u3057\u3066\u304f\u3060\u3055\u3044\uff1a\n{"stockTrend":"\u682a\u4fa1\u52d5\u5411\u30fb\u30c6\u30af\u30cb\u30ab\u30eb\u5206\u6790\uff08200\u5b57\u4ee5\u5185\uff09","valuation":"\u30d0\u30ea\u30e5\u30a8\u30fc\u30b7\u30e7\u30f3\u6bd4\u8f03\uff08PER/PBR/PSR\u6bd4\u8f03\uff09\uff08200\u5b57\u4ee5\u5185\uff09","strategy":"\u7af6\u4e89\u512a\u4f4d\u6027\u30fb\u7d4c\u55b6\u6226\u7565\u3078\u306e\u793a\u5506\uff08200\u5b57\u4ee5\u5185\uff09"}';
-        var result=await callGeminiAPI(prompt,key);
+        var prompt='\u4ee5\u4e0b\u306f\u65e5\u672c\u306e\u5c0f\u58f2\u696d\u7af6\u5408\u4ed65\u793e\u306e\u682a\u4fa1\u30fb\u8ca1\u52d9\u30c7\u30fc\u30bf\u3067\u3059\u3002\u30c8\u30e9\u30a4\u30a2\u30ebHD\uff08141A\uff09\u306e\u7d4c\u55b6\u8005\u30fb\u6295\u8cc4\u5bb6\u8996\u70b9\u3067\u306e\u6226\u7565\u5206\u6790\u3092\u884c\u3063\u3066\u304f\u3060\u3055\u3044\u3002\n\n\u300c\u6700\u65b0\u30c7\u30fc\u30bf\uff08'+_irTodayStr()+'\uff09\u300d\n'+coLines+histSummary+'\n\n\u4ee5\u4e0b\u306eJSON\u5f62\u5f0f\u306e\u307f\u3067\u56de\u7b54\u3057\u3066\u304f\u3060\u3055\u3044\uff1a\n{"trialAnalysis":"\u30c8\u30e9\u30a4\u30a2\u30ebHD\u5358\u4f53\uff1a\u682a\u4fa1\u30fb\u30d0\u30ea\u30e5\u30a8\u30fc\u30b7\u30e7\u30f3\u30fb\u696d\u7e3e\u306e\u73fe\u72b6\u3068\u8ab2\u984c\uff08300\u5b57\u4ee5\u5185\uff09","comparison":"\u7af6\u5408\u4ed64\u793e\u3068\u306e\u6bd4\u8f03\uff1a\u76f8\u5bfe\u7684\u30dd\u30b8\u30b7\u30e7\u30f3\u30fb\u5f37\u307f\u30fb\u8ab2\u984c\u30fb\u6295\u8cc4\u793a\u5506\uff08300\u5b57\u4ee5\u5185\uff09"}';
+        var result=await window.callGeminiAPI(prompt,key);
         saveIRAICache(result);
         renderIRAIResult(result,Date.now());
         updateIRAICacheUI();
