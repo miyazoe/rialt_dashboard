@@ -2147,7 +2147,7 @@ body.public-mode .private-only { display: none !important; }
         </div>
         <!-- 4社統合チャート -->
         <div class="ir-section ir-section-chart">
-          <div class="ir-title" style="flex-shrink:0"><span>株価推移（90日・円）</span></div>
+          <div class="ir-title" style="flex-shrink:0"><span>株価推移（90日・起点=100 指数）</span></div>
           <canvas id="ir-chart-combined"></canvas>
         </div>
         <!-- ニュース（PPIH） -->
@@ -8712,8 +8712,16 @@ document.getElementById('import-btn').addEventListener('click', openPasteDialog)
       return _irTooltipEl;
     }
     function drawIRComboChart(canvas, companies) {
+      // ────────────────────────────────────────────────
+      // 指数化チャート（起点 = 100）
+      //
+      // 絶対株価を描画すると銘柄間の価格差（PPIH:4千円 vs ユニクロ:6万円）が
+      // 大きすぎて比較できない上、Yahoo Finance のデータスケールが
+      // 銘柄によって正しくない問題がある。
+      // → 各社の最初の終値を 100 として指数化し、全社を同一軸で比較する。
+      // ────────────────────────────────────────────────
       if (!canvas || !companies || !companies.length) return;
-      // 高さを親から動的取得（flexレイアウト対応）
+
       var parent = canvas.parentElement;
       var titleH = 0;
       if (parent) {
@@ -8727,172 +8735,153 @@ document.getElementById('import-btn').addEventListener('click', openPasteDialog)
       var ctx = canvas.getContext('2d');
       ctx.clearRect(0, 0, W, H);
 
-      var outerIr  = document.getElementById('outer-ir') || document.body;
-      var cs       = getComputedStyle(outerIr);
-      var bgColor  = cs.getPropertyValue('--rb').trim()  || '#0d1117';
-      var gridClr  = cs.getPropertyValue('--rd').trim()  || '#21262d';
-      var axisClr  = cs.getPropertyValue('--rts').trim() || '#8b949e';
-      var fontFam  = "'Noto Sans JP','Noto Sans',sans-serif";
+      var outerIr = document.getElementById('outer-ir') || document.body;
+      var cs      = getComputedStyle(outerIr);
+      var bgColor = cs.getPropertyValue('--rb').trim()  || '#0d1117';
+      var gridClr = cs.getPropertyValue('--rd').trim()  || '#21262d';
+      var axisClr = cs.getPropertyValue('--rts').trim() || '#8b949e';
+      var fontFam = "'Noto Sans JP','Noto Sans',sans-serif";
 
       ctx.fillStyle = bgColor; ctx.fillRect(0, 0, W, H);
 
-      // 実株価データセット構築
+      // ── データセット構築（生値のまま保持し、指数はあとで算出） ──
       var datasets = companies.map(function(co, ci) {
         var items = (co.chart || []).filter(function(d){ return d.close != null && d.close > 0; });
-        // chart が空でも price.current (or open) があれば今日1点を合成
+        // chart が空でも price.current/open があれば 1 点を合成
         if (!items.length) {
           var synthV = co.price && (co.price.current || co.price.open);
           if (synthV) {
             var td = new Date();
-            var ds2 = td.getFullYear()+'-'+String(td.getMonth()+1).padStart(2,'0')+'-'+String(td.getDate()).padStart(2,'0');
-            items = [{ date: ds2, close: synthV }];
+            var ds_ = td.getFullYear()+'-'+String(td.getMonth()+1).padStart(2,'0')+'-'+String(td.getDate()).padStart(2,'0');
+            items = [{ date: ds_, close: synthV }];
           }
         }
         if (!items.length) return null;
+        var rawArr   = items.map(function(d){ return d.close; });
+        var dateArr  = items.map(function(d){ return d.date;  });
+        var base     = rawArr[0];  // 指数化の基準（初日終値）
+        var idxArr   = rawArr.map(function(v){ return base > 0 ? v / base * 100 : 100; });
+        // minkabu の現在株価（テーブルに表示されている正確な値）
+        var curPrice = co.price && (co.price.current || co.price.open);
         return {
-          name:   co.name,
-          ticker: co.ticker,
-          color:  _IR_COLORS[ci],
-          raw:    items.map(function(d){ return d.close; }),
-          dates:  items.map(function(d){ return d.date;  }),
-          ci:     ci
+          name:     co.name,
+          ticker:   co.ticker,
+          color:    _IR_COLORS[ci],
+          raw:      rawArr,   // 元の close 値（ツールチップ用参考）
+          idx:      idxArr,   // 指数値（グラフ描画用）
+          dates:    dateArr,
+          base:     base,
+          curPrice: curPrice, // minkabu 株価（終点ラベル）
+          ci:       ci
         };
       }).filter(Boolean);
 
-      // --- スケール補正 ---
-      // Yahoo Finance v8/chart の indicators.close が meta.regularMarketPrice と
-      // 乖離している場合 (例: 9983.T が 4000 円で返るが実際は 60000 円) に
-      // 全データを同比率でスケールし、最終値 = price.current に合わせる。
-      datasets.forEach(function(ds) {
-        var co2 = companies[ds.ci];
-        var cur2 = co2 && co2.price && (co2.price.current || co2.price.open);
-        if (cur2 && ds.raw.length > 0) {
-          var lastV = ds.raw[ds.raw.length - 1];
-          if (lastV > 0) {
-            var ratio = cur2 / lastV;
-            // 15% 以上の乖離がある場合のみ補正
-            if (ratio < 0.85 || ratio > 1.15) {
-              ds.raw = ds.raw.map(function(v){ return v * ratio; });
-            }
-          }
-        }
-      });
-
-      if (!datasets.length) { ctx.fillStyle=axisClr; ctx.font='12px '+fontFam; ctx.textAlign='center'; ctx.fillText('データなし', W/2, H/2); return; }
-
-      // デュアルYスケール判定
-      // 低価格グループ（左軸）: 名前でPPIH or イオン → ci 0,3
-      // 高価格グループ（右軸）: ユニクロ or コスモス薬品 → ci 1,2
-      var leftDs  = datasets.filter(function(d){ return d.ci===0 || d.ci===3; });
-      var rightDs = datasets.filter(function(d){ return d.ci===1 || d.ci===2; });
-      // フォールバック: 価格帯で自動判定
-      if (!leftDs.length || !rightDs.length) {
-        var medians = datasets.map(function(d){ return d.raw[Math.floor(d.raw.length/2)] || 0; });
-        var mid = medians.reduce(function(a,b){return a+b;},0) / medians.length;
-        leftDs  = datasets.filter(function(d,i){ return medians[i] <= mid; });
-        rightDs = datasets.filter(function(d,i){ return medians[i] >  mid; });
-        if (!leftDs.length)  { leftDs  = datasets.slice(0,2); rightDs = datasets.slice(2); }
-        if (!rightDs.length) { rightDs = leftDs; leftDs = []; }
+      if (!datasets.length) {
+        ctx.fillStyle = axisClr; ctx.font = '12px '+fontFam; ctx.textAlign = 'center';
+        ctx.fillText('データなし', W/2, H/2);
+        return;
       }
-      function getDsRange(dsArr) {
-        var allV = [].concat.apply([], dsArr.map(function(d){return d.raw;}));
-        var mn = Math.min.apply(null,allV), mx = Math.max.apply(null,allV);
-        var pad = (mx-mn||mx*0.05||1)*0.08;
-        return { mn:mn-pad, mx:mx+pad };
-      }
-      var rL = leftDs.length  ? getDsRange(leftDs)  : null;
-      var rR = rightDs.length ? getDsRange(rightDs) : null;
-      if (!rL) rL = rR; if (!rR) rR = rL;
 
-      // X軸はデータ長が最大のデータセットの日付を使用
-      var refDs = datasets.reduce(function(a,b){return a.dates.length>=b.dates.length?a:b;});
-      var maxLen = refDs.dates.length;
+      // ── Y軸レンジ（指数値ベース、全社共通） ──
+      var allIdx = [].concat.apply([], datasets.map(function(d){ return d.idx; }));
+      var yMin = Math.min.apply(null, allIdx);
+      var yMax = Math.max.apply(null, allIdx);
+      var yPad = (yMax - yMin || 5) * 0.10;
+      yMin -= yPad; yMax += yPad;
 
-      // レイアウト
-      var pL=62, pR=62, pT=34, pB=30;
-      var cW=W-pL-pR, cH=H-pT-pB;
-      function tx(i,n){ return pL + (n>1 ? i/(n-1)*cW : cW/2); }
-      function tyL(v){ return pT + (1-(v-rL.mn)/(rL.mx-rL.mn))*cH; }
-      function tyR(v){ return pT + (1-(v-rR.mn)/(rR.mx-rR.mn))*cH; }
-      function tyFor(ds){ return ds.ci===0||ds.ci===3 ? tyL : tyR; }
-
-      // Y軸グリッド・目盛り（左右）
-      var ticks = 5;
-      function fmtPrice(v){
-        if(v>=10000) return (v/10000).toFixed(1)+'万';
-        return Math.round(v).toLocaleString();
-      }
-      for (var ti=0; ti<=ticks; ti++) {
-        var frac = ti/ticks;
-        // 左
-        var vL = rL.mn + frac*(rL.mx-rL.mn);
-        var yL = tyL(vL);
-        ctx.strokeStyle=gridClr; ctx.lineWidth=0.5;
-        ctx.beginPath(); ctx.moveTo(pL,yL); ctx.lineTo(W-pR,yL); ctx.stroke();
-        ctx.fillStyle=axisClr; ctx.font='9px '+fontFam; ctx.textAlign='right';
-        ctx.fillText(fmtPrice(vL), pL-4, yL+3);
-        // 右（左軸グリッドと同位置になるよう別途）
-        if (rightDs.length && rR !== rL) {
-          var vR = rR.mn + frac*(rR.mx-rR.mn);
-          ctx.fillStyle=axisClr; ctx.textAlign='left';
-          ctx.fillText(fmtPrice(vR), W-pR+4, tyR(vR)+3);
-        }
-      }
-      // 右軸ライン
-      if (rightDs.length) {
-        ctx.strokeStyle=gridClr; ctx.lineWidth=0.5;
-        ctx.beginPath(); ctx.moveTo(W-pR,pT); ctx.lineTo(W-pR,H-pB); ctx.stroke();
-      }
-      // 左軸ライン
-      ctx.strokeStyle=gridClr; ctx.lineWidth=0.5;
-      ctx.beginPath(); ctx.moveTo(pL,pT); ctx.lineTo(pL,H-pB); ctx.stroke();
-
-      // X軸時間目盛り
+      // ── X軸は最長データセットの日付を基準 ──
+      var refDs  = datasets.reduce(function(a,b){ return a.dates.length >= b.dates.length ? a : b; });
       var xDates = refDs.dates;
-      var tickInterval = Math.max(1, Math.round(xDates.length / 6)); // 約6分割
-      ctx.fillStyle=axisClr; ctx.font='9px '+fontFam; ctx.textAlign='center';
-      for (var xi=0; xi<xDates.length; xi+=tickInterval) {
+      var maxLen = xDates.length;
+
+      // ── レイアウト（右余白を広めに：終点ラベル用） ──
+      var pL = 46, pR = 16, pT = 36, pB = 28;
+      var cW = W - pL - pR, cH = H - pT - pB;
+
+      function tx(i, n)  { return pL + (n > 1 ? i/(n-1)*cW : cW/2); }
+      function ty(v)     { return pT + (1 - (v - yMin)/(yMax - yMin)) * cH; }
+
+      // ── グリッド＆Y軸目盛り（指数値 → %表示） ──
+      var ticks = 5;
+      for (var ti = 0; ti <= ticks; ti++) {
+        var frac = ti / ticks;
+        var yv   = yMin + frac * (yMax - yMin);
+        var ypos = ty(yv);
+        // グリッド線
+        ctx.strokeStyle = gridClr; ctx.lineWidth = 0.5;
+        ctx.beginPath(); ctx.moveTo(pL, ypos); ctx.lineTo(W - pR, ypos); ctx.stroke();
+        // Y軸ラベル（100 = 起点。±n% として表示）
+        var pct = yv - 100;
+        var sign = pct >= 0 ? '+' : '';
+        ctx.fillStyle = axisClr; ctx.font = '9px '+fontFam; ctx.textAlign = 'right';
+        ctx.fillText(sign + pct.toFixed(1) + '%', pL - 4, ypos + 3);
+      }
+      // 起点（0%）に強調ライン
+      var y100 = ty(100);
+      ctx.strokeStyle = '#444c56'; ctx.lineWidth = 0.8;
+      ctx.beginPath(); ctx.moveTo(pL, y100); ctx.lineTo(W - pR, y100); ctx.stroke();
+
+      // 左軸ライン
+      ctx.strokeStyle = gridClr; ctx.lineWidth = 0.5;
+      ctx.beginPath(); ctx.moveTo(pL, pT); ctx.lineTo(pL, H - pB); ctx.stroke();
+
+      // ── X軸目盛り（日付） ──
+      var tickInterval = Math.max(1, Math.round(xDates.length / 6));
+      ctx.fillStyle = axisClr; ctx.font = '9px '+fontFam; ctx.textAlign = 'center';
+      for (var xi = 0; xi < xDates.length; xi += tickInterval) {
         var xpos = tx(xi, xDates.length);
-        // 縦破線
-        ctx.save(); ctx.strokeStyle=gridClr; ctx.lineWidth=0.4; ctx.setLineDash([2,4]);
-        ctx.beginPath(); ctx.moveTo(xpos,pT); ctx.lineTo(xpos,H-pB); ctx.stroke();
+        ctx.save(); ctx.strokeStyle = gridClr; ctx.lineWidth = 0.4; ctx.setLineDash([2,4]);
+        ctx.beginPath(); ctx.moveTo(xpos, pT); ctx.lineTo(xpos, H - pB); ctx.stroke();
         ctx.restore();
-        // 日付ラベル（MM/DD）
         var dateStr = (xDates[xi]||'').replace(/^\d{4}-(\d{2})-(\d{2})$/, '$1/$2');
-        ctx.fillText(dateStr, xpos, H-pB+12);
+        ctx.fillText(dateStr, xpos, H - pB + 12);
       }
       // X軸ライン
-      ctx.strokeStyle=gridClr; ctx.lineWidth=0.5;
-      ctx.beginPath(); ctx.moveTo(pL,H-pB); ctx.lineTo(W-pR,H-pB); ctx.stroke();
+      ctx.strokeStyle = gridClr; ctx.lineWidth = 0.5;
+      ctx.beginPath(); ctx.moveTo(pL, H - pB); ctx.lineTo(W - pR, H - pB); ctx.stroke();
 
-      // 各社ライン描画
+      // ── ライン描画 ──
       datasets.forEach(function(ds) {
-        var tyFn = tyFor(ds);
-        var n = ds.raw.length;
-        ctx.beginPath(); ctx.strokeStyle=ds.color; ctx.lineWidth=1.8;
-        ctx.moveTo(tx(0,n), tyFn(ds.raw[0]));
-        for (var i=1; i<n; i++) ctx.lineTo(tx(i,n), tyFn(ds.raw[i]));
+        var n = ds.idx.length;
+        ctx.beginPath(); ctx.strokeStyle = ds.color; ctx.lineWidth = 2;
+        ctx.moveTo(tx(0, n), ty(ds.idx[0]));
+        for (var i = 1; i < n; i++) ctx.lineTo(tx(i, n), ty(ds.idx[i]));
         ctx.stroke();
         // 終点マーカー
-        ctx.beginPath(); ctx.fillStyle=ds.color;
-        ctx.arc(tx(n-1,n), tyFn(ds.raw[n-1]), 3.5, 0, Math.PI*2); ctx.fill();
+        var lastX = tx(n-1, n), lastY = ty(ds.idx[n-1]);
+        ctx.beginPath(); ctx.fillStyle = ds.color;
+        ctx.arc(lastX, lastY, 4, 0, Math.PI*2); ctx.fill();
       });
 
-      // 凡例（上部）
+      // ── 凡例（上部）: 名前 + 現在株価 + 騰落率 ──
       var legStep = Math.floor(cW / Math.max(datasets.length, 1));
       datasets.forEach(function(ds, i) {
-        var lx = pL + i * legStep;
-        ctx.fillStyle=ds.color; ctx.fillRect(lx, 10, 14, 3);
-        ctx.fillStyle=axisClr; ctx.font='9px '+fontFam; ctx.textAlign='left';
-        var suf = (ds.ci===0||ds.ci===3) ? '(左軸)' : '(右軸)';
-        ctx.fillText(ds.name + (datasets.length===1?'':' '+suf), lx+18, 15);
+        var lx  = pL + i * legStep;
+        var pct = ds.idx[ds.idx.length-1] - 100;
+        var sign = pct >= 0 ? '+' : '';
+        var clr  = pct >= 0 ? '#3fb950' : '#f85149';
+        // カラーバー
+        ctx.fillStyle = ds.color; ctx.fillRect(lx, 12, 14, 3);
+        // 名前
+        ctx.fillStyle = axisClr; ctx.font = '9px '+fontFam; ctx.textAlign = 'left';
+        ctx.fillText(ds.name, lx + 18, 16);
+        // 株価（minkabu値）
+        if (ds.curPrice) {
+          var priceStr = Math.round(ds.curPrice).toLocaleString() + '円';
+          ctx.fillStyle = '#e6edf3'; ctx.font = '8px '+fontFam;
+          ctx.fillText(priceStr, lx + 18, 26);
+        }
+        // 騰落率
+        ctx.fillStyle = clr; ctx.font = 'bold 8px '+fontFam;
+        ctx.fillText(sign + pct.toFixed(1)+'%', lx + 18 + (ds.curPrice ? 38 : 0), 26);
       });
 
-      // データ保存（ホバー用）
+      // ── データ保存（ホバー用） ──
       canvas._irDs = {
-        datasets:datasets, maxLen:maxLen, refDates:xDates,
-        pL:pL, pR:pR, pT:pT, pB:pB, W:W, H:H,
-        tyFor:tyFor, cW:cW, bgColor:bgColor, gridClr:gridClr, axisClr:axisClr, fontFam:fontFam
+        datasets: datasets, maxLen: maxLen, refDates: xDates,
+        pL: pL, pR: pR, pT: pT, pB: pB, W: W, H: H,
+        ty: ty, cW: cW,
+        bgColor: bgColor, gridClr: gridClr, axisClr: axisClr, fontFam: fontFam
       };
     }
 
@@ -8920,14 +8909,15 @@ document.getElementById('import-btn').addEventListener('click', openPasteDialog)
         var html = '<div style="color:#8b949e;font-size:10px;margin-bottom:4px">'+dateStr+'</div>';
         d.datasets.forEach(function(ds) {
           var pi = Math.min(idx, ds.raw.length-1); if (pi < 0) return;
-          var raw = ds.raw[pi];
-          var base = ds.raw[0];
-          var pct = base > 0 ? (raw-base)/base*100 : 0;
-          var sign = pct>=0?'+':'';
-          var clr  = pct>=0?'var(--rp,#3fb950)':'var(--rn,#f85149)';
-          html += '<div><span style="color:'+ds.color+';font-weight:600;min-width:100px;display:inline-block">'+ds.name+'</span>'
-               +' <span style="color:var(--rt,#e6edf3)">'+Math.round(raw).toLocaleString()+'円</span>'
-               +' <span style="color:'+clr+'">'+sign+pct.toFixed(2)+'%</span></div>';
+          var idxV = ds.idx ? ds.idx[Math.min(pi, ds.idx.length-1)] : 100;
+          var pct  = idxV - 100;
+          var sign = pct >= 0 ? '+' : '';
+          var clr  = pct >= 0 ? 'var(--rp,#3fb950)' : 'var(--rn,#f85149)';
+          var priceStr = ds.curPrice ? Math.round(ds.curPrice).toLocaleString()+'円 ' : '';
+          html += '<div><span style="color:'+ds.color+';font-weight:600;min-width:90px;display:inline-block">'+ds.name+'</span>'
+               +' <span style="color:#8b949e;font-size:9px">'+priceStr+'</span>'
+               +' <span style="color:var(--rt,#e6edf3)">指数 '+idxV.toFixed(1)+'</span>'
+               +' <span style="color:'+clr+'"> '+sign+pct.toFixed(2)+'%</span></div>';
         });
         tip.innerHTML = html;
         tip.style.display = 'block';
