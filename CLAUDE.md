@@ -186,11 +186,11 @@ window.RESORT_TABLE = {
   - その他 → 月次集約データ
 
 ### GAS IR機能（fetchIRData） — v36: 5社比較
-- **対象4社**: PPIH(141A.T)、ユニクロ/FR(9983.T)、コスモス薬品(3349.T)、イオン(8267.T)
-- **並列取得**: `UrlFetchApp.fetchAll()` で13リクエスト並列（4社×3 + ニュース1）
+- **対象5社**: トライアル(141A.T)、PPIH(7532.T)、ユニクロ/FR(9983.T)、コスモス薬品(3349.T)、イオン(8267.T)
+- **並列取得**: `UrlFetchApp.fetchAll()` で16リクエスト並列（5社×3 + ニュース1）
 - **各社取得フィールド**: price(current/change/changePct/high/low/volume/week52High/week52Low/marketCap), valuation(per/pbr/psr), financial(revenue/targetMeanPrice/recommendationKey), chart(90日スパークライン)
-- **ニュース**: PPIH「トライアルホールディングス」Google News RSS（最大5件）
-- **レスポンス構造**: `{ generated, companies:[{ticker,name,...}×4], news:[] }`
+- **ニュース**: 「トライアルホールディングス」Google News RSS（最大5件）
+- **レスポンス構造**: `{ generated, companies:[{ticker,name,...}×5], news:[] }`
 
 | フィールド | ソース | 状態 |
 |---|---|---|
@@ -205,6 +205,42 @@ window.RESORT_TABLE = {
 - 時価総額: `/時価総額[\s\S]{0,100}?<td[^>]*>([\d,]+)\s*(億円|百万円|兆円)/`
 - 始値: `/始値[\s\S]{0,50}?<td[^>]*>([\d,]+\.?\d*)\s*円/`
 - 売上高（settlement meta）: `/【売上高】([\d,]+)百万円/`（テーブルはJS描画のためmeta descriptionから取得）
+
+### IRセクション — レイアウト・内タブ構成
+
+```
+[outer-ir]
+  ├── .ir-ai-sidebar（左・折りたたみ可）← AI分析サイドバー
+  └── #ir-main-area（右・flex:1）
+        ├── .ir-inner-tabs
+        │     ├── [📊 現在データ]  → #ir-panel（既存の比較テーブル・チャート・ニュース）
+        │     └── [📈 時系列履歴] → #ir-history-panel
+        └── ...
+```
+
+### IRセクション — 時系列スナップショット記録
+
+- IRタブを開いてGASデータを取得するたびに **localStorage（`ir_history_v1`）** に自動保存
+- 保存単位: 1日1件（当日分は上書き）、最大90日間のローリングウィンドウ
+- 保存フィールド: `{ date, ts, companies:[{ticker, name, price:{current,changePct,marketCap}, valuation:{per,pbr,psr}, financial:{revenue}}] }`
+- 時系列タブで指標セレクタ（株価指数化 / 時価総額 / PER / PBR / PSR）を選び5社折れ線チャート表示
+- 株価は起点=100に正規化して比較
+
+### IRセクション — AI分析サイドバー（左）
+
+- 幅320px、折りたたみ可（`◀` ボタン）
+- 「分析を実行」で Gemini API（`gemini_api_key_v1`）を呼び出し
+- プロンプト: 最新データ5社 + 直近30日のトライアル株価変化率 → JSON形式で応答要求
+- 3カード構成: **株価動向・テクニカル** / **バリュエーション比較** / **競争優位性・戦略示唆**
+- 当日キャッシュ（`ir_ai_cache_v1_YYYY-MM-DD`）。「再分析」で強制更新
+
+### IRセクション — 表示フォーマット
+
+- `fmtBn(v)`: 円建て値（yen）を億/兆に変換
+  - `b = v / 1e8` （億単位に変換）
+  - `b >= 10000` → 兆表示（`Math.round(b/1000)/10 + '兆'`）
+  - それ未満 → 億表示（`Math.round(b*10)/10 + '億'`）
+  - **注意**: しきい値は `10000`（1兆=10,000億）。`1000` にすると10倍ズレる
 
 ---
 
@@ -276,6 +312,8 @@ window.RESORT_TABLE = {
 | `dashboard_settings_v2` | 設定（フォントサイズ・表示件数・インターバル） |
 | `rialt_theme_v1` | RIALTテーマ設定 |
 | `gemini_api_key_v1` | Gemini APIキー |
+| `ir_history_v1` | IR日次スナップショット（最大90日分） |
+| `ir_ai_cache_v1_YYYY-MM-DD` | IR AI分析結果キャッシュ（日次） |
 
 ---
 
