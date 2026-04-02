@@ -44,8 +44,8 @@ body {
 /* ===== HEADER ===== */
 .top-bar {
   height: 36px;
-  background: #080c10;
-  border-bottom: 1px solid #0d1f12;
+  background: var(--th-header, #ffffff);
+  border-bottom: 1px solid var(--th-border, #e5e7eb);
   display: flex; align-items: center; justify-content: space-between;
   padding: 0 12px 0 14px;
   flex-shrink: 0;
@@ -2402,8 +2402,8 @@ body.public-mode .private-only { display: none !important; }
     }, 30);
   }
   function loadRialtTheme() {
-    // ページロード時はクラスのみ先に適用（initRialtの前に呼ぶこと）
-    try { var t = localStorage.getItem(_RIALT_THEME_KEY); if (t) _applyRialtThemeClass(t); } catch(e) {}
+    // ページロード時はクラスとグローバルCSS変数を適用（initRialtの前に呼ぶこと）
+    try { var t = localStorage.getItem(_RIALT_THEME_KEY); _applyRialtThemeClass(t || 'default'); } catch(e) { _applyRialtThemeClass('default'); }
   }
   // Canvas チャート用テーマカラー取得
   function _rialtChartBg() {
@@ -7765,22 +7765,26 @@ document.getElementById('import-btn').addEventListener('click', openPasteDialog)
     if (ret.occ_a == null && gm.occ_a != null) ret.occ_a = gm.occ_a;
     if (ret.rvp_a == null && gm.rvp_a != null) ret.rvp_a = gm.rvp_a;
     if (ret.spd_a == null && gm.spd_a != null) ret.spd_a = gm.spd_a;
-    // pax_b: GASからの予算人数、またはrvp_b（予算販売客室数）を代用
+    // pax_b: GASから直接コピー、またはrvp_b（予算販売客室数）を代用
     if (ret.pax_b == null && gm.pax_b != null && gm.pax_b > 0) ret.pax_b = Math.round(gm.pax_b);
     if (ret.pax_b == null && gm.rvp_b != null && gm.rvp_b > 0 && gm.rvp_b < 10000) ret.pax_b = Math.round(gm.rvp_b);
-    // occ_b: 0-1の小数のみ有効
-    if (ret.occ_b == null && gm.occ_b != null && gm.occ_b > 0 && gm.occ_b <= 1) ret.occ_b = gm.occ_b;
-    // adr_b: GASのgm.adr_bは宿泊売上予算総額、gm.rvp_bは予算販売客室数 → 一室平均予算を導出
+    // occ_b: GASから直接コピー（分数/パーセント両対応）
+    if (ret.occ_b == null && gm.occ_b != null) ret.occ_b = gm.occ_b;
+    // adr_b: GASから直接コピー。なければadr_b/rvp_bから導出
+    if (ret.adr_b == null && gm.adr_b != null && gm.adr_b >= 1000) ret.adr_b = gm.adr_b;
     if (ret.adr_b == null && gm.adr_b > 0 && gm.rvp_b > 0) {
       var adrBDerived = Math.round(gm.adr_b / gm.rvp_b);
       if (adrBDerived >= 1000 && adrBDerived <= 500000) ret.adr_b = adrBDerived;
     }
-    // rvp_b: ADR予算 × 稼働率予算（occ_bがnullの旅館はspd_bを稼働率として使用）
+    // rvp_b: GASから直接コピー。なければ導出
+    if (ret.rvp_b == null && gm.rvp_b != null && gm.rvp_b >= 1000) ret.rvp_b = gm.rvp_b;
     if (ret.rvp_b == null && ret.adr_b != null) {
-      var occ4rvp = (ret.occ_b != null) ? ret.occ_b
+      var occ4rvp = (ret.occ_b != null && ret.occ_b > 0 && ret.occ_b <= 1) ? ret.occ_b
                   : (gm.spd_b != null && gm.spd_b > 0 && gm.spd_b <= 1 ? gm.spd_b : null);
       if (occ4rvp != null) ret.rvp_b = Math.round(ret.adr_b * occ4rvp);
     }
+    // spd_b: GASから直接コピー
+    if (ret.spd_b == null && gm.spd_b != null) ret.spd_b = gm.spd_b;
     return ret;
   }
 
@@ -7974,9 +7978,10 @@ document.getElementById('import-btn').addEventListener('click', openPasteDialog)
     return m2;
   }
   function calcRow(fac, ym, mode) {
-    var m = getM(fac.pl, ym, mode);
+    var _tk = fac.tableKey || fac.pl;
+    var m = getM(_tk, ym, mode);
     if (!m) return { fac: fac, noData: true };
-    var py = getM(fac.pl, prevYM(ym), mode === 'ytd' ? 'ytd' : 'single');
+    var py = getM(_tk, prevYM(ym), mode === 'ytd' ? 'ytd' : 'single');
     var r = m.rev_a, b = m.rev_b;
     var rate  = (b != null && b > 0) ? r / b * 100 : null;
     var yoy   = (py && py.rev_a != null && py.rev_a > 0) ? r / py.rev_a * 100 : null;
