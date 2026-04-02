@@ -8787,7 +8787,7 @@ document.getElementById('import-btn').addEventListener('click', openPasteDialog)
     function fmtBn(v) {
       if (v == null) return '—';
       var b = v / 1e8;
-      return b >= 1000 ? Math.round(b/100)/10 + '兆' : Math.round(b*10)/10 + '億';
+      return b >= 10000 ? Math.round(b/1000)/10 + '兆' : Math.round(b*10)/10 + '億';
     }
     function fmtPct(v) { return v == null ? '—' : (v*100).toFixed(1)+'%'; }
     function fmtX(v, d) { return v == null ? '—' : (Math.round(v*(d||10))/(d||10))+'x'; }
