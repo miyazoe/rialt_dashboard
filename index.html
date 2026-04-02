@@ -2412,6 +2412,10 @@ body.public-mode .private-only { display: none !important; }
   if (!PUBLIC_MODE) {
     var _ds = document.createElement('script');
     _ds.src = 'data.js';
+    _ds.onload = function() {
+      if (typeof populateWeekSelect === 'function') populateWeekSelect();
+      if (typeof REFRESH !== 'undefined') Object.keys(REFRESH).forEach(function(k){ REFRESH[k](); });
+    };
     document.head.appendChild(_ds);
   }
 
