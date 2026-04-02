@@ -1399,9 +1399,10 @@ body.public-mode .private-only { display: none !important; }
   /* ── IR Tab (outer) ── */
   /* デフォルトテーマ変数（テーマ未設定時のダーク） */
   #outer-ir {
-    --rb:#0d1117; --rc:#161b22; --rce:#21262d; --rbr:6px;
-    --rd:#21262d; --rt:#e6edf3; --rts:#8b949e; --rtm:#6e7681;
-    --ra:#58a6ff; --rp:#3fb950; --rn:#f85149; --rw:#e3b341;
+    /* デフォルト: #outer-rialt と同じライトテーマ */
+    --rb:#f4f6f9; --rc:#ffffff; --rce:#f0f4f8; --rbr:6px;
+    --rd:#e2e8f0; --rt:#1f2937; --rts:#6b7280; --rtm:#9ca3af;
+    --ra:#2563eb; --rp:#059669; --rn:#dc2626; --rw:#d97706;
   }
   /* Theme A: ダーク */
   #outer-ir.theme-a {
@@ -2126,7 +2127,7 @@ body.public-mode .private-only { display: none !important; }
         <!-- ヘッダー -->
         <div class="ir-section">
           <div class="ir-title">
-            <span>&#x1F4C8; IR 競合比較（PPIH / ユニクロ / コスモス薬品 / イオン）</span>
+            <span>&#x1F4C8; IR 株価比較（トライアル / PPIH / ユニクロ / コスモス薬品 / イオン）</span>
             <span id="ir-status">&#x2014;</span>
           </div>
         </div>
@@ -2152,7 +2153,7 @@ body.public-mode .private-only { display: none !important; }
         </div>
         <!-- ニュース（PPIH） -->
         <div class="ir-section ir-section-news">
-          <div class="ir-title"><span>最新ニュース（PPIH / トライアルHD）</span></div>
+          <div class="ir-title"><span>最新ニュース（トライアルHD）</span></div>
           <ul id="ir-news-list"><li class="ir-loading">読み込み中...</li></ul>
         </div>
       </div><!-- end ir-panel -->
@@ -8700,7 +8701,19 @@ document.getElementById('import-btn').addEventListener('click', openPasteDialog)
       return v >= 10000 ? Math.round(v/1000)+'千株' : v+'株';
     }
 
-    var _IR_COLORS = ['#58a6ff','#f0883e','#3fb950','#bc8cff'];
+    // ティッカー → 正式表示名マッピング
+    // (GASのname値が誤っている場合のJS側オーバーライド)
+    var _IR_NAMES = {
+      '141A.T': 'トライアル',
+      '141A':   'トライアル',
+      '7532.T': 'PPIH',
+      '7532':   'PPIH',
+      '9983.T': 'ユニクロ',
+      '3349.T': 'コスモス薬品',
+      '8267.T': 'イオン',
+    };
+    // 5社対応: トライアル(青)・PPIH(橙)・ユニクロ(緑)・コスモス(紫)・イオン(赤橙)
+    var _IR_COLORS = ['#58a6ff','#f0883e','#3fb950','#bc8cff','#ff7b72'];
     var _irTooltipEl = null;
     function _getIRTooltip() {
       if (!_irTooltipEl) {
@@ -8715,7 +8728,7 @@ document.getElementById('import-btn').addEventListener('click', openPasteDialog)
       // ────────────────────────────────────────────────
       // 指数化チャート（起点 = 100）
       //
-      // 絶対株価を描画すると銘柄間の価格差（PPIH:4千円 vs ユニクロ:6万円）が
+      // 絶対株価を描画すると銘柄間の価格差（トライアル:4千円 vs ユニクロ:6万円）が
       // 大きすぎて比較できない上、Yahoo Finance のデータスケールが
       // 銘柄によって正しくない問題がある。
       // → 各社の最初の終値を 100 として指数化し、全社を同一軸で比較する。
@@ -8764,9 +8777,9 @@ document.getElementById('import-btn').addEventListener('click', openPasteDialog)
         // minkabu の現在株価（テーブルに表示されている正確な値）
         var curPrice = co.price && (co.price.current || co.price.open);
         return {
-          name:     co.name,
+          name:     _IR_NAMES[co.ticker] || co.name,
           ticker:   co.ticker,
-          color:    _IR_COLORS[ci],
+          color:    _IR_COLORS[ci % _IR_COLORS.length],
           raw:      rawArr,   // 元の close 値（ツールチップ用参考）
           idx:      idxArr,   // 指数値（グラフ描画用）
           dates:    dateArr,
@@ -8970,7 +8983,7 @@ document.getElementById('import-btn').addEventListener('click', openPasteDialog)
               : '—';
             var curTxt = (cur != null && cur !== 0) ? Math.round(cur).toLocaleString()+'円' : '—';
             return '<tr>' +
-              '<td class="ir-co-name">' + (co.name||'?') + '</td>' +
+              '<td class="ir-co-name">' + (_IR_NAMES[co.ticker] || co.name || '?') + '</td>' +
               '<td>' + curTxt + '</td>' +
               '<td class="' + chgCls + '">' + chgTxt + '</td>' +
               '<td>' + fmtBn(p.marketCap) + '</td>' +

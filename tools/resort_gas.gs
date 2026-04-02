@@ -205,15 +205,22 @@ function jsonpResponse(obj, callback) {
 // ── IR データ取得 (4社比較: PPIH/ユニクロ/コスモス薬品/イオン) ──────────────
 function fetchIRData(cb) {
   try {
+    // v35: 5社構成に変更
+    //   141A.T = トライアルホールディングス（自社）
+    //   7532.T = PPIH（パン・パシフィック・インターナショナルHD = ドン・キホーテ）
+    //   9983.T = ユニクロ（ファーストリテイリング）
+    //   3349.T = コスモス薬品
+    //   8267.T = イオン
     var COMPANIES = [
-      { ticker: '141A.T', code: '141A', name: 'PPIH' },
+      { ticker: '141A.T', code: '141A', name: 'トライアル' },
+      { ticker: '7532.T', code: '7532', name: 'PPIH' },
       { ticker: '9983.T', code: '9983', name: 'ユニクロ' },
       { ticker: '3349.T', code: '3349', name: 'コスモス薬品' },
       { ticker: '8267.T', code: '8267', name: 'イオン' },
     ];
     var hdrs = { headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36' }, muteHttpExceptions: true };
 
-    // 4社×3リクエスト(chart/minkabu/settlement) + news = 13並列
+    // 5社×3リクエスト(chart/minkabu/settlement) + news = 16並列
     var requests = [];
     COMPANIES.forEach(function(co) {
       requests.push({ url: 'https://query1.finance.yahoo.com/v8/finance/chart/' + co.ticker + '?interval=1d&range=3mo', headers: hdrs.headers, muteHttpExceptions: true });
