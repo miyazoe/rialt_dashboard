@@ -9520,6 +9520,16 @@ document.getElementById('import-btn').addEventListener('click', openPasteDialog)
     if(_irBtnAdv) _irBtnAdv.addEventListener("click",function(){runIRAI(!!loadIRAICache("adv"),"adv");});
     if(_irBtnBeg) _irBtnBeg.addEventListener("click",function(){runIRAI(!!loadIRAICache("beg"),"beg");});
     updateIRAICacheUI("adv"); updateIRAICacheUI("beg");
+    // ページロード時：キャッシュがあれば自動描画（最新のモードを優先）
+    (function(){
+      var _ca=loadIRAICache("adv"), _cb=loadIRAICache("beg");
+      if(_ca&&_cb){
+        // 両方あれば新しい方を表示
+        if(_ca.ts>=_cb.ts){renderIRAIResult(_ca.text,_ca.ts,"adv");}
+        else{renderIRAIResult(_cb.text,_cb.ts,"beg");}
+      } else if(_ca){renderIRAIResult(_ca.text,_ca.ts,"adv");}
+      else if(_cb){renderIRAIResult(_cb.text,_cb.ts,"beg");}
+    })();
     // \u2500\u2500 IR AI \u30b5\u30a4\u30c9\u30d0\u30fc\u30c8\u30b0\u30eb \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
     (function(){
       var sidebar=document.getElementById('ir-ai-sidebar');
