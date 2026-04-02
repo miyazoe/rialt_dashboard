@@ -9468,7 +9468,7 @@ document.getElementById('import-btn').addEventListener('click', openPasteDialog)
       }
     }
     var _irAiRunBtn=document.getElementById('ir-ai-run-btn');
-    if(_irAiRunBtn) _irAiRunBtn.addEventListener('click',function(){runIRAI(false);});
+    if(_irAiRunBtn) _irAiRunBtn.addEventListener('click',function(){runIRAI(!!loadIRAICache());});
     // \u2500\u2500 IR AI \u30b5\u30a4\u30c9\u30d0\u30fc\u30c8\u30b0\u30eb \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
     (function(){
       var sidebar=document.getElementById('ir-ai-sidebar');
