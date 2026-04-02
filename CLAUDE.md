@@ -232,7 +232,7 @@ window.RESORT_TABLE = {
 - 「分析を実行」で Gemini API（`gemini_api_key_v1`）を呼び出し
 - プロンプト: 最新データ5社 + 直近30日のトライアル株価変化率 → JSON形式で応答要求
 - 3カード構成: **株価動向・テクニカル** / **バリュエーション比較** / **競争優位性・戦略示唆**
-- 当日キャッシュ（`ir_ai_cache_v1_YYYY-MM-DD`）。「再分析」で強制更新
+- 永続キャッシュ（`ir_ai_cache_v1_adv` / `ir_ai_cache_v1_beg`）。再分析ボタンで上書き更新
 
 ### IRセクション — 表示フォーマット
 
@@ -313,7 +313,8 @@ window.RESORT_TABLE = {
 | `rialt_theme_v1` | RIALTテーマ設定 |
 | `gemini_api_key_v1` | Gemini APIキー |
 | `ir_history_v1` | IR日次スナップショット（最大90日分） |
-| `ir_ai_cache_v1_YYYY-MM-DD` | IR AI分析結果キャッシュ（日次） |
+| `ir_ai_cache_v1_adv` | IR AI詳細分析キャッシュ（永続・再分析まで保持） |
+| `ir_ai_cache_v1_beg` | IR AI初心者向けキャッシュ（永続・再分析まで保持） |
 
 ---
 
