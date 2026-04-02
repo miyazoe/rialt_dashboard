@@ -9411,20 +9411,24 @@ document.getElementById('import-btn').addEventListener('click', openPasteDialog)
     // \u2500\u2500 IR AI \u5206\u6790 \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
     // ── IR AI 分析 ─────────────────────────────────────────────────────────────────
     function loadIRAICache(mode){
-      try{var s=localStorage.getItem(IR_AI_CACHE_KEY+_irTodayStr()+"_"+(mode||"adv"));return s?JSON.parse(s):null;}catch(e){return null;}
+      try{var s=localStorage.getItem(IR_AI_CACHE_KEY+(mode||"adv"));return s?JSON.parse(s):null;}catch(e){return null;}
     }
     function saveIRAICache(text,mode){
-      try{localStorage.setItem(IR_AI_CACHE_KEY+_irTodayStr()+"_"+(mode||"adv"),JSON.stringify({text:text,ts:Date.now()}));}catch(e){}
+      try{localStorage.setItem(IR_AI_CACHE_KEY+(mode||"adv"),JSON.stringify({text:text,ts:Date.now()}));}catch(e){}
     }
     function updateIRAICacheUI(mode){
       var m=mode||"adv";
       var badge=document.getElementById("ir-ai-cache-badge-"+m);
       var runBtn=document.getElementById("ir-ai-run-btn-"+m);
       var c=loadIRAICache(m);
-      if(badge) badge.style.display=c?"":"none";
-      if(runBtn) runBtn.textContent=c
-        ?(m==="beg"?"🌱 再分析":"📊 再分析")
-        :(m==="beg"?"🌱 初心者向け":"📊 詳細分析");
+      var _fmtTs=function(ts){var d=new Date(ts);return d.getFullYear()+"/"+(d.getMonth()+1).toString().padStart(2,"0")+"/"+d.getDate().toString().padStart(2,"0")+" "+d.getHours().toString().padStart(2,"0")+":"+d.getMinutes().toString().padStart(2,"0");};
+      if(c){
+        if(badge){badge.textContent="✓ "+_fmtTs(c.ts)+" 保存済"; badge.style.display="";}
+        if(runBtn) runBtn.textContent=(m==="beg"?"🌱 キャッシュ表示":"📊 キャッシュ表示");
+      } else {
+        if(badge) badge.style.display="none";
+        if(runBtn) runBtn.textContent=(m==="beg"?"🌱 初心者向け":"📊 詳細分析");
+      }
     }
     function renderIRAIResult(text,ts,mode){
       var area=document.getElementById("ir-ai-result-area"); if(!area) return;
@@ -9517,8 +9521,8 @@ document.getElementById('import-btn').addEventListener('click', openPasteDialog)
     }
     var _irBtnAdv=document.getElementById("ir-ai-run-btn-adv");
     var _irBtnBeg=document.getElementById("ir-ai-run-btn-beg");
-    if(_irBtnAdv) _irBtnAdv.addEventListener("click",function(){runIRAI(!!loadIRAICache("adv"),"adv");});
-    if(_irBtnBeg) _irBtnBeg.addEventListener("click",function(){runIRAI(!!loadIRAICache("beg"),"beg");});
+    if(_irBtnAdv) _irBtnAdv.addEventListener("click",function(){runIRAI(false,"adv");});
+    if(_irBtnBeg) _irBtnBeg.addEventListener("click",function(){runIRAI(false,"beg");});
     updateIRAICacheUI("adv"); updateIRAICacheUI("beg");
     // ページロード時：キャッシュがあれば自動描画（最新のモードを優先）
     (function(){
