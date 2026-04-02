@@ -7739,7 +7739,7 @@ document.getElementById('import-btn').addEventListener('click', openPasteDialog)
     { pl: '宮若虎の湯',   gas: '宮若虎の湯',   type: 'ryokan', rooms: 8 },
     { pl: '小塚久の葉',   gas: '小塚久の葉',   type: 'ryokan', rooms: 8 },
     { pl: '仙石原久の葉', gas: '仙石原久の葉', type: 'ryokan', rooms: 9 },
-    { pl: '古民家煉り',   gas: '古民家煉り',   type: 'ryokan', rooms: 6 },
+    { pl: '古民家煉り',   gas: '古民家練り',   type: 'ryokan', rooms: 6 },
     { pl: 'TSMART',       gas: 'Tsmart',        type: 'ryokan', tableKey: 'Tsmart' },
     { pl: '若宮コース',   gas: '若宮コース',   type: 'golf' },
     { pl: '大分コース',   gas: '大分コース',   type: 'golf' },
@@ -7783,8 +7783,7 @@ document.getElementById('import-btn').addEventListener('click', openPasteDialog)
                   : (gm.spd_b != null && gm.spd_b > 0 && gm.spd_b <= 1 ? gm.spd_b : null);
       if (occ4rvp != null) ret.rvp_b = Math.round(ret.adr_b * occ4rvp);
     }
-    // spd_b: GASから直接コピー
-    if (ret.spd_b == null && gm.spd_b != null) ret.spd_b = gm.spd_b;
+    // spd_b: GASのspd_bは稼働率比率値のため使用不可
     return ret;
   }
 
