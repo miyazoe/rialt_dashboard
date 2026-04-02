@@ -205,7 +205,7 @@ function jsonpResponse(obj, callback) {
 // ── IR データ取得 (4社比較: PPIH/ユニクロ/コスモス薬品/イオン) ──────────────
 function fetchIRData(cb) {
   try {
-    // v35: 5社構成に変更
+    // v36: responses[12]→[15]修正（5社×3=15リクエスト）
     //   141A.T = トライアルホールディングス（自社）
     //   7532.T = PPIH（パン・パシフィック・インターナショナルHD = ドン・キホーテ）
     //   9983.T = ユニクロ（ファーストリテイリング）
@@ -330,7 +330,7 @@ function fetchIRData(cb) {
     // Google News RSS
     var newsItems = [];
     try {
-      var newsXml = responses[12].getContentText();
+      var newsXml = responses[15].getContentText(); // v36: 5社×3=15リクエスト(0-14)の次
       var itemRe  = /<item>([\s\S]*?)<\/item>/g;
       var match;
       var count = 0;

@@ -179,13 +179,13 @@ window.RESORT_TABLE = {
 
 ### GAS Web App
 - **デプロイURL**: `https://script.google.com/a/macros/retail-ai.jp/s/AKfycbwzLMGeJbmiEyJT9606x1AinA4ZAXG2Ebm8dZfztF-pM_U26U4q91fdRA2VIOInVmgvRw/exec`
-- **現在のバージョン**: v35（2026/04/02 13:09）
+- **現在のバージョン**: v36（2026/04/02 13:58）
 - **ルーティング**:
   - `?ir=1[&callback=xxx]` → `fetchIRData()` 呼び出し（4社比較データ、JSONP対応）
   - `?facility=xxx&month=YYYY-MM` → TGR施設日別売上データ
   - その他 → 月次集約データ
 
-### GAS IR機能（fetchIRData） — v34: 4社比較
+### GAS IR機能（fetchIRData） — v36: 5社比較
 - **対象4社**: PPIH(141A.T)、ユニクロ/FR(9983.T)、コスモス薬品(3349.T)、イオン(8267.T)
 - **並列取得**: `UrlFetchApp.fetchAll()` で13リクエスト並列（4社×3 + ニュース1）
 - **各社取得フィールド**: price(current/change/changePct/high/low/volume/week52High/week52Low/marketCap), valuation(per/pbr/psr), financial(revenue/targetMeanPrice/recommendationKey), chart(90日スパークライン)
@@ -200,7 +200,7 @@ window.RESORT_TABLE = {
 | revenue | minkabu.jp/settlement meta description（各社） | ✅ 動作 |
 | ev / ebitda / operatingMargin 等 | — | ❌ 削除（取得不可）|
 
-**minkabuスクレイピング正規表現（v34）**:
+**minkabuスクレイピング正規表現（v36）**:
 - PER/PBR/PSR: `/<th[^>]*>PER[\s\S]*?<\/th>\s*<td[^>]*>([\d.]+)\s*倍/` （`<span>`タグをまたぐため`[\s\S]*?`使用）
 - 時価総額: `/時価総額[\s\S]{0,100}?<td[^>]*>([\d,]+)\s*(億円|百万円|兆円)/`
 - 始値: `/始値[\s\S]{0,50}?<td[^>]*>([\d,]+\.?\d*)\s*円/`

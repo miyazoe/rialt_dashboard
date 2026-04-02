@@ -2371,6 +2371,25 @@ body.public-mode .private-only { display: none !important; }
     document.querySelectorAll('.rialt-theme-btn').forEach(function(b){
       b.style.outline = b.dataset.t === (t||'default') ? '2px solid #2563eb' : 'none';
     });
+    // .top-bar にもテーマクラスを適用
+    var topBar = document.querySelector('.top-bar');
+    if (topBar) {
+      topBar.classList.remove('theme-a','theme-b','theme-c');
+      if (t && t !== 'default') topBar.classList.add('theme-' + t);
+    }
+    // グローバルテーマ変数を更新（TOP報告タブなど全体に適用）
+    var _bodyThemes = {
+      'default': {'--bg':'#f4f6f9','--panel-bg':'#ffffff','--text':'#1f2937','--gap':'#e2e8f0','--dim':'#cbd5e1',
+                  '--th-header':'#ffffff','--th-border':'#e5e7eb','--th-accent':'#2563eb','--th-accent2':'#059669','--th-muted':'#6b7280'},
+      'a':       {'--bg':'#0f1117','--panel-bg':'#141720','--text':'#e2e8f0','--gap':'#1e2330','--dim':'#2d3148',
+                  '--th-header':'#080b10','--th-border':'#2d3148','--th-accent':'#00e5cc','--th-accent2':'#3fb950','--th-muted':'#64748b'},
+      'b':       {'--bg':'#f0f4ff','--panel-bg':'#ffffff','--text':'#1f2937','--gap':'#e2e8f0','--dim':'#cbd5e1',
+                  '--th-header':'#f0f4ff','--th-border':'#c7d2fe','--th-accent':'#6366f1','--th-accent2':'#8b5cf6','--th-muted':'#94a3b8'},
+      'c':       {'--bg':'#0c1929','--panel-bg':'#132338','--text':'#e2e8f0','--gap':'#1e3a5f','--dim':'#1e3a5f',
+                  '--th-header':'#091422','--th-border':'#1e3a5f','--th-accent':'#38bdf8','--th-accent2':'#34d399','--th-muted':'#64748b'}
+    };
+    var _bv = _bodyThemes[t||'default'] || _bodyThemes['default'];
+    Object.keys(_bv).forEach(function(k){ document.documentElement.style.setProperty(k, _bv[k]); });
   }
   function applyRialtTheme(t) {
     _applyRialtThemeClass(t);
@@ -7715,13 +7734,13 @@ document.getElementById('import-btn').addEventListener('click', openPasteDialog)
 
   // 実施設マスタ（合計・本社除く）
   var RESORT_FACS = [
-    { pl: '九重久織亭',   gas: '九重久織亭',   type: 'ryokan' },
-    { pl: 'ロッジ虎の湯', gas: '九重虎乃湯',   type: 'ryokan' },
-    { pl: '宮若虎の湯',   gas: '宮若虎の湯',   type: 'ryokan' },
-    { pl: '小塚久の葉',   gas: '小塚久の葉',   type: 'ryokan' },
-    { pl: '仙石原久の葉', gas: '仙石原久の葉', type: 'ryokan' },
-    { pl: '古民家煉り',   gas: '古民家煉り',   type: 'ryokan' },
-    { pl: 'TSMART',       gas: 'Tsmart',        type: 'ryokan' },
+    { pl: '九重久織亭',   gas: '九重久織亭',   type: 'ryokan', rooms: 9 },
+    { pl: 'ロッジ虎の湯', gas: '九重虎乃湯',   type: 'ryokan', tableKey: '九重虎の湯', rooms: 34 },
+    { pl: '宮若虎の湯',   gas: '宮若虎の湯',   type: 'ryokan', rooms: 8 },
+    { pl: '小塚久の葉',   gas: '小塚久の葉',   type: 'ryokan', rooms: 8 },
+    { pl: '仙石原久の葉', gas: '仙石原久の葉', type: 'ryokan', rooms: 9 },
+    { pl: '古民家煉り',   gas: '古民家煉り',   type: 'ryokan', rooms: 6 },
+    { pl: 'TSMART',       gas: 'Tsmart',        type: 'ryokan', tableKey: 'Tsmart' },
     { pl: '若宮コース',   gas: '若宮コース',   type: 'golf' },
     { pl: '大分コース',   gas: '大分コース',   type: 'golf' },
     { pl: '阿蘇コース',   gas: '阿蘇コース',   type: 'golf' },
@@ -7732,7 +7751,7 @@ document.getElementById('import-btn').addEventListener('click', openPasteDialog)
 
   // GAS施設名取得（PL名 → GAS名）
   function facGasName(plName) {
-    var f = RESORT_FACS.find(function(x) { return x.pl === plName; });
+    var f = RESORT_FACS.find(function(x) { return x.pl === plName || x.tableKey === plName; });
     return f ? f.gas : plName;
   }
   // GAS月次データでnull指標を補完
@@ -7742,16 +7761,26 @@ document.getElementById('import-btn').addEventListener('click', openPasteDialog)
     var gm = window.GAS_MONTHLY[ym] && window.GAS_MONTHLY[ym][gn];
     if (!gm) return ret;
     if (ret.pax_a == null && gm.pax_a != null) ret.pax_a = gm.pax_a;
-    if (ret.pax_b == null && gm.pax_b != null) ret.pax_b = gm.pax_b;
     if (ret.adr_a == null && gm.adr_a != null) ret.adr_a = gm.adr_a;
     if (ret.occ_a == null && gm.occ_a != null) ret.occ_a = gm.occ_a;
     if (ret.rvp_a == null && gm.rvp_a != null) ret.rvp_a = gm.rvp_a;
     if (ret.spd_a == null && gm.spd_a != null) ret.spd_a = gm.spd_a;
-    if (ret.adr_b == null && gm.adr_b != null) ret.adr_b = gm.adr_b;
-    if (ret.occ_b == null && gm.occ_b != null) ret.occ_b = gm.occ_b;
-    if (ret.rvp_b == null && gm.rvp_b != null) ret.rvp_b = gm.rvp_b;
-    if (ret.pax_b == null && gm.pax_b != null) ret.pax_b = gm.pax_b;
-    if (ret.spd_b == null && gm.spd_b != null) ret.spd_b = gm.spd_b;
+    // pax_b: GASからの予算人数、またはrvp_b（予算販売客室数）を代用
+    if (ret.pax_b == null && gm.pax_b != null && gm.pax_b > 0) ret.pax_b = Math.round(gm.pax_b);
+    if (ret.pax_b == null && gm.rvp_b != null && gm.rvp_b > 0 && gm.rvp_b < 10000) ret.pax_b = Math.round(gm.rvp_b);
+    // occ_b: 0-1の小数のみ有効
+    if (ret.occ_b == null && gm.occ_b != null && gm.occ_b > 0 && gm.occ_b <= 1) ret.occ_b = gm.occ_b;
+    // adr_b: GASのgm.adr_bは宿泊売上予算総額、gm.rvp_bは予算販売客室数 → 一室平均予算を導出
+    if (ret.adr_b == null && gm.adr_b > 0 && gm.rvp_b > 0) {
+      var adrBDerived = Math.round(gm.adr_b / gm.rvp_b);
+      if (adrBDerived >= 1000 && adrBDerived <= 500000) ret.adr_b = adrBDerived;
+    }
+    // rvp_b: ADR予算 × 稼働率予算（occ_bがnullの旅館はspd_bを稼働率として使用）
+    if (ret.rvp_b == null && ret.adr_b != null) {
+      var occ4rvp = (ret.occ_b != null) ? ret.occ_b
+                  : (gm.spd_b != null && gm.spd_b > 0 && gm.spd_b <= 1 ? gm.spd_b : null);
+      if (occ4rvp != null) ret.rvp_b = Math.round(ret.adr_b * occ4rvp);
+    }
     return ret;
   }
 
@@ -7863,7 +7892,48 @@ document.getElementById('import-btn').addEventListener('click', openPasteDialog)
         if (ytdRet.occ_a == null && goccCnt > 0) ytdRet.occ_a = gocc / goccCnt;  // 小数平均
         if (ytdRet.rvp_a == null && grvpCnt > 0) ytdRet.rvp_a = Math.round(grvp / grvpCnt);
         if (ytdRet.spd_a == null && gspdCnt > 0) ytdRet.spd_a = Math.round(gspd / gspdCnt);
+        // YTD pax_b fallback・adr_b導出（各月のGASデータから）
+        var gn2data = {};
+        months.forEach(function(mo) { var gm2 = window.GAS_MONTHLY[mo] && window.GAS_MONTHLY[mo][gn2]; if (gm2) gn2data[mo] = gm2; });
+        var grvb = 0, gadb_tot = 0, grvb_tot = 0;
+        Object.values(gn2data).forEach(function(gm2) {
+          if (gm2.rvp_b > 0 && gm2.rvp_b < 10000) grvb += gm2.rvp_b;
+          if (gm2.adr_b > 0 && gm2.rvp_b > 0) { gadb_tot += gm2.adr_b; grvb_tot += gm2.rvp_b; }
+        });
+        if (ytdRet.pax_b == null && grvb > 0) ytdRet.pax_b = grvb;
+        if (ytdRet.adr_b == null && grvb_tot > 0) {
+          var adrBytd = Math.round(gadb_tot / grvb_tot);
+          if (adrBytd >= 1000 && adrBytd <= 500000) ytdRet.adr_b = adrBytd;
+        }
+        // ytd rvp_b: adr_b x budget_occ（spd_bを稼働率として使用）
+        if (ytdRet.rvp_b == null && ytdRet.adr_b != null) {
+          var gspdb_sum = 0, gspdb_cnt = 0;
+          Object.values(gn2data).forEach(function(gm3) {
+            if (gm3.spd_b != null && gm3.spd_b > 0 && gm3.spd_b <= 1) { gspdb_sum += gm3.spd_b; gspdb_cnt++; }
+            else if (gm3.occ_b != null && gm3.occ_b > 0) { gspdb_sum += gm3.occ_b; gspdb_cnt++; }
+          });
+          var occ4rvpb = ytdRet.occ_b != null ? ytdRet.occ_b
+                       : (gspdb_cnt > 0 ? gspdb_sum / gspdb_cnt : null);
+          if (occ4rvpb != null) ytdRet.rvp_b = Math.round(ytdRet.adr_b * occ4rvpb);
+        }
       }
+      // ADR実績 YTDフォールバック: spd_a x pax_a / rooms-based room-nights
+      if (ytdRet.adr_a == null && ytdRet.spd_a != null && ytdRet.pax_a != null && ytdRet.occ_a != null && ytdRet.occ_a > 0) {
+        var facObj3 = RESORT_FACS.find(function(f) { return (f.tableKey || f.pl) === facName; });
+        var rooms3 = facObj3 && facObj3.rooms;
+        if (rooms3 > 0) {
+          var ytdRN = 0;
+          months.forEach(function(mo) {
+            var gm4 = window.GAS_MONTHLY && window.GAS_MONTHLY[mo] && window.GAS_MONTHLY[mo][facGasName(facName)];
+            if (gm4 && gm4.occ_a > 0) {
+              var ymP3 = mo.match(/(\d{4})-(\d{2})/);
+              if (ymP3) ytdRN += rooms3 * new Date(+ymP3[1], +ymP3[2], 0).getDate() * gm4.occ_a;
+            }
+          });
+          if (ytdRN > 0) ytdRet.adr_a = Math.round(ytdRet.spd_a * ytdRet.pax_a / ytdRN);
+        }
+      }
+      if (ytdRet.rvp_a == null && ytdRet.adr_a != null && ytdRet.occ_a != null) ytdRet.rvp_a = Math.round(ytdRet.adr_a * ytdRet.occ_a);
       return ytdRet;
     }
     var d = getPlRow(facName, ym);
@@ -7879,7 +7949,29 @@ document.getElementById('import-btn').addEventListener('click', openPasteDialog)
       pax_a: nv(d['販売客室数_実績']), pax_b: nv(d['来場客数_予算']),
       spd_a: nv(d['客単価_実績']), spd_b: nv(d['客単価_予算'])
     };
-    return suppFromGas(facName, ym, ret);
+    // ゴルフ施設は来場客数_実績を使用（販売客室数_実績はラウンド数なので3.3倍差）
+    var facObjG = RESORT_FACS.find(function(f) { return (f.tableKey || f.pl) === facName; });
+    if (facObjG && facObjG.type === 'golf') {
+      var paxGolf = nv(d['来場客数_実績']);
+      if (paxGolf != null) ret.pax_a = paxGolf;
+    }
+    var m2 = suppFromGas(facName, ym, ret);
+    // ADR実績フォールバック: GASにadr_aがない場合、spd_a x pax_a / (rooms x days x occ_a)で導出
+    if (m2.adr_a == null && m2.spd_a != null && m2.pax_a != null && m2.occ_a != null && m2.occ_a > 0) {
+      var facObj2 = RESORT_FACS.find(function(f) { return (f.tableKey || f.pl) === facName; });
+      var rooms2 = facObj2 && facObj2.rooms;
+      if (rooms2 > 0) {
+        var ymP = ym.match(/(\d{4})-(\d{2})/);
+        if (ymP) {
+          var daysInMo = new Date(+ymP[1], +ymP[2], 0).getDate();
+          var rn2 = rooms2 * daysInMo * m2.occ_a;
+          if (rn2 > 0) m2.adr_a = Math.round(m2.spd_a * m2.pax_a / rn2);
+        }
+      }
+    }
+    // RevPAR実績フォールバック: ADR x 稼働率
+    if (m2.rvp_a == null && m2.adr_a != null && m2.occ_a != null) m2.rvp_a = Math.round(m2.adr_a * m2.occ_a);
+    return m2;
   }
   function calcRow(fac, ym, mode) {
     var m = getM(fac.pl, ym, mode);
@@ -8108,13 +8200,14 @@ document.getElementById('import-btn').addEventListener('click', openPasteDialog)
   }
 
   function renderL2(facObj, ym) {
-    var d = getPlRow(facObj.pl, ym);
+    var _ftk = facObj.tableKey || facObj.pl;
+    var d = getPlRow(_ftk, ym);
     var kEl = document.getElementById('resort-l2-kpi');
     if (d) {
       var rev_a = nv(d['売上高合計_実績']), rev_b = nv(d['売上高合計_予算']);
       var gp_a  = nv(d['売上総利益_実績']);
       var op_a  = nv(d['営業利益_実績']), op_b = nv(d['営業利益_予算']);
-      var py_d  = getPlRow(facObj.pl, prevYM(ym));
+      var py_d  = getPlRow(_ftk, prevYM(ym));
       var py_rev = py_d ? nv(py_d['売上高合計_実績']) : null;
       var rate   = (rev_b != null && rev_b > 0) ? rev_a / rev_b * 100 : null;
       var yoy    = (py_rev != null && py_rev > 0) ? rev_a / py_rev * 100 : null;
@@ -8133,7 +8226,7 @@ document.getElementById('import-btn').addEventListener('click', openPasteDialog)
       kEl.innerHTML = '<div style="color:#9ca3af;padding:8px">PLデータなし</div>';
     }
     switchTab('daily');
-    renderPlTable(facObj.pl, ym);
+    renderPlTable(_ftk, ym);
     setTimeout(function() { renderMonthChart(facObj); }, 50);
 
     document.getElementById('resort-breakdown').innerHTML = '';
@@ -8219,7 +8312,7 @@ document.getElementById('import-btn').addEventListener('click', openPasteDialog)
     var allM = availMonths().slice(0, 12).reverse();
     var rev_a = [], rev_b = [], op_a = [];
     allM.forEach(function(ym) {
-      var d = getPlRow(facObj.pl, ym);
+      var d = getPlRow(facObj.tableKey || facObj.pl, ym);
       rev_a.push(d ? nv(d['売上高合計_実績']) : null);
       rev_b.push(d ? nv(d['売上高合計_予算']) : null);
       op_a.push(d  ? nv(d['営業利益_実績'])        : null);
