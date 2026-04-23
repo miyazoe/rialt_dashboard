@@ -1,5 +1,13 @@
 # 経営ダッシュボード — 仕様書
 
+## プロジェクト共通ルール
+
+### 年度（会計年度）の定義
+- **年度期間**: 7月1日 〜 翌年6月30日
+- **年度名**: 開始年で呼ぶ（例：2025年7月〜2026年6月 = **2025年度**）
+- 実装時の判定: `月 >= 7 ? 年 : 年 - 1`
+- 全タブ・全集計で本ルールを適用すること
+
 ## ファイル構成
 
 | ファイル | 役割 |
@@ -11,7 +19,17 @@
 | `generate_rialt.py` | CP932 CSV → rialt_data.js 生成スクリプト |
 | `tools/generate_resort_table.py` | TGR xlsx → resort_table.js 生成スクリプト |
 | `tools/resort_gas.gs` | GAS Web App ソース（バックアップ用） |
+| `tools/resort_gas_ota.gs` | OTA月次CSV出力GAS（exportOTA_CSV()を実行 → ota_monthly.csvをDriveに生成） |
+| `tools/generate_ota_js.py` | ota_monthly.csv → ota_data.js 生成スクリプト |
+| `ota_data.js` | OTA月次明細データ（`window.OTA_DATA`、generate_ota_js.pyで生成） |
+| `data/tgr/ota_monthly.csv` | OTA月次明細（縦型: 施設名,年月,合計売上,ダイレクトイン,トリプラ,OTA売上,OTA比率,直販比率） |
+| `inbound_budget.js` | インバウンド予算データ（`window.INBOUND_BUDGET`、generate_inbound_budget.pyで生成） |
+| `tools/generate_inbound_budget.py` | 金堀_インバウンド計画.xlsx → inbound_budget.js 生成スクリプト |
 | `notebooklm_prompt.md` | NotebookLM 用抽出プロンプト集 |
+| `news/generate_news_data.py` | Excel → news_data.js 生成スクリプト |
+| `news/news_data.js` | ニュースデータ（`window.NEWS_DATA`、Excel から自動生成） |
+| `news/launch.py` | ダッシュボードランチャー（1日1回 news_data.js 更新 → index.html 開く） |
+| `ダッシュボード.bat` | ダブルクリック起動用 bat（py -3.12 news/launch.py を実行） |
 
 ---
 
@@ -77,8 +95,8 @@ window.RESORT_TABLE = {
 ## 外タブ構成
 
 ```
-[RIALT] [TGR] [TOP]
-  ↑月次PL  ↑リゾート ↑週次TOP報告
+[RIALT] [TGR] [TOP] [IR] [NEWS]
+  ↑月次PL  ↑リゾート ↑週次TOP報告 ↑株価IR ↑業界ニュース
 ```
 
 ---
@@ -169,6 +187,18 @@ window.RESORT_TABLE = {
 - KPIカード（売上・稼働率・ADR・RevPAR等）
 - 日別売上チャート（GAS APIから取得）
 - 売上内訳（泊/食/売店）
+- YoY分析タブ（月次KPI前年比・チャート・チャネル分析）
+
+### サブタブ: インバウンド
+- 国別売上カード（韓国/台湾/中国）
+- 旅行会社TOP10（クリックでTOURSへ遷移）
+- 国別・月別推移テーブル
+- **予算対比セクション**（`inbound_budget.js` 連携）
+  - 施設別: ADR・来期予算室数・予算金額・今期実績・達成率（プログレスバー付き）
+  - 月別室数計画テーブル（主要6施設 + 合計）
+  - 国別構成比（来期計画 vs 今期実績）
+  - データソース: 金堀_インバウンド計画.xlsx（FY2026 = 2026-07〜2027-06）
+  - TOURS実績との施設名マッチング: shortName（虎の湯, 煉り, 若宮 等）で照合
 
 ### RESORT_FACS — 施設マスタ（index.html内）
 各施設に `pl`（表示名）と `tableKey`（resort_table.jsのキー）を持つ:
@@ -179,33 +209,25 @@ window.RESORT_TABLE = {
 → `getPlRow()` は `tableKey` で参照することで名称不一致を回避
 
 ### GAS Web App
-- **デプロイURL**: `https://script.google.com/a/macros/retail-ai.jp/s/AKfycbwzLMGeJbmiEyJT9606x1AinA4ZAXG2Ebm8dZfztF-pM_U26U4q91fdRA2VIOInVmgvRw/exec`
-- **現在のバージョン**: v36（2026/04/02 13:58）
+- **デプロイURL**: `https://script.google.com/a/macros/retail-ai.jp/s/AKfycbwT4eHF5q--bGyD22l5WnmM6115C2hImYIXj-dHN92fragEWvG-au4LgGh7GqgAZdmXfw/exec`
+- **現在のバージョン**: v61（2026/04/21）
 - **ルーティング**:
   - `?ir=1[&callback=xxx]` → `fetchIRData()` 呼び出し（4社比較データ、JSONP対応）
   - `?facility=xxx&month=YYYY-MM` → TGR施設日別売上データ
   - その他 → 月次集約データ
 
-### GAS IR機能（fetchIRData） — v36: 5社比較
+### GAS IR機能（fetchIRData） — v61: 5社比較
 - **対象5社**: トライアル(141A.T)、PPIH(7532.T)、ユニクロ/FR(9983.T)、コスモス薬品(3349.T)、イオン(8267.T)
-- **並列取得**: `UrlFetchApp.fetchAll()` で16リクエスト並列（5社×3 + ニュース1）
-- **各社取得フィールド**: price(current/change/changePct/high/low/volume/week52High/week52Low/marketCap), valuation(per/pbr/psr), financial(revenue/targetMeanPrice/recommendationKey), chart(90日スパークライン)
-- **ニュース**: 「トライアルホールディングス」Google News RSS（最大5件）
+- **並列取得**: `UrlFetchApp.fetchAll()` で5リクエスト並列（5社×1 chart のみ）
+- **各社取得フィールド**: price(current/change/changePct/high/low/volume/week52High/week52Low)、その他はnull
+- **ニュース**: `news:[]`（Google News RSSはGASサーバーからタイムアウトするため除去済み）
 - **レスポンス構造**: `{ generated, companies:[{ticker,name,...}×5], news:[] }`
 
 | フィールド | ソース | 状態 |
 |---|---|---|
 | price系 / chart / week52 | v8/chart 3mo（各社） | ✅ 動作 |
-| per / pbr / psr / marketCap / open | minkabu.jp スクレイピング（各社） | ✅ 動作 |
-| targetMeanPrice / recommendationKey | minkabu.jp スクレイピング（各社） | ✅ 動作 |
-| revenue | minkabu.jp/settlement meta description（各社） | ✅ 動作 |
-| ev / ebitda / operatingMargin 等 | — | ❌ 削除（取得不可）|
-
-**minkabuスクレイピング正規表現（v36）**:
-- PER/PBR/PSR: `/<th[^>]*>PER[\s\S]*?<\/th>\s*<td[^>]*>([\d.]+)\s*倍/` （`<span>`タグをまたぐため`[\s\S]*?`使用）
-- 時価総額: `/時価総額[\s\S]{0,100}?<td[^>]*>([\d,]+)\s*(億円|百万円|兆円)/`
-- 始値: `/始値[\s\S]{0,50}?<td[^>]*>([\d,]+\.?\d*)\s*円/`
-- 売上高（settlement meta）: `/【売上高】([\d,]+)百万円/`（テーブルはJS描画のためmeta descriptionから取得）
+| marketCap | v8/chart meta.marketCap | ❌ null（v8/chartは返さない）|
+| per / pbr / psr / 売上高 / 目標株価 | — | ❌ null（外部サイト全滅）|
 
 ### IRセクション — レイアウト・内タブ構成
 
@@ -282,6 +304,94 @@ window.RESORT_TABLE = {
 - `responseMimeType: 'application/json'` を `generationConfig` に指定
 - `renderAIResult(text, ts, mode)` でパース→カード描画
 
+### 右サイドAIサイドバー（TGR / TOURS / NEWS 共通）
+
+```
+[#rs-ai-float-btn] — position:fixed, right:6px, top:74px（collapsed時のみ表示）
+[#rs-ai-sidebar] — position:fixed, right:0, top:68px, width:440px (collapsed: width:0 完全非表示)
+  ├── ヘッダー（▶（展開時）/ ◀（折りたたみ時） トグル + 「AI 分析」タイトル）
+  └── .rs-ai-panel × 3（id: rs-ai-panel-{tgr/tours/news}）
+        ├── 実行ボタン（rs-ai-run-{sec}）
+        ├── 再分析ボタン（rs-ai-rerun-{sec}）→ runAnalysis(sec, true)
+        ├── キャッシュバッジ（rs-ai-badge-{sec}）
+        └── 結果エリア（rs-ai-result-{sec}）
+```
+
+- **collapsed時**: `width:0` + ボーダーなし + シャドウなし（完全非表示）。フローティングボタン `#rs-ai-float-btn` のみ表示
+- **矢印**: collapsed時 `◀`（展開する方向）、expanded時 `▶`（折りたたむ方向）
+- **デフォルト**: collapsed（最小化）
+- **タブ切替**: `switchOuterTab()` → `CustomEvent('outerTabChange')` → `onTabChange(tabId)` で表示/非表示 + パネル切替
+- **IR タブでは非表示**（IR は専用サイドバーを使用）
+- **RIALT / TOP タブでは非表示**
+- **body クラス**: `rs-sb-visible` / `rs-sb-open` / `rs-sb-close` で外部レイアウト調整
+
+#### TGR AI 分析カード
+- `salesDecline`: 売上悪化施設（先月比・前年比）
+- `costDecline`: コスト悪化施設（先月比・前年比）
+- `improvements`: 高インパクト改善ポイント
+- **当月フォールバック**: 今日の月にデータがなければ `≤ todayYM` の最新月を使用
+
+#### TOURS AI 分析カード
+- `monthChange`: 先月比の数字変化
+- `growing`: 伸びている旅行会社
+- `declining`: 減少している旅行会社
+- `improvements`: 改善ポイント
+
+#### NEWS AI 分析カード
+- `thisWeek`: 直近7日の大きなトピック
+- `lastWeek`: その前7日の大きなトピック
+
+### チャットドック（全タブ共通）
+
+```
+[#rs-chat-dock] — position:fixed, bottom:0, height:320px (collapsed: 34px)
+  ├── ヘッダー（タブ名 Q&A + 履歴消去 + ▲/▼ トグル）
+  ├── メッセージエリア（rs-chat-messages）
+  └── 入力バー（textarea + 送信ボタン）
+```
+
+- **対象タブ**: TGR / TOURS / NEWS / IR（RIALT / TOP では非表示）
+- **タブ別独立履歴**: `rs_chat_{sec}` に localStorage 保存
+- **自動コンテキスト**: 送信時にアクティブタブのデータ（collectTGR/collectTOURS/collectNEWS/collectIR）を自動添付
+- **デフォルト**: collapsed
+
+---
+
+## NEWSセクション（news/news_data.js 連携）
+
+- データソース: `window.NEWS_DATA`（`news/news_data.js`、Excel から generate_news_data.py で生成）
+- Excel: `news/リテール業界ニュースリサーチ.xlsx`（統合ファイル。旧: `_YYYYMMDD.xlsx` 日別 → 2026-04-09 に統合）
+- 起動: `ダッシュボード.bat` → `news/launch.py` → 1日1回のみ news_data.js を再生成してindex.htmlを開く
+- `news/.last_run` マーカーで二重実行防止
+
+### ニュースマトリクス表示
+
+| 項目 | 内容 |
+|---|---|
+| 表示形式 | 日付 × 列（10列）の2次元テーブル（`table-layout:fixed`・全列幅110px統一） |
+| 列構成 | トライアル/西友 / PPIH / ユニクロ/しまむら / コスモス/ロピア / イオン / セブン/ローソン/ファミマ / Amazon/Walmart / NTT/NEC / 電通 / その他 |
+| カテゴリ統合 | `NEWS_COLS[].cats[]` で複数カテゴリ・表記揺れ（`トライアル`⇔`トライアルグループ`、`Walmart`⇔`ウォルマート` 等）を吸収 |
+| その他列 | `isOther:true` フラグ。`_knownCats()` の補集合（既知カテゴリ以外すべて）を集約 |
+| 重要度アイコン | 🔴高 / 🟡中 / 🟢低 |
+| ウィンドウ | 直近14日（◀▶で移動） |
+| ツールチップ | マウスオーバーで詳細（100〜150字）を `position:fixed` で追従表示 |
+| 列単体ビュー | 列ヘッダクリックで遷移（`_focusLabel`）、100件ページネーション、右クリックで全列表示に戻る |
+
+### Excelカラム構成
+
+| 列 | 内容 |
+|---|---|
+| A | No |
+| B | カテゴリ（企業名） |
+| C | リリース日 |
+| D | 概要（20〜30字） |
+| E | 詳細（100〜150字） |
+| F | 重要度（高/中/低） |
+| G | URL |
+| H | 情報ソース |
+
+両シート（今日のニュース・過去履歴）を統合し URL 重複除去、日付降順ソート。
+
 ---
 
 ## 主要機能
@@ -307,7 +417,22 @@ window.RESORT_TABLE = {
 
 ### 公開モード（`?public`）
 - TOP報告・インポート・P1/P2・設定・検索を非表示
+- 表示タブ: RIALT + TGR
 - GitHub Pages: `https://trial-dx.github.io/rialt_dashboard/index.html?public`
+
+### TGR公開モード（`?tgr`）
+- TGR + TOURS のみ表示（RIALT/TOP/IR/NEWS 非表示）
+- ヘッダー検索・設定・インポート等を非表示
+- ページ読込時にTGRタブへ自動切替
+- GitHub Pages: `https://trial-dx.github.io/rialt_dashboard/index.html?tgr`
+
+### インバウンド予算編集（TOURS タブ内）
+- **✏ 編集**: インライン編集モーダル（施設選択 → ADR・月別室数を編集 → localStorage保存）
+- **💾 出力**: 編集済み予算データを `inbound_budget.js` としてダウンロード（git push で全体反映）
+- **📄 取込**: JS/JSONファイルをインポート → localStorage保存
+- **🔄 リセット**: localStorage編集を破棄し元の `inbound_budget.js` に戻す
+- **localStorage キー**: `inbound_budget_override_v1`
+- **優先順位**: localStorage > inbound_budget.js（ローカル編集が常に優先）
 
 ---
 
@@ -355,6 +480,14 @@ window.RESORT_TABLE = {
 | `ir_history_v1` | IR日次スナップショット（最大90日分） |
 | `ir_ai_cache_v1_adv` | IR AI詳細分析キャッシュ（永続・再分析まで保持） |
 | `ir_ai_cache_v1_beg` | IR AI初心者向けキャッシュ（永続・再分析まで保持） |
+| `rs_ai_cache_tgr` | TGR AI分析キャッシュ（永続・再分析まで保持） |
+| `rs_ai_cache_tours` | TOURS AI分析キャッシュ（永続・再分析まで保持） |
+| `rs_ai_cache_news` | NEWS AI分析キャッシュ（永続・再分析まで保持） |
+| `rs_chat_tgr` | TGR チャット履歴 |
+| `rs_chat_tours` | TOURS チャット履歴 |
+| `rs_chat_news` | NEWS チャット履歴 |
+| `rs_chat_ir` | IR チャット履歴 |
+| `inbound_budget_override_v1` | インバウンド予算ローカル編集データ |
 
 ---
 
