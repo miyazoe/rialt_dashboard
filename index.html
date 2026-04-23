@@ -2529,6 +2529,14 @@ body.tgr-mode .tgr-hide { display: none !important; }
         <div class="tours-dash-title">&#x26F3; &#12468;&#12523;&#12501;&#22580;&#21029; &#22770;&#19978;&#12521;&#12531;&#12461;&#12531;&#12464;&#65288;TOP10&#65289;</div>
         <canvas class="tours-dash-canvas" id="tours-chart-course-bar" width="1060" height="320"></canvas>
       </div>
+      <div class="tours-dash-card tours-dash-card-wide">
+        <div class="tours-dash-title">&#x1F3E8; ホテル別 売上ランキング（TOP10）</div>
+        <canvas class="tours-dash-canvas" id="tours-chart-hotel-bar" width="1060" height="320"></canvas>
+      </div>
+      <div class="tours-dash-card tours-dash-card-wide">
+        <div class="tours-dash-title">&#x1F3E2; 旅行会社別 売上ランキング（TOP10）</div>
+        <canvas class="tours-dash-canvas" id="tours-chart-agency-bar" width="1060" height="320"></canvas>
+      </div>
     </div>
     <div id="tours-chart-tooltip" class="tours-chart-tooltip"></div>
   </div>
@@ -11497,12 +11505,18 @@ document.getElementById('import-btn').addEventListener('click', openPasteDialog)
     }
 
     // ── KPI（年度合計＋今月合計、それぞれ昨対付き） ───────────────────
+    // エリアフィルター共通取得
+    function getCurrArea() { return getVal('tours-area-sel'); }
+    function matchArea(b, area) { return !area || area === 'all' || b.source === area; }
+
     function sumBookings(bookings, nendo, onlyMonth) {
       // nendo 指定 → 当該年度のみ / onlyMonth 指定 → さらに月番号で絞り込み
+      var area = getCurrArea();
       var r={cnt:0,pax:0,golf:0,hotel:0,transfer:0,food:0,total:0};
       bookings.forEach(function(b){
         if (isHeaderTsuki(b.tsuki)) return;
         if (!(Number(b.total)>0)) return;
+        if (!matchArea(b, area)) return;
         if (nendo && toNendo(b.dateRaw,b.tsuki)!==nendo) return;
         if (onlyMonth && monthNum(b.tsuki)!==onlyMonth) return;
         r.cnt++;
@@ -11809,11 +11823,13 @@ document.getElementById('import-btn').addEventListener('click', openPasteDialog)
 
     // 年度×月度 で集計した {total,golf,hotel} マップを作成
     function aggByFiscalMonth(targetNendo) {
+      var area = getCurrArea();
       var agg = {}; // {month: {total,golf,hotel}}
       FISCAL_MONTHS.forEach(function(m){ agg[m]={total:0,golf:0,hotel:0,cnt:0,pax:0}; });
       _toursData.bookings.forEach(function(b){
         if (isHeaderTsuki(b.tsuki)) return;
         if (!(Number(b.total)>0)) return;
+        if (!matchArea(b, area)) return;
         var nd = toNendo(b.dateRaw,b.tsuki);
         if (nd !== targetNendo) return;
         var mn = monthNum(b.tsuki);
@@ -11867,12 +11883,19 @@ document.getElementById('import-btn').addEventListener('click', openPasteDialog)
       drawLineChart('tours-chart-golf',  labels, buildSeries('golf'));
       drawLineChart('tours-chart-hotel', labels, buildSeries('hotel'));
 
+      var area = getCurrArea();
+      // 当年度 & エリアフィルター通過の予約を事前抽出
+      var filtered = _toursData.bookings.filter(function(b){
+        if (isHeaderTsuki(b.tsuki)) return false;
+        if (!(Number(b.total)>0)) return false;
+        if (!matchArea(b, area)) return false;
+        if (toNendo(b.dateRaw,b.tsuki)!==currNendo) return false;
+        return true;
+      });
+
       // 旅行会社別円グラフ（今年度）
       var agencyTotals = {};
-      _toursData.bookings.forEach(function(b){
-        if (isHeaderTsuki(b.tsuki)) return;
-        if (!(Number(b.total)>0)) return;
-        if (toNendo(b.dateRaw,b.tsuki)!==currNendo) return;
+      filtered.forEach(function(b){
         var a = b.agency||'\u672a\u8a2d\u5b9a';
         agencyTotals[a] = (agencyTotals[a]||0) + (b.total||0);
       });
@@ -11884,10 +11907,7 @@ document.getElementById('import-btn').addEventListener('click', openPasteDialog)
       var top5 = agencyItems.slice(0,5).map(function(x){return x.label;});
       var agMonthly = {}; // {agency: {month:total}}
       top5.forEach(function(a){ agMonthly[a]={}; FISCAL_MONTHS.forEach(function(m){agMonthly[a][m]=0;}); });
-      _toursData.bookings.forEach(function(b){
-        if (isHeaderTsuki(b.tsuki)) return;
-        if (!(Number(b.total)>0)) return;
-        if (toNendo(b.dateRaw,b.tsuki)!==currNendo) return;
+      filtered.forEach(function(b){
         var a = b.agency||'\u672a\u8a2d\u5b9a';
         if (top5.indexOf(a)===-1) return;
         var mn = monthNum(b.tsuki);
@@ -11900,10 +11920,7 @@ document.getElementById('import-btn').addEventListener('click', openPasteDialog)
 
       // 国籍別 人数構成比（今年度）
       var natTotals = {};
-      _toursData.bookings.forEach(function(b){
-        if (isHeaderTsuki(b.tsuki)) return;
-        if (!(Number(b.total)>0)) return;
-        if (toNendo(b.dateRaw,b.tsuki)!==currNendo) return;
+      filtered.forEach(function(b){
         var n = b.nationality||'\u672a\u8a2d\u5b9a';
         natTotals[n] = (natTotals[n]||0) + (b.pax||0);
       });
@@ -11911,12 +11928,9 @@ document.getElementById('import-btn').addEventListener('click', openPasteDialog)
         .sort(function(x,y){return y.value-x.value;});
       drawPieChart('tours-chart-nat-pie', natItems);
 
-      // ゴルフ場別 売上 TOP10（横棒）
+      // ゴルフ場別 売上ランキング（横棒）
       var courseTotals = {};
-      _toursData.bookings.forEach(function(b){
-        if (isHeaderTsuki(b.tsuki)) return;
-        if (!(Number(b.total)>0)) return;
-        if (toNendo(b.dateRaw,b.tsuki)!==currNendo) return;
+      filtered.forEach(function(b){
         var c = (b.golfCourse||'').trim();
         if (!c) return;
         courseTotals[c] = (courseTotals[c]||0) + (b.golfFee||0);
@@ -11924,6 +11938,25 @@ document.getElementById('import-btn').addEventListener('click', openPasteDialog)
       var courseItems = Object.keys(courseTotals).map(function(k){return {label:k,value:courseTotals[k]};})
         .sort(function(x,y){return y.value-x.value;}).slice(0,10);
       drawHBarChart('tours-chart-course-bar', courseItems);
+
+      // ホテル別 売上ランキング（横棒）
+      var hotelTotals = {};
+      filtered.forEach(function(b){
+        ['hotel1','hotel2','hotel3'].forEach(function(hk){
+          var hn = (b[hk]||'').trim();
+          if (!hn) return;
+          var feeKey = hk + 'Fee';
+          var fee = b[feeKey]||0;
+          if (fee > 0) hotelTotals[hn] = (hotelTotals[hn]||0) + fee;
+        });
+      });
+      var hotelItems = Object.keys(hotelTotals).map(function(k){return {label:k,value:hotelTotals[k]};})
+        .sort(function(x,y){return y.value-x.value;}).slice(0,10);
+      drawHBarChart('tours-chart-hotel-bar', hotelItems);
+
+      // 旅行会社別 売上ランキング（横棒）
+      var agencyBarItems = agencyItems.slice(0,10);
+      drawHBarChart('tours-chart-agency-bar', agencyBarItems);
     }
 
     // ── Chart Helpers (RIALT-styled Canvas, with hover tooltip) ───────────
