@@ -1758,6 +1758,7 @@ body.tgr-mode .tgr-hide { display: none !important; }
 .tours-dash-title { font-size:12px; font-weight:700; color:#1e3a5f; margin-bottom:8px; padding-bottom:6px; border-bottom:1px solid #d1d9e6; letter-spacing:0.02em; font-family:"Noto Sans JP",sans-serif; }
 .tours-dash-canvas { display:block; width:100%; height:auto; max-height:320px; cursor:crosshair; }
 .tours-hbar-canvas { height:320px; max-height:none; }
+.tours-kpi-card.budget { border-left:3px solid #f59e0b; background:#fffbeb; }
 .tours-chart-tooltip { position:fixed; display:none; background:rgba(15,23,42,0.95); color:#fff; padding:6px 10px; border-radius:4px; font-size:11px; pointer-events:none; z-index:9999; box-shadow:0 2px 8px rgba(0,0,0,0.3); white-space:nowrap; line-height:1.5; }
 @media (max-width:1200px) { .tours-dash-grid { grid-template-columns:repeat(2,1fr); } .tours-dash-card-wide { grid-column: span 2; } }
 </style>
@@ -2488,6 +2489,7 @@ body.tgr-mode .tgr-hide { display: none !important; }
     <button class="tours-refresh-btn" id="tours-refresh-btn">&#8635; &#26356;&#26032;</button>
     <select id="tours-year-sel" style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:4px;padding:3px 8px;font-size:11px;margin-left:8px;"><option value="all">&#20840;&#24180;&#24230;</option></select>
     <select id="tours-area-sel" style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:4px;padding:3px 8px;font-size:11px;margin-left:4px;"><option value="all">&#20840;&#12456;&#12522;&#12450;</option><option value="宮若">宮若</option><option value="阿蘇">阿蘇</option><option value="台湾">台湾</option></select>
+    <button class="tours-refresh-btn" id="tours-budget-btn" style="margin-left:auto;background:#f59e0b;color:#fff;font-size:10px;padding:3px 10px;" title="インバウンド予算保守">📋 予算保守</button>
     <span class="tours-status-lbl" id="tours-status">&#8212;</span>
   </div>
   <div class="tours-kpi-row" id="tours-kpi-row"></div>
@@ -11411,6 +11413,13 @@ document.getElementById('import-btn').addEventListener('click', openPasteDialog)
       if (rBtn) rBtn.addEventListener('click', function() { _toursData=null; _inited=false; window.TOURS_DATA=null; initTours(); });
       var csvBtn = document.getElementById('tours-csv-btn');
       if (csvBtn) csvBtn.addEventListener('click', downloadCSV);
+      // Budget maintenance button - opens existing budget editor
+      var budBtn = document.getElementById('tours-budget-btn');
+      if (budBtn) budBtn.addEventListener('click', function() {
+        if (typeof _toggleBudgetEditor === 'function') _toggleBudgetEditor();
+        else if (typeof window._toggleBudgetEditor === 'function') window._toggleBudgetEditor();
+        else alert('予算エディタが見つかりません');
+      });
     }
 
     // ── データ取得 ──────────────────────────────────────────────────────────
@@ -11582,6 +11591,42 @@ document.getElementById('import-btn').addEventListener('click', openPasteDialog)
       var fmtPax = function(v){ return v+'\u540d'; };
       var fmtYen2 = function(v){ return '\xa5'+fmtNum(v); };
 
+      // Budget achievement card
+      var budgetCard = '';
+      var ib = window.INBOUND_BUDGET;
+      if (ib && ib.facilities) {
+        var budTotal = 0, actTotal = 0;
+        Object.values(ib.facilities).forEach(function(fd) {
+          budTotal += fd.annual.budget || 0;
+        });
+        // Sum actual from current bookings (all facilities)
+        bookings.forEach(function(b) {
+          if (isHeaderTsuki(b.tsuki)) return;
+          if (!(Number(b.total)>0)) return;
+          if (!matchArea(b, getCurrArea())) return;
+          actTotal += b.total || 0;
+        });
+        var achPct = budTotal > 0 ? (actTotal / budTotal * 100) : 0;
+        var achCls = achPct >= 100 ? 'up' : achPct >= 80 ? '' : 'down';
+        var achArrow = achPct >= 100 ? '\u25b2' : achPct >= 80 ? '\u25ac' : '\u25bc';
+        budgetCard = '<div class="tours-kpi-card budget">'
+          +'<div class="tours-kpi-lbl">\u4e88\u7b97\u9054\u6210</div>'
+          +'<div class="tours-kpi-row-item">'
+          +'<span class="tours-kpi-sublbl">\u5b9f\u7e3e</span>'
+          +'<span class="tours-kpi-val">\xa5'+fmtNum(actTotal)+'</span>'
+          +'</div>'
+          +'<div class="tours-kpi-row-item">'
+          +'<span class="tours-kpi-sublbl">\u4e88\u7b97</span>'
+          +'<span class="tours-kpi-val" style="font-size:11px;color:#6b7280;">\xa5'+fmtNum(budTotal)+'</span>'
+          +'</div>'
+          +'<div class="tours-kpi-row-item">'
+          +'<span class="tours-kpi-sublbl">\u9054\u6210\u7387</span>'
+          +'<span class="tours-kpi-val" style="color:'+(achPct>=100?'#059669':achPct>=80?'#d97706':'#dc2626')+'">'+achPct.toFixed(1)+'%</span>'
+          +'<span class="tours-kpi-yoy '+achCls+'">'+achArrow+'</span>'
+          +'</div>'
+          +'</div>';
+      }
+
       el.innerHTML = [
         makeCard('\u4ef6\u6570',            function(r){return r.cnt;},      fmtCnt, ''),
         makeCard('\u4eba\u6570',            function(r){return r.pax;},      fmtPax, ''),
@@ -11590,6 +11635,7 @@ document.getElementById('import-btn').addEventListener('click', openPasteDialog)
         makeCard('\u9001\u8fce',            function(r){return r.transfer;}, fmtYen2, ''),
         makeCard('\u98df\u4e8b\u8ffd\u52a0\u4ed6', function(r){return r.food;}, fmtYen2, ''),
         makeCard('\u5408\u8a08',            function(r){return r.total;},    fmtYen2, 'accent'),
+        budgetCard
       ].join('');
 
       // ヘッダに対象年度を付記
@@ -11929,7 +11975,7 @@ document.getElementById('import-btn').addEventListener('click', openPasteDialog)
         .sort(function(x,y){return y.value-x.value;});
       drawPieChart('tours-chart-nat-pie', natItems);
 
-      // ゴルフ場別 売上ランキング（横棒）
+      // ゴルフ場別 売上ランキング（横棒）+ 予算ライン
       var courseTotals = {};
       filtered.forEach(function(b){
         var c = (b.golfCourse||'').trim();
@@ -11938,9 +11984,18 @@ document.getElementById('import-btn').addEventListener('click', openPasteDialog)
       });
       var courseItems = Object.keys(courseTotals).map(function(k){return {label:k,value:courseTotals[k]};})
         .sort(function(x,y){return y.value-x.value;}).slice(0,10);
+      // Attach budget for each course
+      var ibData = window.INBOUND_BUDGET;
+      if (ibData && ibData.facilities) {
+        courseItems.forEach(function(item) {
+          Object.values(ibData.facilities).forEach(function(fd) {
+            if (fd.shortName === item.label) item.budget = fd.annual.budget || 0;
+          });
+        });
+      }
       drawHBarChart('tours-chart-course-bar', courseItems);
 
-      // ホテル別 売上ランキング（横棒）
+      // ホテル別 売上ランキング（横棒）+ 予算ライン
       var hotelTotals = {};
       filtered.forEach(function(b){
         ['hotel1','hotel2','hotel3'].forEach(function(hk){
@@ -11953,6 +12008,15 @@ document.getElementById('import-btn').addEventListener('click', openPasteDialog)
       });
       var hotelItems = Object.keys(hotelTotals).map(function(k){return {label:k,value:hotelTotals[k]};})
         .sort(function(x,y){return y.value-x.value;}).slice(0,10);
+      // Attach budget for each hotel
+      if (ibData && ibData.facilities) {
+        hotelItems.forEach(function(item) {
+          var hn = item.label === 'TSMART' ? 'Tsmart' : item.label;
+          Object.values(ibData.facilities).forEach(function(fd) {
+            if (fd.shortName === hn) item.budget = fd.annual.budget || 0;
+          });
+        });
+      }
       drawHBarChart('tours-chart-hotel-bar', hotelItems);
 
       // 旅行会社別 売上ランキング（横棒）
@@ -12196,6 +12260,19 @@ document.getElementById('import-btn').addEventListener('click', openPasteDialog)
         var w = plotW*(x.value/maxV);
         ctx.fillStyle='#2563eb';
         ctx.fillRect(pL,y,w,barH);
+        // Budget marker line (red dashed)
+        if (x.budget != null && x.budget > 0) {
+          var bx = pL + plotW*(x.budget/maxV);
+          if (bx > pL && bx < W-pR) {
+            ctx.save();
+            ctx.strokeStyle='#dc2626';
+            ctx.lineWidth=2;
+            ctx.setLineDash([4,3]);
+            ctx.beginPath(); ctx.moveTo(bx, y-2); ctx.lineTo(bx, y+barH+2); ctx.stroke();
+            ctx.setLineDash([]);
+            ctx.restore();
+          }
+        }
         // label (left)
         ctx.fillStyle=AXIS_COLOR; ctx.textAlign='right'; ctx.textBaseline='middle';
         var maxChars = pL < 150 ? 12 : 22;
