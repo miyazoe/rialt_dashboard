@@ -1792,7 +1792,7 @@ body.tgr-mode .tgr-hide { display: none !important; }
 <!-- OUTER TAB NAV -->
 <div class="outer-tab-nav">
   <button class="outer-tab-btn active tgr-hide" data-outer="rialt">RIALT</button>
-  <button class="outer-tab-btn" data-outer="resort">TGR</button>
+  <button class="outer-tab-btn private-only tgr-show" data-outer="resort">TGR</button>
   <button class="outer-tab-btn private-only tgr-show" data-outer="tours">TOURS</button>
   <button class="outer-tab-btn private-only tgr-hide" data-outer="top-report">TOP</button>
   <button class="outer-tab-btn private-only tgr-hide" data-outer="ir">IR</button>
@@ -2972,6 +2972,13 @@ body.tgr-mode .tgr-hide { display: none !important; }
 <script src="tgr_facts.js"></script>
 <script>
 'use strict';
+
+  // ── GitHub Pages: パラメータなし → ?public にリダイレクト ──
+  if (location.hostname.indexOf('github.io') !== -1
+      && location.search.indexOf('public') === -1
+      && location.search.indexOf('tgr') === -1) {
+    location.replace(location.pathname + '?public');
+  }
 
   // ── PUBLIC MODE ────────────────────────────────────────────────
   var PUBLIC_MODE = location.search.indexOf('public') !== -1;

@@ -415,16 +415,21 @@ window.RESORT_TABLE = {
 - File System Access API で `data.js` に直接書き込み
 - IndexedDB (`dashboard_import_v1`) にファイルハンドルを永続化
 
-### 公開モード（`?public`）
-- TOP報告・インポート・P1/P2・設定・検索を非表示
-- 表示タブ: RIALT + TGR
+### 公開モード（`?public`）— RIALT関係者向け
+- 表示タブ: **RIALTのみ**（TGR/TOURS/TOP/IR/NEWS すべて非表示）
+- ヘッダー: P1/P2・設定・検索・インポート非表示
 - GitHub Pages: `https://trial-dx.github.io/rialt_dashboard/index.html?public`
 
-### TGR公開モード（`?tgr`）
-- TGR + TOURS のみ表示（RIALT/TOP/IR/NEWS 非表示）
-- ヘッダー検索・設定・インポート等を非表示
+### TGR公開モード（`?tgr`）— リゾート関係者向け
+- 表示タブ: **TGR + TOURS のみ**（RIALT/TOP/IR/NEWS 非表示）
+- ヘッダー: 検索・設定・インポート等を非表示
 - ページ読込時にTGRタブへ自動切替
 - GitHub Pages: `https://trial-dx.github.io/rialt_dashboard/index.html?tgr`
+
+### GitHub Pagesアクセス制御
+- パラメータなしでGitHub Pagesにアクセス → `?public`に自動リダイレクト
+- ローカル（file://）はリダイレクトなし → 全タブ表示（個人用）
+- TOP/IR/NEWSは個人用のため公開URLには含めない
 
 ### インバウンド予算編集（TOURS タブ内）
 - **✏ 編集**: インライン編集モーダル（施設選択 → ADR・月別室数を編集 → localStorage保存）
