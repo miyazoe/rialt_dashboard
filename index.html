@@ -2489,8 +2489,8 @@ body.tgr-mode .tgr-hide { display: none !important; }
     <button class="tours-refresh-btn" id="tours-refresh-btn">&#8635; &#26356;&#26032;</button>
     <select id="tours-year-sel" style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:4px;padding:3px 8px;font-size:11px;margin-left:8px;"><option value="all">&#20840;&#24180;&#24230;</option></select>
     <select id="tours-area-sel" style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:4px;padding:3px 8px;font-size:11px;margin-left:4px;"><option value="all">&#20840;&#12456;&#12522;&#12450;</option><option value="宮若">宮若</option><option value="阿蘇">阿蘇</option><option value="台湾">台湾</option></select>
-    <button class="tours-refresh-btn" id="tours-budget-btn" style="margin-left:auto;background:#f59e0b;color:#fff;font-size:10px;padding:3px 10px;" title="インバウンド予算保守">📋 予算保守</button>
     <span class="tours-status-lbl" id="tours-status">&#8212;</span>
+    <button class="tours-refresh-btn" id="tours-budget-btn" style="background:#f59e0b;color:#fff;font-size:10px;padding:3px 10px;margin-left:8px;" title="インバウンド予算保守">📋 予算保守</button>
   </div>
   <div class="tours-kpi-row" id="tours-kpi-row"></div>
   <!-- サブタブナビ -->
@@ -8473,8 +8473,8 @@ document.getElementById('import-btn').addEventListener('click', openPasteDialog)
   // ── Helpers ──────────────────────────────────────────────────────
   function fmtM(v) {
     if (v == null || v === '' || isNaN(Number(v))) return '—';
-    var n = Math.round(Number(v) / 10000);
-    return n.toLocaleString() + '万';
+    var n = Math.round(Number(v) / 1000);
+    return n.toLocaleString();
   }
   function fmtYen(v) {
     if (v == null || v === '' || isNaN(Number(v))) return '—';
@@ -8879,14 +8879,14 @@ document.getElementById('import-btn').addEventListener('click', openPasteDialog)
     }
     var hdr = '<thead><tr>'
       + '<th class="resort-th-fac">施設</th>'
-      + '<th class="resort-th-num">売上<span class="resort-th-sub">実績/予算</span></th>'
+      + '<th class="resort-th-num">売上(千)<span class="resort-th-sub">実績/予算</span></th>'
       + '<th class="resort-th-num">達成率</th>'
       + '<th class="resort-th-bar"></th>'
       + '<th class="resort-th-num">前年比</th>'
       + '<th class="resort-th-num">荒利率</th>'
-      + '<th class="resort-th-num">営業利益<span class="resort-th-sub">実/予</span></th>'
+      + '<th class="resort-th-num">営業利益(千)<span class="resort-th-sub">実/予</span></th>'
       + '<th class="resort-th-num">利益率</th>'
-      + '<th class="resort-th-num">人件費<span class="resort-th-sub">実/予</span></th>'
+      + '<th class="resort-th-num">人件費(千)<span class="resort-th-sub">実/予</span></th>'
       + '<th class="resort-th-num">稼働率<span class="resort-th-sub">実/予</span></th>'
       + '<th class="resort-th-num">ADR<span class="resort-th-sub">実/予</span></th>'
       + '<th class="resort-th-num">RevPAR<span class="resort-th-sub">実/予</span></th>'
@@ -9069,7 +9069,7 @@ document.getElementById('import-btn').addEventListener('click', openPasteDialog)
       var gy = pT + gi / 4 * cH;
       ctx.beginPath(); ctx.moveTo(pL, gy); ctx.lineTo(W - pR, gy); ctx.stroke();
       ctx.fillStyle = '#9ca3af'; ctx.font = '9px sans-serif'; ctx.textAlign = 'right';
-      ctx.fillText(Math.round(maxR * (1 - gi / 4) / 10000) + '万', pL - 4, gy + 3);
+      ctx.fillText(Math.round(maxR * (1 - gi / 4) / 1000).toLocaleString() + '\u5343', pL - 4, gy + 3);
     }
     // 予算バー
     for (var i = 0; i < n; i++) {
@@ -9111,7 +9111,7 @@ document.getElementById('import-btn').addEventListener('click', openPasteDialog)
     ctx.fillStyle = '#9ca3af'; ctx.font = '9px sans-serif'; ctx.textAlign = 'left';
     [-1, 0, 1].forEach(function(k) {
       var ov = opRange * k;
-      ctx.fillText(Math.round(ov / 10000) + '万', W - pR + 4, opy(ov) + 3);
+      ctx.fillText(Math.round(ov / 1000).toLocaleString() + '\u5343', W - pR + 4, opy(ov) + 3);
     });
     // X軸
     ctx.fillStyle = '#6b7280'; ctx.font = '9px sans-serif'; ctx.textAlign = 'center';
@@ -9423,7 +9423,7 @@ document.getElementById('import-btn').addEventListener('click', openPasteDialog)
         ctx.strokeStyle = '#f1f5f9'; ctx.lineWidth = 1;
         ctx.beginPath(); ctx.moveTo(pL, gy); ctx.lineTo(W - pR, gy); ctx.stroke();
         ctx.fillStyle = '#9ca3af'; ctx.font = '9px sans-serif'; ctx.textAlign = 'right';
-        ctx.fillText(Math.round(maxVal * (1 - gi / 4) / 10000) + '万', pL - 4, gy + 3);
+        ctx.fillText(Math.round(maxVal * (1 - gi / 4) / 1000).toLocaleString() + '\u5343', pL - 4, gy + 3);
       }
       // today vertical line
       if (todayIdx >= 0) {
@@ -9799,8 +9799,6 @@ document.getElementById('import-btn').addEventListener('click', openPasteDialog)
     });
 
     function fmtK(v) {
-      if (Math.abs(v) >= 100000000) return (v/100000000).toFixed(2) + '\u5104';
-      if (Math.abs(v) >= 10000) return Math.round(v/10000).toLocaleString() + '\u4E07';
       return Math.round(v).toLocaleString();
     }
 
@@ -10505,9 +10503,9 @@ document.getElementById('import-btn').addEventListener('click', openPasteDialog)
 
   function _kpiConfig(kpi) {
     var map = {
-      'sales':        { pl: '売上高合計_実績',    label: '売上',     unit: '万', div: 10000, fmt: 'money' },
-      'gross_profit': { pl: '売上総利益_実績',    label: '粗利',     unit: '万', div: 10000, fmt: 'money' },
-      'op_profit':    { pl: '営業利益_実績',      label: '営業利益', unit: '万', div: 10000, fmt: 'money' },
+      'sales':        { pl: '売上高合計_実績',    label: '売上',     unit: '千', div: 1000, fmt: 'money' },
+      'gross_profit': { pl: '売上総利益_実績',    label: '粗利',     unit: '千', div: 1000, fmt: 'money' },
+      'op_profit':    { pl: '営業利益_実績',      label: '営業利益', unit: '千', div: 1000, fmt: 'money' },
       'occ':          { pl: '客室稼働率_実績',    label: '稼働率',   unit: '%',  div: 1,     fmt: 'pct' },
       'adr':          { pl: 'ADR_実績',           label: 'ADR',      unit: '円', div: 1,     fmt: 'yen' },
       'revpar':       { pl: 'RevPAR_実績',        label: 'RevPAR',   unit: '円', div: 1,     fmt: 'yen' },
@@ -10927,7 +10925,7 @@ document.getElementById('import-btn').addEventListener('click', openPasteDialog)
         var gy = pT + g*cH/4;
         ctx.beginPath(); ctx.moveTo(pL,gy); ctx.lineTo(W-pR,gy); ctx.stroke();
         ctx.fillStyle='#9ca3af'; ctx.font='9px sans-serif'; ctx.textAlign='right';
-        ctx.fillText(Math.round((1-g/4)*maxV/10000).toLocaleString()+'万', pL-4, gy+3);
+        ctx.fillText(Math.round((1-g/4)*maxV/1000).toLocaleString()+'\u5343', pL-4, gy+3);
       }
 
       // Lines per channel
@@ -10981,8 +10979,8 @@ document.getElementById('import-btn').addEventListener('click', openPasteDialog)
         var share = grandTotal > 0 ? (d.thisSum / grandTotal * 100).toFixed(1) + '%' : '—';
         h += '<tr style="border-top:1px solid #f0f4f8;">'
           + '<td style="padding:5px 10px;">' + ch + '</td>'
-          + '<td style="padding:5px 10px;text-align:right;font-weight:600;">' + Math.round(d.thisSum/10000).toLocaleString() + '万</td>'
-          + '<td style="padding:5px 10px;text-align:right;color:#9ca3af;">' + Math.round(d.lastSum/10000).toLocaleString() + '万</td>'
+          + '<td style="padding:5px 10px;text-align:right;font-weight:600;">\xa5' + Math.round(d.thisSum).toLocaleString() + '</td>'
+          + '<td style="padding:5px 10px;text-align:right;color:#9ca3af;">\xa5' + Math.round(d.lastSum).toLocaleString() + '</td>'
           + '<td style="padding:5px 10px;text-align:right;font-weight:600;color:' + yc + ';">' + (yoy!=null?(yoy>=0?'+':'')+yoy.toFixed(1)+'%':'—') + '</td>'
           + '<td style="padding:5px 10px;text-align:right;">' + share + '</td>'
           + '</tr>';
@@ -11591,39 +11589,35 @@ document.getElementById('import-btn').addEventListener('click', openPasteDialog)
       var fmtPax = function(v){ return v+'\u540d'; };
       var fmtYen2 = function(v){ return '\xa5'+fmtNum(v); };
 
-      // Budget achievement card
+      // 来期予算参考カード（年度累計 + 今月）
       var budgetCard = '';
       var ib = window.INBOUND_BUDGET;
       if (ib && ib.facilities) {
-        var budTotal = 0, actTotal = 0;
+        var budAnnual = 0;
         Object.values(ib.facilities).forEach(function(fd) {
-          budTotal += fd.annual.budget || 0;
+          budAnnual += fd.annual.budget || 0;
         });
-        // Sum actual from current bookings (all facilities)
-        bookings.forEach(function(b) {
-          if (isHeaderTsuki(b.tsuki)) return;
-          if (!(Number(b.total)>0)) return;
-          if (!matchArea(b, getCurrArea())) return;
-          actTotal += b.total || 0;
+        // 来期予算の今月分
+        var budMonth = 0;
+        var nowYM = new Date().getFullYear() + '-' + String(new Date().getMonth()+1).padStart(2,'0');
+        // 来期の対応月: 来期FYの同じ月
+        Object.values(ib.facilities).forEach(function(fd) {
+          if (fd.monthly && fd.monthly[nowYM]) {
+            budMonth += fd.monthly[nowYM].budget || 0;
+          }
         });
-        var achPct = budTotal > 0 ? (actTotal / budTotal * 100) : 0;
-        var achCls = achPct >= 100 ? 'up' : achPct >= 80 ? '' : 'down';
-        var achArrow = achPct >= 100 ? '\u25b2' : achPct >= 80 ? '\u25ac' : '\u25bc';
         budgetCard = '<div class="tours-kpi-card budget">'
-          +'<div class="tours-kpi-lbl">\u4e88\u7b97\u9054\u6210</div>'
-          +'<div class="tours-kpi-row-item">'
-          +'<span class="tours-kpi-sublbl">\u5b9f\u7e3e</span>'
-          +'<span class="tours-kpi-val">\xa5'+fmtNum(actTotal)+'</span>'
-          +'</div>'
-          +'<div class="tours-kpi-row-item">'
-          +'<span class="tours-kpi-sublbl">\u4e88\u7b97</span>'
-          +'<span class="tours-kpi-val" style="font-size:11px;color:#6b7280;">\xa5'+fmtNum(budTotal)+'</span>'
-          +'</div>'
-          +'<div class="tours-kpi-row-item">'
-          +'<span class="tours-kpi-sublbl">\u9054\u6210\u7387</span>'
-          +'<span class="tours-kpi-val" style="color:'+(achPct>=100?'#059669':achPct>=80?'#d97706':'#dc2626')+'">'+achPct.toFixed(1)+'%</span>'
-          +'<span class="tours-kpi-yoy '+achCls+'">'+achArrow+'</span>'
-          +'</div>'
+          +'<div class="tours-kpi-lbl">\u6765\u671F\u4E88\u7B97\uFF08FY'+ib.fyLabel+'\uFF09</div>'
+          +'<table style="width:100%;font-size:10px;border-collapse:collapse;margin-top:4px;">'
+          +'<tr><td></td><td style="text-align:right;color:#6b7280;font-size:9px;padding:1px 2px;">\u4E88\u7B97</td>'
+          +'<td style="text-align:right;color:#6b7280;font-size:9px;padding:1px 2px;">\u4ECA\u671F\u5B9F\u7E3E</td></tr>'
+          +'<tr><td style="font-size:9px;color:#6b7280;padding:2px 2px;">\u7D2F\u8A08</td>'
+          +'<td style="text-align:right;padding:2px 2px;font-weight:600;">\xa5'+fmtNum(budAnnual)+'</td>'
+          +'<td style="text-align:right;padding:2px 2px;font-weight:600;">\xa5'+fmtNum(yC.total)+'</td></tr>'
+          +'<tr><td style="font-size:9px;color:#6b7280;padding:2px 2px;">'+latestM+'\u6708</td>'
+          +'<td style="text-align:right;padding:2px 2px;font-weight:600;">\xa5'+fmtNum(budMonth)+'</td>'
+          +'<td style="text-align:right;padding:2px 2px;font-weight:600;">\xa5'+fmtNum(mC.total)+'</td></tr>'
+          +'</table>'
           +'</div>';
       }
 
@@ -12046,12 +12040,10 @@ document.getElementById('import-btn').addEventListener('click', openPasteDialog)
     function hideTip() { var t=getTooltip(); if(t) t.style.display='none'; }
     function fmtYen(v) { return '\xa5'+fmtNum(Math.round(v)); }
 
-    // RIALT風: 千円単位→万/億表記
     function shortYen(v) {
       var av = Math.abs(v);
-      if (av>=1e8)   return (v/1e8).toFixed(1)+'\u5104';
-      if (av>=1e4)   return Math.round(v/1e4).toLocaleString()+'\u4e07';
-      return Math.round(v).toLocaleString();
+      if (av >= 1e6) return '\xa5' + Math.round(v/1000).toLocaleString() + '\u5343';
+      return '\xa5' + Math.round(v).toLocaleString();
     }
 
     // RIALT風 niceAxis
