@@ -1757,6 +1757,7 @@ body.tgr-mode .tgr-hide { display: none !important; }
 .tours-dash-card-wide { grid-column: span 3; }
 .tours-dash-title { font-size:12px; font-weight:700; color:#1e3a5f; margin-bottom:8px; padding-bottom:6px; border-bottom:1px solid #d1d9e6; letter-spacing:0.02em; font-family:"Noto Sans JP",sans-serif; }
 .tours-dash-canvas { display:block; width:100%; height:auto; max-height:320px; cursor:crosshair; }
+.tours-hbar-canvas { height:320px; max-height:none; }
 .tours-chart-tooltip { position:fixed; display:none; background:rgba(15,23,42,0.95); color:#fff; padding:6px 10px; border-radius:4px; font-size:11px; pointer-events:none; z-index:9999; box-shadow:0 2px 8px rgba(0,0,0,0.3); white-space:nowrap; line-height:1.5; }
 @media (max-width:1200px) { .tours-dash-grid { grid-template-columns:repeat(2,1fr); } .tours-dash-card-wide { grid-column: span 2; } }
 </style>
@@ -2525,17 +2526,17 @@ body.tgr-mode .tgr-hide { display: none !important; }
         <div class="tours-dash-title">&#x1F30F; &#22269;&#31565;&#21029; &#20154;&#25968;&#27083;&#25104;&#27604;</div>
         <canvas class="tours-dash-canvas" id="tours-chart-nat-pie" width="520" height="300"></canvas>
       </div>
-      <div class="tours-dash-card tours-dash-card-wide">
-        <div class="tours-dash-title">&#x26F3; &#12468;&#12523;&#12501;&#22580;&#21029; &#22770;&#19978;&#12521;&#12531;&#12461;&#12531;&#12464;&#65288;TOP10&#65289;</div>
-        <canvas class="tours-dash-canvas" id="tours-chart-course-bar" width="1060" height="320"></canvas>
+      <div class="tours-dash-card">
+        <div class="tours-dash-title">&#x26F3; ゴルフ場別 売上ランキング</div>
+        <canvas class="tours-dash-canvas tours-hbar-canvas" id="tours-chart-course-bar" width="400" height="320"></canvas>
       </div>
-      <div class="tours-dash-card tours-dash-card-wide">
-        <div class="tours-dash-title">&#x1F3E8; ホテル別 売上ランキング（TOP10）</div>
-        <canvas class="tours-dash-canvas" id="tours-chart-hotel-bar" width="1060" height="320"></canvas>
+      <div class="tours-dash-card">
+        <div class="tours-dash-title">&#x1F3E8; ホテル別 売上ランキング</div>
+        <canvas class="tours-dash-canvas tours-hbar-canvas" id="tours-chart-hotel-bar" width="400" height="320"></canvas>
       </div>
-      <div class="tours-dash-card tours-dash-card-wide">
-        <div class="tours-dash-title">&#x1F3E2; 旅行会社別 売上ランキング（TOP10）</div>
-        <canvas class="tours-dash-canvas" id="tours-chart-agency-bar" width="1060" height="320"></canvas>
+      <div class="tours-dash-card">
+        <div class="tours-dash-title">&#x1F3E2; 旅行会社別 売上ランキング</div>
+        <canvas class="tours-dash-canvas tours-hbar-canvas" id="tours-chart-agency-bar" width="400" height="320"></canvas>
       </div>
     </div>
     <div id="tours-chart-tooltip" class="tours-chart-tooltip"></div>
@@ -12006,7 +12007,15 @@ document.getElementById('import-btn').addEventListener('click', openPasteDialog)
     function setupCanvasHover(canvas, onMove) {
       canvas.onmousemove = function(e){
         var rect = canvas.getBoundingClientRect();
-        var sx = canvas.width/rect.width, sy=canvas.height/rect.height;
+        // dprスケールされたcanvasの場合もCSS座標で統一
+        var useDpr = canvas.dataset.dprScaled === '1';
+        var sx, sy;
+        if (useDpr) {
+          // drawHBarChart等でctx.scale(dpr)済み → CSS座標をそのまま使う
+          sx = 1; sy = 1;
+        } else {
+          sx = canvas.width/rect.width; sy = canvas.height/rect.height;
+        }
         var x = (e.clientX-rect.left)*sx, y=(e.clientY-rect.top)*sy;
         onMove(x, y, e.clientX, e.clientY);
       };
@@ -12156,11 +12165,20 @@ document.getElementById('import-btn').addEventListener('click', openPasteDialog)
     // ── 横棒グラフ (RIALT風) ──
     function drawHBarChart(canvasId, items) {
       var c = document.getElementById(canvasId); if(!c) return;
+      // CSS表示サイズにcanvas解像度を合わせる（フォント潰れ防止）
+      var dpr = window.devicePixelRatio || 1;
+      var rect = c.getBoundingClientRect();
+      var cssW = rect.width || c.offsetWidth || 400;
+      var cssH = rect.height || c.offsetHeight || 320;
+      c.width = Math.round(cssW * dpr);
+      c.height = Math.round(cssH * dpr);
+      c.dataset.dprScaled = '1';
       var ctx = c.getContext('2d');
-      var W=c.width, H=c.height;
+      ctx.scale(dpr, dpr);
+      var W=cssW, H=cssH;
       ctx.fillStyle=CHART_BG; ctx.fillRect(0,0,W,H);
       if (!items.length) { ctx.fillStyle='#94a3b8'; ctx.font=CHART_FONT; ctx.textAlign='center'; ctx.fillText('\u30c7\u30fc\u30bf\u306a\u3057', W/2, H/2); return; }
-      var pL=180, pR=90, pT=14, pB=14;
+      var pL=Math.min(140, W*0.35), pR=70, pT=14, pB=14;
       var plotW=W-pL-pR, plotH=H-pT-pB;
       var maxV=0; items.forEach(function(x){ if(x.value>maxV) maxV=x.value; });
       if (maxV<=0) maxV=1;
@@ -12180,7 +12198,8 @@ document.getElementById('import-btn').addEventListener('click', openPasteDialog)
         ctx.fillRect(pL,y,w,barH);
         // label (left)
         ctx.fillStyle=AXIS_COLOR; ctx.textAlign='right'; ctx.textBaseline='middle';
-        var lbl = x.label.length>22 ? x.label.substring(0,22)+'\u2026' : x.label;
+        var maxChars = pL < 150 ? 12 : 22;
+        var lbl = x.label.length>maxChars ? x.label.substring(0,maxChars)+'\u2026' : x.label;
         ctx.fillText(lbl, pL-6, y+barH/2);
         // value (right of bar)
         ctx.textAlign='left';
