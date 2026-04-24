@@ -231,13 +231,23 @@ window.RESORT_TABLE = {
 
 ### GAS Web App
 - **デプロイURL**: `https://script.google.com/a/macros/retail-ai.jp/s/AKfycbwT4eHF5q--bGyD22l5WnmM6115C2hImYIXj-dHN92fragEWvG-au4LgGh7GqgAZdmXfw/exec`
-- **現在のバージョン**: v61（2026/04/21）
+- **現在のバージョン**: v6+budget（@91 / 2026/04/23）
 - **ルーティング**:
-  - `?ir=1[&callback=xxx]` → `fetchIRData()` 呼び出し（4社比較データ、JSONP対応）
+  - `?budget_ping=1` → 診断エンドポイント（スプレッドシートアクセスなし）
+  - `?budget_get=1&fy=YYYY` → 予算データ取得（JSONP対応）
+  - `?budget_save=1&fy=YYYY&fac=NAME&data=JSON` → 1施設予算保存（JSONP対応）
+  - `?ir=1[&callback=xxx]` → `fetchIRData()` 呼び出し（5社比較データ、JSONP対応）
   - `?facility=xxx&month=YYYY-MM` → TGR施設日別売上データ
   - その他 → 月次集約データ
+- **予算スプレッドシート**: `13X7r8VZkODGbIalBNQ15QarjhloR-FI-6D5f3uLErP0`（ツアーズインバウンド予算）
+  - シート名: `FY{年度}` （例: FY2026）
+  - 列構成: A=facility, B=ADR, C=month(YYYY-MM/テキスト形式), D=KOR, E=TWN, F=HKG, G=CHA, H=EUR
+  - 1施設×1月＝1行（12施設×12ヶ月＝144行/FY）
+  - ⚠️ C列はテキスト形式必須（Date自動変換でキー不一致が発生する）
+- **予算通信方式**: JSONP GET（IR/TOURSと同じパターン）。読み取り=`_bmJsonpLoad`、書き込み=`_bmJsonpSaveFacility`×施設数（順次実行、1.5秒デバウンス）
+- **予算データフロー**: GAS読込→enrichment(total/budget/annual/shortName計算)→INBOUND_BUDGET設定→レンダリング。GAS空の場合はinbound_budget.jsからシード
 
-### GAS IR機能（fetchIRData） — v61: 5社比較
+### GAS IR機能（fetchIRData） — v62: 5社比較
 - **対象5社**: トライアル(141A.T)、PPIH(7532.T)、ユニクロ/FR(9983.T)、コスモス薬品(3349.T)、イオン(8267.T)
 - **並列取得**: `UrlFetchApp.fetchAll()` で5リクエスト並列（5社×1 chart のみ）
 - **各社取得フィールド**: price(current/change/changePct/high/low/volume/week52High/week52Low)、その他はnull
@@ -453,12 +463,14 @@ window.RESORT_TABLE = {
 - TOP/IR/NEWSは個人用のため公開URLには含めない
 
 ### インバウンド予算編集（TOURS タブ内）
-- **✏ 編集**: インライン編集モーダル（施設選択 → ADR・月別室数を編集 → localStorage保存）
-- **💾 出力**: 編集済み予算データを `inbound_budget.js` としてダウンロード（git push で全体反映）
-- **📄 取込**: JS/JSONファイルをインポート → localStorage保存
-- **🔄 リセット**: localStorage編集を破棄し元の `inbound_budget.js` に戻す
-- **localStorage キー**: `inbound_budget_override_v1`
-- **優先順位**: localStorage > inbound_budget.js（ローカル編集が常に優先）
+- **✏ 編集**: インライン編集モーダル（施設選択 → ADR・月別室数を編集 → GAS自動保存）
+- **💾 出力**: 編集済み予算データを `inbound_budget.js` としてダウンロード
+- **📄 取込**: JS/JSONファイルをインポート
+- **🔄 リセット**: 編集を破棄し元の `inbound_budget.js` に戻す
+- **GAS自動保存**: 入力変更後1.5秒デバウンスでスプレッドシートに自動保存（JSONP GET）
+- **サマリー行**: theadの先頭（ヘッダ上）に🏨ホテル合計・⛳ゴルフ合計・🌟総合計の3行を表示（sticky固定）
+- **ゴルフ施設判定**: 施設名に「コース」を含むものをゴルフに分類（`_BM_GOLF_FACS`）
+- **データフロー**: GAS読込→enrichment(total/budget/annual/shortName計算)→INBOUND_BUDGET設定→レンダリング。GAS空の場合はinbound_budget.jsからシード
 
 ---
 

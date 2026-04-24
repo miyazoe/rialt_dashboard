@@ -29,6 +29,10 @@
 | `tools/resort_gas.gs` | GAS Web App — 全施設日別売上集約エンドポイント | — |
 | `notebooklm_prompt.md` | NotebookLM用プロンプト集（Prompt1 / Prompt2） | — |
 | `data/tgr/` | TGR月次xlsxソースファイル（2024.xlsx + YYYYMM.xlsx） | — |
+| `news/generate_news_data.py` | Excel → news_data.js 生成スクリプト | — |
+| `news/news_data.js` | ニュースデータ（`window.NEWS_DATA`、Excel から自動生成） | — |
+| `news/launch.py` | ダッシュボードランチャー（1日1回 news_data.js 更新 → index.html 開く） | — |
+| `ダッシュボード.bat` | ダブルクリック起動用 bat（py -3.12 news/launch.py を実行） | — |
 
 ---
 
@@ -37,7 +41,7 @@
 ### 外タブ構成
 
 ```
-[RIALT] [TGR] [TOP]  ← TGRは全員表示、TOPはprivate-only
+[RIALT] [TGR] [TOP] [IR] [NEWS]  ← TGR/IR/NEWSは全員表示、TOPはprivate-only
 ```
 
 ---
@@ -200,6 +204,23 @@ window.RIALT_DATA = {
 | 2026-03-30 | テーマ統一 — index.htmlに `--th-header/--th-border/--th-accent/--th-accent2/--th-muted` グローバルCSS変数追加、ヘッダー・設定モーダル・ナビゲーションを全テーマ（A/B/C）で統一 | — |
 | 2026-03-30 | TGR施設名マッピング修正 — RESORT_FACに `tableKey` フィールド追加（ロッジ虎の湯→`九重虎の湯`・TSMART→`Tsmart`）でresort_table.jsキー名と一致させデータ表示を修正 | — |
 | 2026-03-30 | GAS v17デプロイ — `buildIRData()`にリネーム・Google News RSS（最大10件）・v10/quoteSummary+v7/quote fallback・JSONP完全対応 | — |
+| 2026-04-01 | GAS v23〜v28: crumb認証・high/low/open フォールバック・minkabu.jpスクレイピング成功（PER/PBR/PSR/時価総額）| — |
+| 2026-04-01 | GAS v33: targetMeanPrice/recommendationKey/revenue追加（minkabu settlement meta description利用）| — |
+| 2026-04-01 | GAS v34: IR機能を4社比較に刷新（PPIH/ユニクロ/コスモス薬品/イオン）| — |
+| 2026-04-02 | GAS v36: トライアル追加で5社比較に刷新、GAS URL更新 | — |
+| 2026-04-06 | news/ ディレクトリ新規作成: generate_news_data.py / news_data.js / launch.py、ダッシュボード.bat 作成 | — |
+| 2026-04-06 | NEWSタブ新規追加（外タブ: RIALT→TGR→TOP→IR→NEWS）、Excel駆動ニュースマトリクス（10社×日付・直近14日）| — |
+| 2026-04-06 | ニュースマトリクス: ツールチップ（詳細100〜150字）・企業単体ビュー（100件ページネーション・右クリックで戻る）| — |
+| 2026-04-06 | IR AIサイドバー: デフォルト最小化（collapsed）・再分析ボタン（↺）復活 | — |
+| 2026-04-06 | IRタブのニュース内タブを削除（NEWSタブに独立）、IR内タブ: 現在データ・時系列履歴のみ | — |
+| 2026-04-06 | バグ修正: outer-news 黒画面（背景色未設定）→ background:#f4f6f9 + CSS変数インライン追加 | — |
+| 2026-04-06 | バグ修正: scanline div 削除（CSS削除済みだったがHTMLに残存） | — |
+| 2026-04-08 | TOURSタブ新規追加（TGR→TOURS→TOP）・GAS `?tours=1` エンドポイント追加・fetchToursData/saveTourSnapshot（週次Drive保存）| — |
+| 2026-04-08 | TOURS: ダッシュボード（KPI7件・年度/今月＋昨対・Canvasチャート4枚）・月別サマリ・月別×旅行会社別サマリ・明細（月度×旅行会社×国籍×CSV出力）| — |
+| 2026-04-09 | GAS v52: parseTourRows の親行判定を A列 → G列（旅行会社）に変更しサブ行集計バグを修正、toursDebug エンドポイント追加。月次合計 65M → 249M で正常化（元シートAC列数式の不備が判明） | — |
+| 2026-04-09 | TOURS: 誤字「旱行会社」→「旅行会社」全4箇所修正 | — |
+| 2026-04-09 | TOURS 月別・旅行会社別サマリ: 月度内の旅行会社を売上合計の降順で並び替え | — |
+| 2026-04-09 | TOURS 明細タブ: 月度フィルタを「年月（YYYY年M月）」に変更（calSortKey ベース） | — |
 
 ---
 
@@ -371,7 +392,7 @@ Layer 2：施設ドリルダウン（問題の所在特定）
 | 古民家煉り | 旅館 泊のみ | 1FOfNps2-dP0wIrBkJulj-Wn4vdTxftvv8ctVf-y0qEM |
 | Tsmart | 旅館 泊+食 | 1HVpaoPG-riSu0RrtBTgsIeba_7YaDlfzmVLv6qmMCCE |
 | 九重久織亭 | 旅館 泊+食 | 1AXKvdoFsD7tUmeP-CUuq1Squ-vyZRkubz9k5bhV2e00 |
-| 九重虎乃湯(ロッジ) | 旅館 泊+食 | 1cbkvN09SbMiIO0n0urOUjjjCK-HIm7s7V0AMPedMlwI |
+| 九重虎の湯(ロッジ) | 旅館 泊+食 | 1cbkvN09SbMiIO0n0urOUjjjCK-HIm7s7V0AMPedMlwI |
 | 仙石原久の葉 | 旅館 泊+食 | 1KyL_p0S8Hw0JjRIXJcz5MqjC_Ey9SRnmeC60hhDdk8g |
 | 小塚久の葉 | 旅館 泊+食 | 13PMcODCT0OeQC3rue8YMFNsFRNiM_LsIE0rYufd8_DI |
 | 阿蘇ホテル | 旅館 泊+食 | 1Mp5NlAW-5qHZk4zNLzrBetyfwC6gi0jhauqKIsm5WZk |

@@ -4,7 +4,7 @@ window.INBOUND_BUDGET = {
   "fyLabel": "2026",
   "facilities": {
     "九重久織亭": {
-      "shortName": "久織亭",
+      "shortName": "九重久織亭",
       "adr": 62000,
       "monthly": {
         "2026-07": {
@@ -127,7 +127,7 @@ window.INBOUND_BUDGET = {
       }
     },
     "ロッジ虎の湯": {
-      "shortName": "虎の湯",
+      "shortName": "ロッジ虎の湯",
       "adr": 17000,
       "monthly": {
         "2026-07": {
@@ -373,7 +373,7 @@ window.INBOUND_BUDGET = {
       }
     },
     "小塚久の葉": {
-      "shortName": "小塚",
+      "shortName": "小塚久の葉",
       "adr": 37000,
       "monthly": {
         "2026-07": {
@@ -496,7 +496,7 @@ window.INBOUND_BUDGET = {
       }
     },
     "仙石原久の葉": {
-      "shortName": "仙石原",
+      "shortName": "仙石原久の葉",
       "adr": 42000,
       "monthly": {
         "2026-07": {
@@ -619,7 +619,7 @@ window.INBOUND_BUDGET = {
       }
     },
     "古民家煉り": {
-      "shortName": "煉り",
+      "shortName": "古民家煉り",
       "adr": 78000,
       "monthly": {
         "2026-07": {
@@ -741,8 +741,8 @@ window.INBOUND_BUDGET = {
         "budget": 62400000
       }
     },
-    "Tsmart": {
-      "shortName": "Tsmart",
+    "TSMART": {
+      "shortName": "TSMART",
       "adr": 7000,
       "monthly": {
         "2026-07": {
@@ -864,8 +864,8 @@ window.INBOUND_BUDGET = {
         "budget": 14007000
       }
     },
-    "阿蘇ホテル": {
-      "shortName": "阿蘇ホテル",
+    "阿蘇キャニオンテラスロッジ": {
+      "shortName": "阿蘇キャニオンテラスロッジ",
       "adr": 28000,
       "monthly": {
         "2026-07": {
@@ -987,8 +987,8 @@ window.INBOUND_BUDGET = {
         "budget": 95256000
       }
     },
-    "若宮コース": {
-      "shortName": "若宮",
+    "WAKAMIYAコース": {
+      "shortName": "WAKAMIYAコース",
       "adr": 34650,
       "monthly": {
         "2026-07": {
@@ -1110,8 +1110,8 @@ window.INBOUND_BUDGET = {
         "budget": 82813500
       }
     },
-    "阿蘇コース": {
-      "shortName": "阿蘇",
+    "ASOコース": {
+      "shortName": "ASOコース",
       "adr": 26400,
       "monthly": {
         "2026-07": {
@@ -1233,8 +1233,8 @@ window.INBOUND_BUDGET = {
         "budget": 118984800
       }
     },
-    "大分コース": {
-      "shortName": "大分",
+    "OITAコース": {
+      "shortName": "OITAコース",
       "adr": 32340,
       "monthly": {
         "2026-07": {
@@ -1357,7 +1357,7 @@ window.INBOUND_BUDGET = {
       }
     },
     "南阿蘇コース": {
-      "shortName": "南阿蘇",
+      "shortName": "南阿蘇コース",
       "adr": 21450,
       "monthly": {
         "2026-07": {

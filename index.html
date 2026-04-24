@@ -1757,6 +1757,63 @@ body.tgr-mode .tgr-hide { display: none !important; }
 .tours-dash-card-wide { grid-column: span 3; }
 .tours-dash-title { font-size:12px; font-weight:700; color:#1e3a5f; margin-bottom:8px; padding-bottom:6px; border-bottom:1px solid #d1d9e6; letter-spacing:0.02em; font-family:"Noto Sans JP",sans-serif; }
 .tours-dash-canvas { display:block; width:100%; height:auto; max-height:320px; cursor:crosshair; }
+  /* Budget Maintenance Table v4 — Light, metric-first axis */
+  .bm-toolbar { display:flex; align-items:center; gap:10px; margin-bottom:14px; flex-wrap:wrap; padding:10px 14px; background:#fff; border:1px solid #e2e8f0; border-radius:8px; box-shadow:0 1px 3px rgba(0,0,0,.06); }
+  .bm-fy-sel { font-size:13px; padding:6px 14px; border:1px solid #cbd5e1; border-radius:6px; background:#f8fafc; color:#1e293b; font-weight:700; }
+  .bm-fy-sel:focus { outline:2px solid #3b82f6; }
+  .bm-btn { font-size:11px; padding:6px 16px; border:none; border-radius:6px; cursor:pointer; font-weight:700; white-space:nowrap; transition:all .15s; }
+  .bm-btn:hover { filter:brightness(.93); }
+  .bm-btn-save { background:#2563eb; color:#fff; }
+  .bm-btn-export { background:#059669; color:#fff; }
+  .bm-btn-import { background:#7c3aed; color:#fff; }
+  .bm-btn-reset { background:#dc2626; color:#fff; }
+  .bm-table-wrap { overflow-x:auto; max-height:calc(100vh - 240px); overflow-y:auto; border:1px solid #9ca3af; border-radius:8px; background:#fff; box-shadow:0 1px 3px rgba(0,0,0,.06); }
+  .bm-table { border-collapse:collapse; font-size:11px; min-width:1800px; width:100%; table-layout:fixed; }
+  .bm-table th, .bm-table td { padding:3px 6px; white-space:nowrap; border:1px solid #9ca3af; }
+  .bm-table thead { position:sticky; top:0; z-index:2; }
+  .bm-hdr1 th { background:#1e3a5f; color:#fff; text-align:center; font-size:11px; padding:7px 6px; font-weight:700; letter-spacing:.03em; border-color:#9ca3af; }
+  .bm-hdr2 th { background:#2a4a6e; color:#cbd5e1; text-align:center; font-size:9px; padding:4px 6px; font-weight:600; border-color:#9ca3af; border-bottom:2px solid #6b7280; }
+  .bm-th-fac { min-width:80px; position:sticky; left:0; z-index:3; background:#1e3a5f !important; }
+  .bm-th-mon { min-width:44px; }
+  .bm-th-adr { min-width:74px; }
+  .bm-grp-sep { border-left:3px solid #475569 !important; }
+  .bm-th-plan { background:#1e4080 !important; color:#bfdbfe !important; border-color:#9ca3af !important; }
+  .bm-th-planam { background:#2a3f6f !important; color:#a5c4f0 !important; border-color:#9ca3af !important; }
+  .bm-th-act { background:#374151 !important; color:#e2e8f0 !important; border-color:#9ca3af !important; }
+  .bm-th-actam { background:#2d3748 !important; color:#d1d5db !important; border-color:#9ca3af !important; }
+  .bm-td-fac { font-weight:700; color:#1e3a5f; background:#fff; position:sticky; left:0; z-index:1; vertical-align:middle; text-align:center; border-right:2px solid #6b7280; font-size:11px; }
+  .bm-td-mon { font-weight:500; color:#475569; text-align:center; background:#fff; font-size:10px; }
+  .bm-td-adr { text-align:center; background:#fff; vertical-align:middle; }
+  .bm-adr-input { width:68px; font-size:11px; padding:3px 5px; border:1px solid #e2e8f0; border-radius:4px; text-align:right; background:#fffbeb; color:#92400e; font-weight:600; -moz-appearance:textfield; }
+  .bm-adr-input::-webkit-inner-spin-button, .bm-adr-input::-webkit-outer-spin-button { -webkit-appearance:none; margin:0; }
+  .bm-adr-input:focus { outline:2px solid #f59e0b; border-color:#f59e0b; }
+  .bm-td-plan { background:#fff; text-align:right; }
+  .bm-plan-input { width:42px; font-size:11px; padding:2px 4px; border:1px solid #cbd5e1; border-radius:4px; text-align:right; background:#fff; color:#1e293b; font-weight:600; -moz-appearance:textfield; }
+  .bm-plan-input::-webkit-inner-spin-button, .bm-plan-input::-webkit-outer-spin-button { -webkit-appearance:none; margin:0; }
+  .bm-plan-input:focus { outline:2px solid #3b82f6; border-color:#3b82f6; background:#eff6ff; }
+  .bm-td-planam { background:#fff; color:#1e293b; text-align:right; font-size:10px; }
+  .bm-td-act { background:#fff; text-align:right; color:#1e293b; }
+  .bm-td-actam { background:#fff; text-align:right; color:#1e293b; font-size:10px; }
+  .bm-td-total { font-weight:700; background:#fef9c3 !important; color:#1e293b; text-align:right; }
+  .bm-fac-sep td { border-top:3px solid #9ca3af !important; }
+  .bm-row-total td { font-weight:700; border-top:2px solid #6b7280 !important; border-bottom:2px solid #6b7280 !important; background:#fef9c3 !important; }
+  .bm-row-total .bm-td-mon { color:#1e293b; font-weight:700; background:#fef9c3 !important; }
+  .bm-row-total .bm-td-total { background:#fef08a !important; }
+  .bm-subtotal-row td { font-weight:800; background:#eef2ff !important; color:#1e3a5f; border-top:2px solid #1d4ed8 !important; border-bottom:2px solid #1d4ed8 !important; font-size:11px; }
+  .bm-subtotal-row .bm-td-fac { background:#eef2ff !important; font-size:12px; color:#2563eb; }
+  .bm-subtotal-row .bm-td-mon { background:#eef2ff !important; color:#1e3a5f; }
+  .bm-subtotal-row .bm-td-total { background:#fef08a !important; color:#1e293b; }
+  .bm-sum-label { text-align:left !important; font-weight:800; font-size:12px; }
+  .bm-sum-hotel td, .bm-sum-golf td, .bm-sum-grand td { color:#000 !important; font-size:11px; }
+  .bm-sum-hotel td { background:#e0f2fe !important; }
+  .bm-sum-golf td { background:#dcfce7 !important; }
+  .bm-sum-grand td { background:#fef9c3 !important; font-weight:800; font-size:12px; }
+  .bm-sum-grand .bm-sum-label { background:#fbbf24 !important; color:#000 !important; }
+  .bm-sum-hotel .bm-sum-label { background:#bae6fd !important; color:#000 !important; }
+  .bm-sum-golf .bm-sum-label { background:#bbf7d0 !important; color:#000 !important; }
+  .bm-sum-total-col { background:#fef08a !important; font-weight:800; }
+  .bm-sum-grand .bm-sum-total-col { background:#fbbf24 !important; }
+
 .tours-hbar-canvas { height:320px; max-height:none; }
 .tours-kpi-card.budget { border-left:3px solid #f59e0b; background:#fffbeb; }
 .tours-chart-tooltip { position:fixed; display:none; background:rgba(15,23,42,0.95); color:#fff; padding:6px 10px; border-radius:4px; font-size:11px; pointer-events:none; z-index:9999; box-shadow:0 2px 8px rgba(0,0,0,0.3); white-space:nowrap; line-height:1.5; }
@@ -2500,6 +2557,7 @@ body.tgr-mode .tgr-hide { display: none !important; }
     <button class="tours-sub-btn" data-tours-sub="agency">&#x1F3E2; &#26053;&#34892;&#20250;&#31038;&#21029;</button>
     <button class="tours-sub-btn" data-tours-sub="facility">&#x1F3E8; &#26045;&#35373;&#36899;&#25658;</button>
     <button class="tours-sub-btn" data-tours-sub="detail">&#x1F4CB; &#26126;&#32048;</button>
+    <button class="tours-sub-btn" data-tours-sub="budget">&#x1F4CB; &#20104;&#31639;&#20445;&#23432;</button>
   </div>
   <!-- ダッシュボード -->
   <div class="tours-screen active" id="tours-screen-dashboard" style="overflow:auto;padding:12px;background:#f4f6f9;">
@@ -2589,6 +2647,10 @@ body.tgr-mode .tgr-hide { display: none !important; }
       <button class="tours-csv-btn" id="tours-csv-btn">&#x2193; CSV</button>
     </div>
     <div id="tours-table-wrap" style="flex:1;overflow:auto;padding:10px 14px;background:#f4f6f9;"><div style="text-align:center;color:#6b7280;padding:32px;font-size:12px;">&#35501;&#12415;&#36796;&#12415;&#20013;&#8230;</div></div>
+  </div>
+  <!-- Budget Maintenance -->
+  <div class="tours-screen" id="tours-screen-budget" style="overflow:auto;padding:0;background:#f4f6f9;">
+    <div id="budget-screen-content" style="padding:12px;"></div>
   </div>
 </div><!-- end outer-tours -->
 <!-- RESORT CONTENT -->
@@ -2716,7 +2778,7 @@ body.tgr-mode .tgr-hide { display: none !important; }
     <!-- Budget vs Actual section -->
     <div style="margin-top:8px;background:#fff;border-radius:6px;padding:10px;border:1px solid #e2e8f0;">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
-        <div style="font-size:12px;font-weight:700;color:#1f2937;">&#9889; &#12452;&#12531;&#12496;&#12454;&#12531;&#12489;&#20104;&#31639;&#23550;&#27604;&#65288;&#20170;&#26399;&#23455;&#32318; vs &#26469;&#26399;&#35336;&#30011;&#65289;</div><div style="display:flex;gap:4px;"><button id="budget-edit-btn" onclick="_toggleBudgetEditor()" style="font-size:9px;padding:2px 8px;border:1px solid #d1d5db;border-radius:3px;background:#f9fafb;cursor:pointer;color:#4b5563;">&#9998; &#32232;&#38598;</button><button id="budget-export-btn" onclick="_exportBudgetData()" style="font-size:9px;padding:2px 8px;border:1px solid #d1d5db;border-radius:3px;background:#f9fafb;cursor:pointer;color:#4b5563;">&#128190; &#20986;&#21147;</button><button id="budget-import-btn" onclick="_importBudgetData()" style="font-size:9px;padding:2px 8px;border:1px solid #d1d5db;border-radius:3px;background:#f9fafb;cursor:pointer;color:#4b5563;">&#128196; &#21462;&#36796;</button><button id="budget-reset-btn" onclick="_resetBudgetData()" style="font-size:9px;padding:2px 8px;border:1px solid #d1d5db;border-radius:3px;background:#fff0f0;cursor:pointer;color:#dc2626;display:none;">&#128260; &#12522;&#12475;&#12483;&#12488;</button></div>
+        <div style="font-size:12px;font-weight:700;color:#1f2937;">&#9889; &#12452;&#12531;&#12496;&#12454;&#12531;&#12489;&#20104;&#31639;&#23550;&#27604;&#65288;&#20170;&#26399;&#23455;&#32318; vs &#26469;&#26399;&#35336;&#30011;&#65289;</div><div style="display:flex;gap:4px;"><button id="budget-edit-btn" onclick="document.querySelector('[data-outer=tours]').click();setTimeout(function(){var b=document.querySelector('[data-tours-sub=budget]');if(b)b.click();},100);" style="font-size:9px;padding:2px 8px;border:1px solid #d1d5db;border-radius:3px;background:#f9fafb;cursor:pointer;color:#4b5563;">&#9998; &#32232;&#38598;</button><button id="budget-export-btn" onclick="if(window.INBOUND_BUDGET){var js='// inbound_budget.js\nwindow.INBOUND_BUDGET = '+JSON.stringify(window.INBOUND_BUDGET,null,2)+';\n';var b=new Blob([js],{type:'text/javascript'});var a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='inbound_budget.js';a.click();}else{alert('No data');}" style="font-size:9px;padding:2px 8px;border:1px solid #d1d5db;border-radius:3px;background:#f9fafb;cursor:pointer;color:#4b5563;">&#128190; &#20986;&#21147;</button><button id="budget-import-btn" onclick="document.querySelector('[data-outer=tours]').click();setTimeout(function(){var b=document.querySelector('[data-tours-sub=budget]');if(b)b.click();},100);" style="font-size:9px;padding:2px 8px;border:1px solid #d1d5db;border-radius:3px;background:#f9fafb;cursor:pointer;color:#4b5563;">&#128196; &#21462;&#36796;</button><button id="budget-reset-btn" onclick="localStorage.removeItem('inbound_budget_override_v1');var s=document.createElement('script');s.src='inbound_budget.js?_='+Date.now();s.onload=function(){if(typeof window._renderInbound==='function')window._renderInbound();};document.head.appendChild(s);this.style.display='none';" style="font-size:9px;padding:2px 8px;border:1px solid #d1d5db;border-radius:3px;background:#fff0f0;cursor:pointer;color:#dc2626;display:none;">&#128260; &#12522;&#12475;&#12483;&#12488;</button></div>
         <div style="font-size:9px;color:#6b7280;" id="resort-budget-fy-label"></div>
       </div>
       <div id="resort-inbound-budget-table"></div>
@@ -2733,24 +2795,6 @@ body.tgr-mode .tgr-hide { display: none !important; }
     </div>
   </div>
 
-    <!-- Budget Editor Modal -->
-    <div id="budget-editor-overlay" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.5);z-index:9999;">
-      <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);background:#fff;border-radius:8px;padding:16px;width:90%;max-width:900px;max-height:80vh;overflow:auto;">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
-          <h3 style="margin:0;font-size:14px;color:#1f2937;">&#12452;&#12531;&#12496;&#12454;&#12531;&#12489;&#20104;&#31639;&#32232;&#38598;</h3>
-          <button onclick="_closeBudgetEditor()" style="border:none;background:none;font-size:18px;cursor:pointer;color:#6b7280;">&times;</button>
-        </div>
-        <div style="margin-bottom:8px;font-size:10px;color:#6b7280;">&#26045;&#35373;&#12434;&#36984;&#25246;&#12375;&#12390;ADR&#12539;&#26376;&#21029;&#23460;&#25968;&#12434;&#32232;&#38598;&#12290;&#20445;&#23384;&#12377;&#12427;&#12392;localStorage&#12395;&#21453;&#26144;&#12373;&#12428;&#12414;&#12377;&#12290;</div>
-        <div style="margin-bottom:8px;">
-          <select id="budget-editor-fac" onchange="_loadBudgetEditorFac()" style="font-size:11px;padding:4px 8px;border:1px solid #d1d5db;border-radius:4px;"></select>
-        </div>
-        <div id="budget-editor-content"></div>
-        <div style="display:flex;gap:8px;margin-top:12px;justify-content:flex-end;">
-          <button onclick="_saveBudgetEdit()" style="font-size:11px;padding:6px 16px;border:none;border-radius:4px;background:#2563eb;color:#fff;cursor:pointer;font-weight:600;">&#20445;&#23384;</button>
-          <button onclick="_closeBudgetEditor()" style="font-size:11px;padding:6px 16px;border:1px solid #d1d5db;border-radius:4px;background:#fff;cursor:pointer;color:#6b7280;">&#12461;&#12515;&#12531;&#12475;&#12523;</button>
-        </div>
-      </div>
-    </div>
   <!-- チャンネル スクリーン -->
   <div class="resort-screen" id="resort-screen-channel" style="flex:1;overflow:auto;padding:8px;background:#f4f6f9;display:none;">
     <div style="display:flex;gap:8px;margin-bottom:8px;">
@@ -8418,7 +8462,7 @@ document.getElementById('import-btn').addEventListener('click', openPasteDialog)
   // 実施設マスタ（合計・本社除く）
   var RESORT_FACS = [
     { pl: '九重久織亭',   gas: '九重久織亭',   type: 'ryokan', rooms: 9 },
-    { pl: 'ロッジ虎の湯', gas: '九重虎乃湯',   type: 'ryokan', tableKey: '九重虎の湯', rooms: 34 },
+    { pl: 'ロッジ虎の湯', gas: '九重虎の湯',   type: 'ryokan', tableKey: '九重虎の湯', rooms: 34 },
     { pl: '宮若虎の湯',   gas: '宮若虎の湯',   type: 'ryokan', rooms: 8 },
     { pl: '小塚久の葉',   gas: '小塚久の葉',   type: 'ryokan', rooms: 8 },
     { pl: '仙石原久の葉', gas: '仙石原久の葉', type: 'ryokan', rooms: 9 },
@@ -9986,6 +10030,8 @@ document.getElementById('import-btn').addEventListener('click', openPasteDialog)
     }
     return window.INBOUND_BUDGET || null;
   }
+  window._getBudgetData = _getBudgetData;
+  window._renderInbound = function() { renderInbound(); };
 
   // Override INBOUND_BUDGET on page load if localStorage has edits
   (function() {
@@ -10003,197 +10049,8 @@ document.getElementById('import-btn').addEventListener('click', openPasteDialog)
     }
   })();
 
-  window._toggleBudgetEditor = function() {
-    var overlay = document.getElementById('budget-editor-overlay');
-    if (!overlay) return;
-    overlay.style.display = overlay.style.display === 'none' ? '' : 'none';
-    if (overlay.style.display !== 'none') {
-      _initBudgetEditor();
-    }
-  };
+  // Budget editor moved to TOURS sub-tab
 
-  window._closeBudgetEditor = function() {
-    var overlay = document.getElementById('budget-editor-overlay');
-    if (overlay) overlay.style.display = 'none';
-  };
-
-  function _initBudgetEditor() {
-    var data = _getBudgetData();
-    if (!data || !data.facilities) return;
-    var sel = document.getElementById('budget-editor-fac');
-    if (!sel) return;
-    sel.innerHTML = Object.keys(data.facilities).map(function(name) {
-      return '<option value="' + name + '">' + name + '</option>';
-    }).join('');
-    _loadBudgetEditorFac();
-  }
-
-  window._loadBudgetEditorFac = function() {
-    var data = _getBudgetData();
-    if (!data) return;
-    var sel = document.getElementById('budget-editor-fac');
-    var facName = sel ? sel.value : null;
-    if (!facName || !data.facilities[facName]) return;
-    var fd = data.facilities[facName];
-    var el = document.getElementById('budget-editor-content');
-    if (!el) return;
-
-    var months = Object.keys(fd.monthly).sort();
-    var nats = ['KOR','TWN','HKG','CHA','EUR'];
-    var natLabels = {KOR:'\u97D3\u56FD',TWN:'\u53F0\u6E7E',HKG:'\u9999\u6E2F',CHA:'\u4E2D\u56FD',EUR:'\u6B27\u7C73'};
-
-    var h = '<div style="margin-bottom:8px;">';
-    h += '<label style="font-size:10px;font-weight:600;color:#4b5563;">ADR: </label>';
-    h += '<input type="number" id="bed-adr" value="' + fd.adr + '" style="width:100px;font-size:11px;padding:2px 6px;border:1px solid #d1d5db;border-radius:3px;">';
-    h += '<span style="font-size:10px;color:#6b7280;margin-left:4px;">\u5186</span>';
-    h += '</div>';
-
-    h += '<table style="width:100%;font-size:10px;border-collapse:collapse;border:1px solid #e2e8f0;">';
-    h += '<thead><tr style="background:#f0f4ff;">';
-    h += '<th style="padding:3px 4px;border:1px solid #e2e8f0;">\u6708</th>';
-    nats.forEach(function(n) {
-      h += '<th style="padding:3px 4px;border:1px solid #e2e8f0;">' + natLabels[n] + '</th>';
-    });
-    h += '<th style="padding:3px 4px;border:1px solid #e2e8f0;background:#e8f4fe;">\u5408\u8A08</th>';
-    h += '</tr></thead><tbody>';
-
-    months.forEach(function(ym) {
-      var md = fd.monthly[ym];
-      var label = ym.substring(5) + '\u6708';
-      h += '<tr>';
-      h += '<td style="padding:2px 4px;border:1px solid #e2e8f0;font-weight:500;">' + label + '</td>';
-      nats.forEach(function(n) {
-        var v = md[n] || 0;
-        h += '<td style="padding:1px 2px;border:1px solid #e2e8f0;">';
-        h += '<input type="number" class="bed-cell" data-ym="' + ym + '" data-nat="' + n + '" value="' + v + '" style="width:50px;font-size:10px;padding:1px 3px;border:1px solid #e8e8e8;border-radius:2px;text-align:right;" onchange="_updateBudgetRowTotal(this)">';
-        h += '</td>';
-      });
-      h += '<td style="padding:2px 4px;border:1px solid #e2e8f0;text-align:right;font-weight:600;background:#f0f8ff;" id="bed-total-' + ym + '">' + (md.total||0) + '</td>';
-      h += '</tr>';
-    });
-    h += '</tbody></table>';
-    el.innerHTML = h;
-  };
-
-  window._updateBudgetRowTotal = function(input) {
-    var ym = input.dataset.ym;
-    var row = input.closest('tr');
-    var inputs = row.querySelectorAll('.bed-cell');
-    var total = 0;
-    inputs.forEach(function(inp) { total += Number(inp.value) || 0; });
-    var totalCell = document.getElementById('bed-total-' + ym);
-    if (totalCell) totalCell.textContent = total;
-  };
-
-  window._saveBudgetEdit = function() {
-    var data = JSON.parse(JSON.stringify(_getBudgetData()));
-    if (!data) return;
-    var sel = document.getElementById('budget-editor-fac');
-    var facName = sel ? sel.value : null;
-    if (!facName || !data.facilities[facName]) return;
-
-    var fd = data.facilities[facName];
-    // Update ADR
-    var adrInput = document.getElementById('bed-adr');
-    if (adrInput) fd.adr = Number(adrInput.value) || 0;
-
-    // Update monthly values
-    var cells = document.querySelectorAll('.bed-cell');
-    cells.forEach(function(c) {
-      var ym = c.dataset.ym;
-      var nat = c.dataset.nat;
-      if (fd.monthly[ym]) {
-        fd.monthly[ym][nat] = Number(c.value) || 0;
-        // Recalculate total and budget
-        var nats = ['KOR','TWN','HKG','CHA','EUR'];
-        var t = 0;
-        nats.forEach(function(n) { t += fd.monthly[ym][n] || 0; });
-        fd.monthly[ym].total = t;
-        fd.monthly[ym].budget = t * fd.adr;
-      }
-    });
-
-    // Recalculate annual
-    var annNats = {KOR:0,TWN:0,HKG:0,CHA:0,EUR:0,total:0,budget:0};
-    Object.values(fd.monthly).forEach(function(md) {
-      annNats.KOR += md.KOR||0;
-      annNats.TWN += md.TWN||0;
-      annNats.HKG += md.HKG||0;
-      annNats.CHA += md.CHA||0;
-      annNats.EUR += md.EUR||0;
-      annNats.total += md.total||0;
-    });
-    annNats.budget = annNats.total * fd.adr;
-    fd.annual = annNats;
-
-    // Save to localStorage
-    localStorage.setItem(_BUDGET_LS_KEY, JSON.stringify(data));
-    window.INBOUND_BUDGET = data;
-
-    // Show reset button
-    var rb = document.getElementById('budget-reset-btn');
-    if (rb) rb.style.display = '';
-
-    // Close editor and re-render
-    _closeBudgetEditor();
-    renderInbound();
-    alert('\u4FDD\u5B58\u3057\u307E\u3057\u305F\u3002\u753B\u9762\u306B\u53CD\u6620\u3055\u308C\u3066\u3044\u307E\u3059\u3002');
-  };
-
-  window._exportBudgetData = function() {
-    var data = _getBudgetData();
-    if (!data) { alert('\u4E88\u7B97\u30C7\u30FC\u30BF\u304C\u3042\u308A\u307E\u305B\u3093'); return; }
-    var js = '// inbound_budget.js -- exported ' + new Date().toISOString().substring(0,16) + '\nwindow.INBOUND_BUDGET = ' + JSON.stringify(data, null, 2) + ';\n';
-    var blob = new Blob([js], {type:'text/javascript;charset=utf-8'});
-    var url = URL.createObjectURL(blob);
-    var a = document.createElement('a');
-    a.href = url; a.download = 'inbound_budget.js';
-    a.click(); URL.revokeObjectURL(url);
-  };
-
-  window._importBudgetData = function() {
-    var input = document.createElement('input');
-    input.type = 'file'; input.accept = '.js,.json';
-    input.onchange = function(e) {
-      var file = e.target.files[0];
-      if (!file) return;
-      var reader = new FileReader();
-      reader.onload = function(ev) {
-        var text = ev.target.result;
-        // Extract JSON from JS file
-        var m = text.match(/window\.INBOUND_BUDGET\s*=\s*([\s\S]+);?\s*$/);
-        var json = m ? m[1] : text;
-        try {
-          var data = JSON.parse(json.replace(/;\s*$/, ''));
-          if (!data.facilities) throw new Error('invalid format');
-          localStorage.setItem(_BUDGET_LS_KEY, JSON.stringify(data));
-          window.INBOUND_BUDGET = data;
-          var rb = document.getElementById('budget-reset-btn');
-          if (rb) rb.style.display = '';
-          renderInbound();
-          alert('\u30A4\u30F3\u30DD\u30FC\u30C8\u5B8C\u4E86\u3002\u753B\u9762\u306B\u53CD\u6620\u3055\u308C\u307E\u3057\u305F\u3002');
-        } catch(err) {
-          alert('\u30D5\u30A1\u30A4\u30EB\u5F62\u5F0F\u304C\u4E0D\u6B63\u3067\u3059: ' + err.message);
-        }
-      };
-      reader.readAsText(file);
-    };
-    input.click();
-  };
-
-  window._resetBudgetData = function() {
-    if (!confirm('\u30ED\u30FC\u30AB\u30EB\u7DE8\u96C6\u3092\u30EA\u30BB\u30C3\u30C8\u3057\u3001\u5143\u306E\u4E88\u7B97\u30C7\u30FC\u30BF\u306B\u623B\u3057\u307E\u3059\u304B\uff1f')) return;
-    localStorage.removeItem(_BUDGET_LS_KEY);
-    // Reload original inbound_budget.js by re-reading it
-    var s = document.createElement('script');
-    s.src = 'inbound_budget.js?_=' + Date.now();
-    s.onload = function() {
-      renderInbound();
-      var rb = document.getElementById('budget-reset-btn');
-      if (rb) rb.style.display = 'none';
-    };
-    document.head.appendChild(s);
-  };
 
   // ── チャンネル ペイン（OTA + GA）────────────────────────────────────────
   function renderChannelOta() {
@@ -11396,7 +11253,7 @@ document.getElementById('import-btn').addEventListener('click', openPasteDialog)
           btn.classList.add('active');
           var screen = document.getElementById('tours-screen-' + btn.dataset.toursSub);
           if (screen) screen.classList.add('active');
-          renderTours();
+          if (btn.dataset.toursSub === 'budget') { renderBudgetScreen(); } else { renderTours(); }
         });
       });
     }
@@ -11414,9 +11271,13 @@ document.getElementById('import-btn').addEventListener('click', openPasteDialog)
       // Budget maintenance button - opens existing budget editor
       var budBtn = document.getElementById('tours-budget-btn');
       if (budBtn) budBtn.addEventListener('click', function() {
-        if (typeof _toggleBudgetEditor === 'function') _toggleBudgetEditor();
-        else if (typeof window._toggleBudgetEditor === 'function') window._toggleBudgetEditor();
-        else alert('予算エディタが見つかりません');
+        document.querySelectorAll('.tours-sub-btn').forEach(function(b){ b.classList.remove('active'); });
+        document.querySelectorAll('.tours-screen').forEach(function(s){ s.classList.remove('active'); });
+        var bb = document.querySelector('[data-tours-sub="budget"]');
+        if (bb) bb.classList.add('active');
+        var sc = document.getElementById('tours-screen-budget');
+        if (sc) sc.classList.add('active');
+        renderBudgetScreen();
       });
     }
 
@@ -12439,6 +12300,679 @@ document.getElementById('import-btn').addEventListener('click', openPasteDialog)
       var dtBtn = document.querySelector('[data-tours-sub="detail"]');
       if (dtBtn) dtBtn.click(); else if (_toursData) renderDetail();
     };
+
+
+    // == Budget Maintenance Screen (inline sub-tab) ==
+    var _BM_NATS = ['KOR','TWN','HKG','CHA','EUR'];
+    var _BM_NAT_LABELS = {KOR:'\u97d3\u56fd',TWN:'\u53f0\u6e7e',HKG:'\u9999\u6e2f',CHA:'\u4e2d\u56fd',EUR:'\u6b27\u7c73'};
+
+    var _BM_GAS_URL = 'https://script.google.com/a/macros/retail-ai.jp/s/AKfycbwT4eHF5q--bGyD22l5WnmM6115C2hImYIXj-dHN92fragEWvG-au4LgGh7GqgAZdmXfw/exec';
+    var _bmSaveTimer = null;
+
+    // ── JSONP GETによる予算読み書き（IRタブと同じパターン） ──
+
+    // JSONP GET: 予算データ読み込み
+    function _bmJsonpLoad(fy, callback) {
+      var cbName = '_bmLoadCb' + Date.now();
+      var script = document.createElement('script');
+      var timer = setTimeout(function() {
+        delete window[cbName];
+        if (script.parentNode) script.parentNode.removeChild(script);
+        console.warn('[BM-JSONP] Load timeout FY' + fy);
+        callback(null);
+      }, 20000);
+      window[cbName] = function(data) {
+        clearTimeout(timer);
+        delete window[cbName];
+        if (script.parentNode) script.parentNode.removeChild(script);
+        if (data && data.facilities) {
+          console.log('[BM-JSONP] Load OK: ' + Object.keys(data.facilities).length + ' facilities');
+          callback(data);
+        } else {
+          console.log('[BM-JSONP] Load empty/no data');
+          callback(null);
+        }
+      };
+      script.onerror = function() {
+        clearTimeout(timer);
+        delete window[cbName];
+        if (script.parentNode) script.parentNode.removeChild(script);
+        console.error('[BM-JSONP] Load script error');
+        callback(null);
+      };
+      script.src = _BM_GAS_URL + '?budget_get=1&fy=' + encodeURIComponent(fy) + '&callback=' + cbName;
+      document.head.appendChild(script);
+    }
+
+    // JSONP GET: 1施設分の予算保存
+    function _bmJsonpSaveFacility(fy, facName, facData, callback) {
+      var cbName = '_bmSaveCb' + Date.now() + '_' + Math.random().toString(36).slice(2,6);
+      var script = document.createElement('script');
+      var timer = setTimeout(function() {
+        delete window[cbName];
+        if (script.parentNode) script.parentNode.removeChild(script);
+        console.warn('[BM-JSONP] Save timeout: ' + facName);
+        if (callback) callback(false);
+      }, 20000);
+      window[cbName] = function(res) {
+        clearTimeout(timer);
+        delete window[cbName];
+        if (script.parentNode) script.parentNode.removeChild(script);
+        var ok = res && res.status === 'ok';
+        console.log('[BM-JSONP] Save ' + facName + ': ' + (ok ? 'OK' : JSON.stringify(res)));
+        if (callback) callback(ok);
+      };
+      script.onerror = function() {
+        clearTimeout(timer);
+        delete window[cbName];
+        if (script.parentNode) script.parentNode.removeChild(script);
+        console.error('[BM-JSONP] Save script error: ' + facName);
+        if (callback) callback(false);
+      };
+      var dataJson = JSON.stringify(facData);
+      script.src = _BM_GAS_URL + '?budget_save=1&fy=' + encodeURIComponent(fy)
+        + '&fac=' + encodeURIComponent(facName)
+        + '&data=' + encodeURIComponent(dataJson)
+        + '&callback=' + cbName;
+      document.head.appendChild(script);
+    }
+
+    // 全施設を順次JSONP保存
+    function _bmSaveAllFacilities(fy, facilities, onDone) {
+      var names = Object.keys(facilities);
+      if (names.length === 0) { if (onDone) onDone(true); return; }
+      var idx = 0;
+      var allOk = true;
+      function next() {
+        if (idx >= names.length) {
+          console.log('[BM-JSONP] All ' + names.length + ' facilities saved');
+          if (onDone) onDone(allOk);
+          return;
+        }
+        var fn = names[idx++];
+        _bmJsonpSaveFacility(fy, fn, facilities[fn], function(ok) {
+          if (!ok) allOk = false;
+          next();
+        });
+      }
+      next();
+    }
+
+    function _bmLoadFY(fy) {
+      var ib = window.INBOUND_BUDGET;
+      if (ib && ib.fyLabel === String(fy)) return JSON.parse(JSON.stringify(ib));
+      return _bmCreateEmpty(fy);
+    }
+
+    function _bmLoadFromGAS(fy, callback) {
+      _bmJsonpLoad(fy, callback);
+    }
+
+    function _bmCreateEmpty(fy) {
+      var ib = window.INBOUND_BUDGET;
+      var facs = (ib && ib.facilities) ? ib.facilities : {};
+      var tmpl = { fyLabel: String(fy), facilities: {} };
+      var sy = Number(fy);
+      Object.keys(facs).forEach(function(name) {
+        var fd = facs[name];
+        var monthly = {};
+        for (var mm = 7; mm <= 12; mm++) {
+          monthly[sy + '-' + (mm<10?'0':'') + mm] = {KOR:0,TWN:0,HKG:0,CHA:0,EUR:0,total:0,budget:0};
+        }
+        for (var mm = 1; mm <= 6; mm++) {
+          monthly[(sy+1) + '-' + (mm<10?'0':'') + mm] = {KOR:0,TWN:0,HKG:0,CHA:0,EUR:0,total:0,budget:0};
+        }
+        tmpl.facilities[name] = { shortName: fd.shortName, adr: fd.adr||0, monthly: monthly,
+          annual: {KOR:0,TWN:0,HKG:0,CHA:0,EUR:0,total:0,budget:0} };
+      });
+      return tmpl;
+    }
+
+    function _bmFYOptions(selected) {
+      var set = {};
+      var ib = window.INBOUND_BUDGET;
+      if (ib && ib.fyLabel) set[ib.fyLabel] = true;
+      for (var i = 0; i < localStorage.length; i++) {
+        var k = localStorage.key(i);
+        var mm = k.match(/^inbound_budget_fy_(\d{4})$/);
+        if (mm) set[mm[1]] = true;
+      }
+      var now = new Date();
+      var cfy = now.getMonth() >= 6 ? now.getFullYear() : now.getFullYear() - 1;
+      set[String(cfy)] = true;
+      set[String(cfy + 1)] = true;
+      if (selected) set[selected] = true;
+      return Object.keys(set).sort();
+    }
+
+    function _bmTsukiToYM(tsuki, dateRaw) {
+      if (dateRaw) {
+        var d = new Date(dateRaw);
+        if (!isNaN(d.getTime())) {
+          var y = d.getFullYear(), mm = d.getMonth()+1;
+          return y + '-' + (mm<10?'0':'') + mm;
+        }
+      }
+      var t = normTsuki(tsuki);
+      if (/^\d{6}$/.test(t)) return t.substring(0,4) + '-' + t.substring(4,6);
+      return '';
+    }
+
+    // Hotel name mapping: TOURS data name -> INBOUND_BUDGET shortName
+    var _BM_HOTEL_MAP = {
+      '\u963f\u8607': '\u963f\u8607\u30ad\u30e3\u30cb\u30aa\u30f3\u30c6\u30e9\u30b9\u30ed\u30c3\u30b8', // ASO -> 阿蘇キャニオンテラスロッジ
+      '\u963f\u8607(\uff78\uff9b\uff70\uff7d\uff9e)': '\u963f\u8607\u30ad\u30e3\u30cb\u30aa\u30f3\u30c6\u30e9\u30b9\u30ed\u30c3\u30b8', // ASO(close) -> 阿蘇キャニオンテラスロッジ
+      '\u864e\u306e\u6e6f': '\u30ed\u30c3\u30b8\u864e\u306e\u6e6f', // 虎の湯 -> ロッジ虎の湯
+      '\u864e\u306e\u6e6f\n\u30d3\u30e5\u30c3\u30d5\u30a7': '\u30ed\u30c3\u30b8\u864e\u306e\u6e6f', // 虎の湯+buffet -> ロッジ虎の湯
+      'Tsmart': 'TSMART', 'TSMART': 'TSMART',
+      '\u7149\u308a': '\u53e4\u6c11\u5bb6\u7149\u308a', // 煉り -> 古民家煉り
+      '\u5bae\u82e5\u864e\u306e\u6e6f': '\u5bae\u82e5\u864e\u306e\u6e6f', // 宮若虎の湯
+    };
+    // Golf name mapping
+    var _BM_GOLF_MAP = {
+      '\u82e5\u5bae': 'WAKAMIYA\u30b3\u30fc\u30b9', // 若宮 -> WAKAMIYAコース
+      '\u963f\u8607': 'ASO\u30b3\u30fc\u30b9',       // 阿蘇 -> ASOコース
+      '\u5927\u5206': 'OITA\u30b3\u30fc\u30b9',       // 大分 -> OITAコース
+    };
+    // Skip these hotel names (not real hotels)
+    var _BM_HOTEL_SKIP = ['\u6709','\u5c0f\u5c71\u5bbf\u6cca\u4ee3','\u98f2\u307f\u653e\u984c','\u98f2\u307f\u653e\u984c3\u56de',
+      '\u523a\u8eab\u5408\u308f\u305b','\u523a\u8eab\u76db\u5408\u305b','\u98df\u4e8b\u8ffd\u52a0','\u98df\u4e8b\u8ffd\u52a0\u6599',
+      '\u5dee\u984d\u8acb\u6c42','\u9001\u8fce\u8abf\u6574','\u5915\u98df\u8ffd\u52a0','4\u6642\u9593\u89b3\u5149',
+      '\u30ad\u30e3\u30f3\u30bb\u30eb\u5f85\u30613B\u8ffd\u52a0','\u30b4\u30eb\u30d51\u540d\n\u73fe\u91d1\u8fd4\u91d1',
+      '\u8107\u7530\u7814\u4fee\u68df\n\u4f1a\u8b70\u5ba4'];
+
+    function _bmAggregateActuals(fy) {
+      var result = {};
+      var td = window._toursData || _toursData;
+      if (!td || !td.bookings) return result;
+      var sy = Number(fy);
+      var fyStart = sy + '-07', fyEnd = (sy+1) + '-06';
+      td.bookings.forEach(function(b) {
+        if (isHeaderTsuki(b.tsuki)) return;
+        var ym = _bmTsukiToYM(b.tsuki, b.dateRaw);
+        if (!ym || ym < fyStart || ym > fyEnd) return;
+        var nat = b.nationality || '';
+        var hFees = ['hotel1Fee','hotel2Fee','hotel3Fee'];
+        ['hotel1','hotel2','hotel3'].forEach(function(hk, idx) {
+          var hh = b[hk]; if (!hh) return;
+          // Skip non-hotel entries
+          if (_BM_HOTEL_SKIP.indexOf(hh) >= 0) return;
+          if (/\u8fd4\u91d1|\u8ffd\u52a0\u8cbb|\u5229\u7528\u7a0e/.test(hh)) return;
+          // Map hotel name to budget shortName
+          var hn = _BM_HOTEL_MAP[hh];
+          if (!hn) {
+            // Try partial match for ビュッフェ variants
+            if (hh.indexOf('\u30d3\u30e5\u30c3\u30d5\u30a7') >= 0 && hh.indexOf('\u864e\u306e\u6e6f') >= 0) hn = '\u864e\u306e\u6e6f';
+            else if (hh.indexOf('\u963f\u8607') >= 0) hn = '\u963f\u8607\u30db\u30c6\u30eb';
+            else return; // Unknown hotel, skip
+          }
+          if (!result[hn]) result[hn] = {};
+          if (!result[hn][ym]) result[hn][ym] = {};
+          if (!result[hn][ym][nat]) result[hn][ym][nat] = {rooms:0, amount:0};
+          result[hn][ym][nat].rooms++;
+          result[hn][ym][nat].amount += b[hFees[idx]] || 0;
+        });
+        if (b.golfCourse) {
+          var gc = b.golfCourse;
+          // Normalize golf course name
+          var gn = _BM_GOLF_MAP[gc];
+          if (!gn) {
+            // Partial match: starts with 阿蘇 -> 阿蘇
+            if (gc.indexOf('\u963f\u8607') === 0) gn = '\u963f\u8607';
+            else if (gc.indexOf('\u5927\u5206') === 0) gn = '\u5927\u5206';
+            else return; // External/unknown golf course, skip
+          }
+          if (!result[gn]) result[gn] = {};
+          if (!result[gn][ym]) result[gn][ym] = {};
+          if (!result[gn][ym][nat]) result[gn][ym][nat] = {rooms:0, amount:0};
+          result[gn][ym][nat].rooms++;
+          result[gn][ym][nat].amount += b.golfFee || 0;
+        }
+      });
+      return result;
+    }
+
+    function _bmFmtK(v) { return v ? Math.round(v/1000).toLocaleString() : ''; }
+    function _bmFmtN(v) { return v ? Number(v).toLocaleString() : ''; }
+
+    function renderBudgetScreen() {
+      var container = document.getElementById('budget-screen-content');
+      if (!container) return;
+      var fyEl = document.getElementById('budget-fy-sel');
+      var selectedFY = fyEl ? fyEl.value : '';
+      if (!selectedFY) {
+        var ib = window.INBOUND_BUDGET;
+        selectedFY = ib ? ib.fyLabel : String(new Date().getFullYear());
+      }
+      // Load from GAS on first call
+      if (!container.dataset.gasLoaded) {
+        container.dataset.pendingFY = selectedFY;
+        container.innerHTML = '<div style="padding:40px;text-align:center;color:#6b7280;"><span style="font-size:18px;">\u2601</span> GAS\u304b\u3089\u4e88\u7b97\u30c7\u30fc\u30bf\u3092\u8aad\u8fbc\u4e2d...</div>';
+        _bmLoadFromGAS(selectedFY, function(gasData) {
+          if (gasData && gasData.facilities && Object.keys(gasData.facilities).length > 0) {
+            // enrich: add total/budget/annual/shortName (GAS stores raw country values only)
+            Object.keys(gasData.facilities).forEach(function(fn) {
+              var fd = gasData.facilities[fn];
+              if (!fd.shortName) fd.shortName = fn;
+              var adr2 = fd.adr || 0;
+              var ann = {KOR:0,TWN:0,HKG:0,CHA:0,EUR:0,total:0,budget:0};
+              Object.keys(fd.monthly || {}).forEach(function(ym) {
+                var md = fd.monthly[ym];
+                var t = 0;
+                _BM_NATS.forEach(function(n) { t += md[n]||0; ann[n] += md[n]||0; });
+                md.total = t; md.budget = t * adr2;
+                ann.total += t;
+              });
+              ann.budget = ann.total * adr2;
+              fd.annual = ann;
+            });
+            window.INBOUND_BUDGET = { fyLabel: String(selectedFY), facilities: gasData.facilities };
+            console.log('Budget: loaded ' + Object.keys(gasData.facilities).length + ' facilities from GAS');
+          } else {
+            // GAS is empty — seed spreadsheet with local data
+            var seed = _bmLoadFY(selectedFY);
+            if (seed && seed.facilities && Object.keys(seed.facilities).length > 0) {
+              _bmSaveAllFacilities(selectedFY, seed.facilities, function(ok) {
+                console.log('Budget: seed ' + (ok ? 'OK' : 'FAILED'));
+              });
+              console.log('Budget: seeding FY' + selectedFY + ' to spreadsheet');
+            }
+          }
+          container.dataset.gasLoaded = '1';
+          renderBudgetScreen();
+        });
+        return;
+      }
+      // Restore pending FY after GAS load (select was destroyed during loading)
+      if (container.dataset.pendingFY) {
+        selectedFY = container.dataset.pendingFY;
+        delete container.dataset.pendingFY;
+      }
+      var budgetData = _bmLoadFY(selectedFY);
+      var actuals = _bmAggregateActuals(selectedFY);
+      var fyOptions = _bmFYOptions(selectedFY);
+      var sy = Number(selectedFY);
+      var months = [];
+      for (var mm = 7; mm <= 12; mm++) months.push(sy + '-' + (mm<10?'0':'') + mm);
+      for (var mm = 1; mm <= 6; mm++) months.push((sy+1) + '-' + (mm<10?'0':'') + mm);
+
+      var h = '<div class="bm-toolbar">';
+      h += '<select id="budget-fy-sel" class="bm-fy-sel">';
+      fyOptions.forEach(function(fy) {
+        h += '<option value="'+fy+'"'+(fy===selectedFY?' selected':'')+'>FY'+fy+' ('+fy+'/7\u301c'+(Number(fy)+1)+'/6)</option>';
+      });
+      h += '</select>';
+      h += '<button class="bm-btn bm-btn-export" id="bm-export-btn">\ud83d\udce5 JS\u51fa\u529b</button>';
+      h += '<span id="bm-save-badge" style="font-size:10px;color:#059669;margin-left:8px;">\u2601 GAS\u9023\u643a</span>';
+      h += '</div>';
+
+            // Classify facilities into hotel / golf
+      var _BM_GOLF_FACS = ['WAKAMIYAコース','ASOコース','OITAコース','南阿蘇コース'];
+      var hotelFacs = [], golfFacs = [];
+      Object.keys(budgetData.facilities).forEach(function(fn) {
+        if (_BM_GOLF_FACS.indexOf(fn) >= 0 || fn.indexOf('コース') >= 0) golfFacs.push(fn);
+        else hotelFacs.push(fn);
+      });
+
+      // === Summary totals above header ===
+      var _sumNats = ['KOR','TWN','HKG','CHA','EUR'];
+      var _sumNatLbl = {KOR:'\u97d3\u56fd',TWN:'\u53f0\u6e7e',HKG:'\u9999\u6e2f',CHA:'\u4e2d\u56fd',EUR:'\u6b27\u7c73'};
+      function _calcGroupTotals(facList) {
+        var r = {}; _sumNats.forEach(function(n){ r[n]={plan:0,planAmt:0,act:0,actAmt:0}; });
+        facList.forEach(function(fn) {
+          var fd2 = budgetData.facilities[fn]; var adr2=fd2.adr||0;
+          var sn2 = fd2.shortName||fn; var afd2 = actuals[sn2]||{};
+          _sumNats.forEach(function(n) {
+            months.forEach(function(ym) {
+              var md3=(fd2.monthly&&fd2.monthly[ym])||{};
+              var am3=(afd2[ym]||{})[n]||{rooms:0,amount:0};
+              r[n].plan += md3[n]||0;
+              r[n].planAmt += (md3[n]||0)*adr2;
+              r[n].act += am3.rooms;
+              r[n].actAmt += am3.amount;
+            });
+          });
+        });
+        var tPlan=0,tPlanAmt=0,tAct=0,tActAmt=0;
+        _sumNats.forEach(function(n){ tPlan+=r[n].plan; tPlanAmt+=r[n].planAmt; tAct+=r[n].act; tActAmt+=r[n].actAmt; });
+        r._total = {plan:tPlan,planAmt:tPlanAmt,act:tAct,actAmt:tActAmt};
+        return r;
+      }
+      var htTot = _calcGroupTotals(hotelFacs);
+      var gfTot = _calcGroupTotals(golfFacs);
+      var grTot = {}; _sumNats.forEach(function(n){ grTot[n]={plan:htTot[n].plan+gfTot[n].plan, planAmt:htTot[n].planAmt+gfTot[n].planAmt, act:htTot[n].act+gfTot[n].act, actAmt:htTot[n].actAmt+gfTot[n].actAmt}; });
+      grTot._total = {plan:htTot._total.plan+gfTot._total.plan, planAmt:htTot._total.planAmt+gfTot._total.planAmt, act:htTot._total.act+gfTot._total.act, actAmt:htTot._total.actAmt+gfTot._total.actAmt};
+
+      function _sumRow(label, cls, data) {
+        var r2 = '<tr class="'+cls+'"><td colspan="3" class="bm-sum-label">'+label+'</td>';
+        // Plan count
+        _sumNats.forEach(function(n,ni){ r2 += '<td class="bm-td-plan'+(ni===0?' bm-grp-sep':'')+'">'+_bmFmtN(data[n].plan)+'</td>'; });
+        r2 += '<td class="bm-td-plan bm-sum-total-col">'+_bmFmtN(data._total.plan)+'</td>';
+        // Plan amount
+        _sumNats.forEach(function(n,ni){ r2 += '<td class="bm-td-planam'+(ni===0?' bm-grp-sep':'')+'">'+_bmFmtK(data[n].planAmt)+'</td>'; });
+        r2 += '<td class="bm-td-planam bm-sum-total-col">'+_bmFmtK(data._total.planAmt)+'</td>';
+        // Actual count
+        _sumNats.forEach(function(n,ni){ r2 += '<td class="bm-td-act'+(ni===0?' bm-grp-sep':'')+'">'+_bmFmtN(data[n].act)+'</td>'; });
+        r2 += '<td class="bm-td-act bm-sum-total-col">'+_bmFmtN(data._total.act)+'</td>';
+        // Actual amount
+        _sumNats.forEach(function(n,ni){ r2 += '<td class="bm-td-actam'+(ni===0?' bm-grp-sep':'')+'">'+_bmFmtK(data[n].actAmt)+'</td>'; });
+        r2 += '<td class="bm-td-actam bm-sum-total-col">'+_bmFmtK(data._total.actAmt)+'</td>';
+        r2 += '</tr>';
+        return r2;
+      }
+      var _sumHtml = _sumRow('\ud83c\udfe8 \u30db\u30c6\u30eb', 'bm-sum-hotel', htTot);
+      _sumHtml += _sumRow('\u26f3 \u30b4\u30eb\u30d5', 'bm-sum-golf', gfTot);
+      _sumHtml += _sumRow('\ud83c\udf1f \u7dcf\u5408\u8a08', 'bm-sum-grand', grTot);
+
+      h += '<div class="bm-table-wrap"><table class="bm-table">';
+      var _NAT_LABELS_SHORT = {KOR:'\u97d3\u56fd',TWN:'\u53f0\u6e7e',HKG:'\u9999\u6e2f',CHA:'\u4e2d\u56fd',EUR:'\u6b27\u7c73'};
+      h += '<colgroup>';h += '<col style="width:80px">';h += '<col style="width:68px">';h += '<col style="width:44px">';for(var _ci=0;_ci<24;_ci++) h += '<col style="width:58px">';h += '</colgroup>';
+      h += '<thead>' + _sumHtml + '<tr class="bm-hdr1">';
+      h += '<th rowspan="2" class="bm-th-fac">\u65bd\u8a2d</th>';
+      h += '<th rowspan="2" class="bm-th-adr">ADR</th>';
+      h += '<th rowspan="2" class="bm-th-mon">\u6708</th>';
+      h += '<th colspan="6" class="bm-th-plan bm-grp-sep">\u8a08\u753b\u6570</th>';
+      h += '<th colspan="6" class="bm-th-planam bm-grp-sep">\u8a08\u753b\u984d\uff08\u5343\uff09</th>';
+      h += '<th colspan="6" class="bm-th-act bm-grp-sep">\u5b9f\u7e3e\u6570</th>';
+      h += '<th colspan="6" class="bm-th-actam bm-grp-sep">\u5b9f\u7e3e\u984d\uff08\u5343\uff09</th>';
+      h += '</tr><tr class="bm-hdr2">';
+      for (var g = 0; g < 4; g++) {
+        _BM_NATS.forEach(function(n, ni) {
+          var cls = g===0?'bm-th-plan':g===1?'bm-th-planam':g===2?'bm-th-act':'bm-th-actam';
+          h += '<th class="'+cls+(ni===0?' bm-grp-sep':'')+'">'+_NAT_LABELS_SHORT[n]+'</th>';
+        });
+        var cls2 = g===0?'bm-th-plan':g===1?'bm-th-planam':g===2?'bm-th-act':'bm-th-actam';
+        h += '<th class="'+cls2+'" style="font-weight:800;">\u8a08</th>';
+      }
+      h += '</tr></thead><tbody>';
+
+
+      function _renderFacGroup(facList, groupLabel) {
+        facList.forEach(function(facName, facIdx) {
+          var fd = budgetData.facilities[facName];
+          var shortName = fd.shortName || facName;
+          var adr = fd.adr || 0;
+          var altCls = '';
+          var actFacData = actuals[shortName] || {};
+
+          months.forEach(function(ym, mi) {
+            var md = (fd.monthly && fd.monthly[ym]) || {};
+            var actMon = actFacData[ym] || {};
+            var firstRow = (mi === 0);
+            var sepCls = firstRow && facIdx > 0 ? ' bm-fac-sep' : '';
+            h += '<tr class="bm-row '+altCls+sepCls+'">';
+            if (firstRow) {
+              h += '<td class="bm-td-fac" rowspan="'+(months.length+1)+'">'+shortName+'</td>';
+              h += '<td class="bm-td-adr" rowspan="'+(months.length+1)+'"><input type="text" inputmode="numeric" pattern="[0-9]*" class="bm-adr-input" data-fac="'+facName+'" value="'+adr+'"></td>';
+            }
+            h += '<td class="bm-td-mon">'+ym.substring(5)+'\u6708</td>';
+            // Collect per-nat data
+            var pData = {}, planTot=0, planAmtTot=0, actTot=0, actAmtTot=0;
+            _BM_NATS.forEach(function(n) {
+              var plan = md[n]||0, planAmt = plan*adr;
+              var actN = actMon[n]||{rooms:0,amount:0};
+              pData[n] = {plan:plan, planAmt:planAmt, actR:actN.rooms, actA:actN.amount};
+              planTot+=plan; planAmtTot+=planAmt; actTot+=actN.rooms; actAmtTot+=actN.amount;
+            });
+            // Plan count group
+            _BM_NATS.forEach(function(n, ni) {
+              h += '<td class="bm-td-plan'+(ni===0?' bm-grp-sep':'')+'"><input type="text" inputmode="numeric" pattern="[0-9]*" class="bm-plan-input" data-fac="'+facName+'" data-ym="'+ym+'" data-nat="'+n+'" value="'+pData[n].plan+'"></td>';
+            });
+            h += '<td class="bm-td-plan bm-td-total" data-role="pt" data-fac="'+facName+'" data-ym="'+ym+'">'+planTot+'</td>';
+            // Plan amount group
+            _BM_NATS.forEach(function(n, ni) {
+              h += '<td class="bm-td-planam'+(ni===0?' bm-grp-sep':'')+'" data-role="pa" data-fac="'+facName+'" data-ym="'+ym+'" data-nat="'+n+'">'+_bmFmtK(pData[n].planAmt)+'</td>';
+            });
+            h += '<td class="bm-td-planam bm-td-total" data-role="pta" data-fac="'+facName+'" data-ym="'+ym+'">'+_bmFmtK(planAmtTot)+'</td>';
+            // Actual count group
+            _BM_NATS.forEach(function(n, ni) {
+              h += '<td class="bm-td-act'+(ni===0?' bm-grp-sep':'')+'">'+(pData[n].actR||'')+'</td>';
+            });
+            h += '<td class="bm-td-act bm-td-total">'+(actTot||'')+'</td>';
+            // Actual amount group
+            _BM_NATS.forEach(function(n, ni) {
+              h += '<td class="bm-td-actam'+(ni===0?' bm-grp-sep':'')+'">'+_bmFmtK(pData[n].actA)+'</td>';
+            });
+            h += '<td class="bm-td-actam bm-td-total">'+_bmFmtK(actAmtTot)+'</td>';
+            h += '</tr>';
+          });
+
+          // Annual total row
+          h += '<tr class="bm-row bm-row-total '+altCls+'">';
+          h += '<td class="bm-td-mon bm-td-mon-total">\u8a08</td>';
+          var annPlan={},annAct={},gpt=0,gpa=0,gat=0,gaa=0;
+          _BM_NATS.forEach(function(n) {
+            var ps=0,as2=0,aa2=0;
+            months.forEach(function(ym) {
+              var md2=(fd.monthly&&fd.monthly[ym])||{};
+              var am2=(actFacData[ym]||{})[n]||{rooms:0,amount:0};
+              ps+=md2[n]||0; as2+=am2.rooms; aa2+=am2.amount;
+            });
+            annPlan[n]={plan:ps,planAmt:ps*adr}; annAct[n]={rooms:as2,amount:aa2};
+            gpt+=ps; gpa+=ps*adr; gat+=as2; gaa+=aa2;
+          });
+          // Plan count
+          _BM_NATS.forEach(function(n, ni) {
+            h += '<td class="bm-td-plan'+(ni===0?' bm-grp-sep':'')+'" data-role="npt" data-fac="'+facName+'" data-nat="'+n+'">'+annPlan[n].plan+'</td>';
+          });
+          h += '<td class="bm-td-plan bm-td-total" data-role="gpt" data-fac="'+facName+'">'+gpt+'</td>';
+          // Plan amount
+          _BM_NATS.forEach(function(n, ni) {
+            h += '<td class="bm-td-planam'+(ni===0?' bm-grp-sep':'')+'" data-role="npta" data-fac="'+facName+'" data-nat="'+n+'">'+_bmFmtK(annPlan[n].planAmt)+'</td>';
+          });
+          h += '<td class="bm-td-planam bm-td-total" data-role="gpta" data-fac="'+facName+'">'+_bmFmtK(gpa)+'</td>';
+          // Actual count
+          _BM_NATS.forEach(function(n, ni) {
+            h += '<td class="bm-td-act'+(ni===0?' bm-grp-sep':'')+'">'+(annAct[n].rooms||'')+'</td>';
+          });
+          h += '<td class="bm-td-act bm-td-total">'+(gat||'')+'</td>';
+          // Actual amount
+          _BM_NATS.forEach(function(n, ni) {
+            h += '<td class="bm-td-actam'+(ni===0?' bm-grp-sep':'')+'">'+_bmFmtK(annAct[n].amount)+'</td>';
+          });
+          h += '<td class="bm-td-actam bm-td-total">'+_bmFmtK(gaa)+'</td>';
+          h += '</tr>';
+        });
+
+        // Group subtotal row
+        if (facList.length > 0) {
+          h += '<tr class="bm-subtotal-row">';
+          h += '<td class="bm-td-fac" style="font-size:12px;">'+groupLabel+'</td>';
+          h += '<td class="bm-td-adr"></td>';
+          h += '<td class="bm-td-mon">\u5408\u8a08</td>';
+          // Aggregate across facilities
+          var subData = {};
+          _BM_NATS.forEach(function(n) { subData[n] = {plan:0,planAmt:0,act:0,actAmt:0}; });
+          facList.forEach(function(fn) {
+            var fd2 = budgetData.facilities[fn]; var adr2=fd2.adr||0;
+            var sn2 = fd2.shortName||fn; var afd2 = actuals[sn2]||{};
+            _BM_NATS.forEach(function(n) {
+              months.forEach(function(ym) {
+                var md3=(fd2.monthly&&fd2.monthly[ym])||{};
+                var am3=(afd2[ym]||{})[n]||{rooms:0,amount:0};
+                subData[n].plan += md3[n]||0;
+                subData[n].planAmt += (md3[n]||0)*adr2;
+                subData[n].act += am3.rooms;
+                subData[n].actAmt += am3.amount;
+              });
+            });
+          });
+          var sGpt=0,sGpa=0,sGat=0,sGaa=0;
+          _BM_NATS.forEach(function(n) { sGpt+=subData[n].plan; sGpa+=subData[n].planAmt; sGat+=subData[n].act; sGaa+=subData[n].actAmt; });
+          // Plan count
+          _BM_NATS.forEach(function(n, ni) { h += '<td class="bm-td-plan'+(ni===0?' bm-grp-sep':'')+'">'+subData[n].plan+'</td>'; });
+          h += '<td class="bm-td-plan bm-td-total">'+sGpt+'</td>';
+          // Plan amount
+          _BM_NATS.forEach(function(n, ni) { h += '<td class="bm-td-planam'+(ni===0?' bm-grp-sep':'')+'">'+_bmFmtK(subData[n].planAmt)+'</td>'; });
+          h += '<td class="bm-td-planam bm-td-total">'+_bmFmtK(sGpa)+'</td>';
+          // Actual count
+          _BM_NATS.forEach(function(n, ni) { h += '<td class="bm-td-act'+(ni===0?' bm-grp-sep':'')+'">'+( subData[n].act||'')+'</td>'; });
+          h += '<td class="bm-td-act bm-td-total">'+(sGat||'')+'</td>';
+          // Actual amount
+          _BM_NATS.forEach(function(n, ni) { h += '<td class="bm-td-actam'+(ni===0?' bm-grp-sep':'')+'">'+_bmFmtK(subData[n].actAmt)+'</td>'; });
+          h += '<td class="bm-td-actam bm-td-total">'+_bmFmtK(sGaa)+'</td>';
+          h += '</tr>';
+        }
+      }
+
+      _renderFacGroup(hotelFacs, '\u{1F3E8} \u30db\u30c6\u30eb\u5408\u8a08');
+      _renderFacGroup(golfFacs, '\u{26F3} \u30b4\u30eb\u30d5\u5408\u8a08');
+
+      h += '</tbody></table></div>';
+      container.innerHTML = h;
+
+      // Bind events
+      var newFyEl = document.getElementById('budget-fy-sel');
+      if (newFyEl) newFyEl.addEventListener('change', function() { var c = document.getElementById('budget-screen-content'); if (c) delete c.dataset.gasLoaded; renderBudgetScreen(); });
+      container.querySelectorAll('.bm-plan-input').forEach(function(inp) {
+        inp.addEventListener('input', function() { _bmRecalcRow(this, container); _bmAutoSave(container); });
+      });
+      container.querySelectorAll('.bm-adr-input').forEach(function(inp) {
+        inp.addEventListener('input', function() { _bmRecalcFac(this, container); _bmAutoSave(container); });
+      });
+      var expBtn = document.getElementById('bm-export-btn');
+      if (expBtn) expBtn.addEventListener('click', function() { _bmExport(); });
+    }
+
+    function _bmRecalcRow(input, container) {
+      var fac = input.dataset.fac, ym = input.dataset.ym, nat = input.dataset.nat;
+      var adrInp = container.querySelector('.bm-adr-input[data-fac="'+fac+'"]');
+      var adr = Number(adrInp ? adrInp.value : 0) || 0;
+      var val = Number(input.value) || 0;
+      var paCell = container.querySelector('[data-role="pa"][data-fac="'+fac+'"][data-ym="'+ym+'"][data-nat="'+nat+'"]');
+      if (paCell) paCell.textContent = _bmFmtK(val * adr);
+      var rowPlan=0,rowPlanAmt=0;
+      _BM_NATS.forEach(function(n) {
+        var pinp = container.querySelector('.bm-plan-input[data-fac="'+fac+'"][data-ym="'+ym+'"][data-nat="'+n+'"]');
+        var v = Number(pinp?pinp.value:0)||0;
+        rowPlan+=v; rowPlanAmt+=v*adr;
+      });
+      var ptC = container.querySelector('[data-role="pt"][data-fac="'+fac+'"][data-ym="'+ym+'"]');
+      var ptaC = container.querySelector('[data-role="pta"][data-fac="'+fac+'"][data-ym="'+ym+'"]');
+      if (ptC) ptC.textContent = rowPlan;
+      if (ptaC) ptaC.textContent = _bmFmtK(rowPlanAmt);
+      _bmRecalcAnnualTotals(fac, adr, container);
+    }
+
+    function _bmRecalcFac(adrInput, container) {
+      var fac = adrInput.dataset.fac;
+      var adr = Number(adrInput.value) || 0;
+      container.querySelectorAll('.bm-plan-input[data-fac="'+fac+'"]').forEach(function(pinp) {
+        var v = Number(pinp.value)||0;
+        var ym2=pinp.dataset.ym, nat2=pinp.dataset.nat;
+        var paC = container.querySelector('[data-role="pa"][data-fac="'+fac+'"][data-ym="'+ym2+'"][data-nat="'+nat2+'"]');
+        if (paC) paC.textContent = _bmFmtK(v*adr);
+      });
+      var yms = new Set();
+      container.querySelectorAll('.bm-plan-input[data-fac="'+fac+'"]').forEach(function(p){yms.add(p.dataset.ym);});
+      yms.forEach(function(ym2) {
+        var rp=0,rpa=0;
+        _BM_NATS.forEach(function(n) {
+          var pinp = container.querySelector('.bm-plan-input[data-fac="'+fac+'"][data-ym="'+ym2+'"][data-nat="'+n+'"]');
+          var v = Number(pinp?pinp.value:0)||0; rp+=v; rpa+=v*adr;
+        });
+        var ptC = container.querySelector('[data-role="pt"][data-fac="'+fac+'"][data-ym="'+ym2+'"]');
+        var ptaC = container.querySelector('[data-role="pta"][data-fac="'+fac+'"][data-ym="'+ym2+'"]');
+        if (ptC) ptC.textContent = rp;
+        if (ptaC) ptaC.textContent = _bmFmtK(rpa);
+      });
+      _bmRecalcAnnualTotals(fac, adr, container);
+    }
+
+    function _bmRecalcAnnualTotals(fac, adr, container) {
+      var natSums = {};
+      _BM_NATS.forEach(function(n) { natSums[n]=0; });
+      container.querySelectorAll('.bm-plan-input[data-fac="'+fac+'"]').forEach(function(pinp) {
+        natSums[pinp.dataset.nat] += Number(pinp.value)||0;
+      });
+      var grand=0, grandAmt=0;
+      _BM_NATS.forEach(function(n) {
+        var nptC = container.querySelector('[data-role="npt"][data-fac="'+fac+'"][data-nat="'+n+'"]');
+        var nptaC = container.querySelector('[data-role="npta"][data-fac="'+fac+'"][data-nat="'+n+'"]');
+        if (nptC) nptC.textContent = natSums[n];
+        if (nptaC) nptaC.textContent = _bmFmtK(natSums[n]*adr);
+        grand+=natSums[n]; grandAmt+=natSums[n]*adr;
+      });
+      var gptC = container.querySelector('[data-role="gpt"][data-fac="'+fac+'"]');
+      var gptaC = container.querySelector('[data-role="gpta"][data-fac="'+fac+'"]');
+      if (gptC) gptC.textContent = grand;
+      if (gptaC) gptaC.textContent = _bmFmtK(grandAmt);
+    }
+
+    function _bmCollectData(container) {
+      var fyEl = document.getElementById('budget-fy-sel');
+      var fy = fyEl ? fyEl.value : '';
+      if (!fy) return null;
+      var data = _bmLoadFY(fy);
+      container.querySelectorAll('.bm-adr-input').forEach(function(inp) {
+        var fac = inp.dataset.fac;
+        if (data.facilities[fac]) data.facilities[fac].adr = Number(inp.value)||0;
+      });
+      container.querySelectorAll('.bm-plan-input').forEach(function(inp) {
+        var fac=inp.dataset.fac, ym2=inp.dataset.ym, nat2=inp.dataset.nat;
+        if (data.facilities[fac] && data.facilities[fac].monthly[ym2]) {
+          data.facilities[fac].monthly[ym2][nat2] = Number(inp.value)||0;
+        }
+      });
+      Object.keys(data.facilities).forEach(function(fac) {
+        var fd = data.facilities[fac];
+        var adr2 = fd.adr||0;
+        var ann = {KOR:0,TWN:0,HKG:0,CHA:0,EUR:0,total:0,budget:0};
+        Object.keys(fd.monthly).forEach(function(ym2) {
+          var md2 = fd.monthly[ym2];
+          var t2 = 0;
+          _BM_NATS.forEach(function(n) { t2 += md2[n]||0; ann[n] += md2[n]||0; });
+          md2.total = t2; md2.budget = t2 * adr2;
+          ann.total += t2;
+        });
+        ann.budget = ann.total * adr2;
+        fd.annual = ann;
+      });
+      data.fyLabel = fy;
+      return data;
+    }
+
+    function _bmSaveToGAS(container) {
+      var data = _bmCollectData(container);
+      if (!data) return;
+      var fy = data.fyLabel;
+      if (window.INBOUND_BUDGET && window.INBOUND_BUDGET.fyLabel === fy) {
+        window.INBOUND_BUDGET = JSON.parse(JSON.stringify(data));
+        if (typeof window._renderInbound === 'function') window._renderInbound();
+      }
+      var badge = document.getElementById('bm-save-badge');
+      if (badge) { badge.textContent = '\u4fdd\u5b58\u4e2d...'; badge.style.color = '#d97706'; }
+      _bmSaveAllFacilities(fy, data.facilities, function(ok) {
+        if (badge) {
+          if (ok) {
+            badge.textContent = '\u2713 \u4fdd\u5b58\u5b8c\u4e86 (' + new Date().toLocaleTimeString() + ')';
+            badge.style.color = '#059669';
+          } else {
+            badge.textContent = '\u274c \u4fdd\u5b58\u5931\u6557';
+            badge.style.color = '#dc2626';
+          }
+        }
+      });
+    }
+
+    function _bmAutoSave(container) {
+      if (_bmSaveTimer) clearTimeout(_bmSaveTimer);
+      _bmSaveTimer = setTimeout(function() { _bmSaveToGAS(container); }, 1500);
+    }
+
+    function _bmExport() {
+      var container = document.getElementById('budget-screen-content');
+      var data = container ? _bmCollectData(container) : _bmLoadFY(document.getElementById('budget-fy-sel').value);
+      if (!data) return;
+      var fy = data.fyLabel;
+      var js = '// inbound_budget.js -- exported ' + new Date().toISOString().substring(0,16) + '\nwindow.INBOUND_BUDGET = ' + JSON.stringify(data, null, 2) + ';\n';
+      var blob = new Blob([js], {type:'text/javascript;charset=utf-8'});
+      var url = URL.createObjectURL(blob);
+      var a = document.createElement('a'); a.href=url; a.download='inbound_budget.js';
+      a.click(); URL.revokeObjectURL(url);
+    }
+
+
 
     window._toursInit = function() { initTours(); };
     window._toursHandleJump = function(f) { handleJumpFilter(f); };
@@ -13944,6 +14478,5 @@ document.getElementById('import-btn').addEventListener('click', openPasteDialog)
     <button class="rs-chat-send-btn" id="rs-chat-send">&#36865;&#20449;</button>
   </div>
 </div>
-
 </body>
 </html>

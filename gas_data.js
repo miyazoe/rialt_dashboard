@@ -63,7 +63,7 @@ Object.assign(window.GAS_MONTHLY["2026-04"] = window.GAS_MONTHLY["2026-04"] || {
     "spd_a": 26756,
     "spd_b": 0.6
   },
-  "九重虎乃湯": {
+  "九重虎の湯": {
     "pax_a": 522,
     "pax_b": null,
     "adr_a": 17940,
@@ -153,7 +153,7 @@ Object.assign(window.GAS_MONTHLY["2026-03"] = window.GAS_MONTHLY["2026-03"] || {
     "spd_a": 27407,
     "spd_b": 0.5483870967741935
   },
-  "九重虎乃湯": {
+  "九重虎の湯": {
     "pax_a": 2435,
     "pax_b": null,
     "adr_a": 20486,
@@ -255,7 +255,7 @@ Object.assign(window.GAS_MONTHLY["2026-02"] = window.GAS_MONTHLY["2026-02"] || {
     "spd_a": 25963,
     "spd_b": 0.6507936507936508
   },
-  "九重虎乃湯": {
+  "九重虎の湯": {
     "pax_a": 1791,
     "pax_b": null,
     "adr_a": 17709,
@@ -357,7 +357,7 @@ Object.assign(window.GAS_MONTHLY["2026-01"] = window.GAS_MONTHLY["2026-01"] || {
     "spd_a": 28023,
     "spd_b": 0.6487455197132617
   },
-  "九重虎乃湯": {
+  "九重虎の湯": {
     "pax_a": 1551,
     "pax_b": null,
     "adr_a": 20063,
@@ -459,7 +459,7 @@ Object.assign(window.GAS_MONTHLY["2025-12"] = window.GAS_MONTHLY["2025-12"] || {
     "spd_a": 28002,
     "spd_b": 0.6487455197132617
   },
-  "九重虎乃湯": {
+  "九重虎の湯": {
     "pax_a": 1422,
     "pax_b": null,
     "adr_a": 20473,
@@ -561,7 +561,7 @@ Object.assign(window.GAS_MONTHLY["2025-11"] = window.GAS_MONTHLY["2025-11"] || {
     "spd_a": 28604,
     "spd_b": 0.7518518518518519
   },
-  "九重虎乃湯": {
+  "九重虎の湯": {
     "pax_a": 1832,
     "pax_b": null,
     "adr_a": 22922,
@@ -663,7 +663,7 @@ Object.assign(window.GAS_MONTHLY["2025-10"] = window.GAS_MONTHLY["2025-10"] || {
     "spd_a": 26328,
     "spd_b": 0.7491039426523297
   },
-  "九重虎乃湯": {
+  "九重虎の湯": {
     "pax_a": 2114,
     "pax_b": null,
     "adr_a": 20344,
@@ -765,7 +765,7 @@ Object.assign(window.GAS_MONTHLY["2025-09"] = window.GAS_MONTHLY["2025-09"] || {
     "spd_a": 25097,
     "spd_b": 0.6
   },
-  "九重虎乃湯": {
+  "九重虎の湯": {
     "pax_a": 1630,
     "pax_b": null,
     "adr_a": 18822,
@@ -867,7 +867,7 @@ Object.assign(window.GAS_MONTHLY["2025-08"] = window.GAS_MONTHLY["2025-08"] || {
     "spd_a": 26815,
     "spd_b": 0.6487455197132617
   },
-  "九重虎乃湯": {
+  "九重虎の湯": {
     "pax_a": 2730,
     "pax_b": null,
     "adr_a": 25008,
@@ -969,7 +969,7 @@ Object.assign(window.GAS_MONTHLY["2025-07"] = window.GAS_MONTHLY["2025-07"] || {
     "spd_a": 25542,
     "spd_b": 0.4731182795698925
   },
-  "九重虎乃湯": {
+  "九重虎の湯": {
     "pax_a": 1502,
     "pax_b": 1885,
     "adr_a": 19913,
@@ -1071,7 +1071,7 @@ Object.assign(window.GAS_MONTHLY["2025-06"] = window.GAS_MONTHLY["2025-06"] || {
     "spd_a": 23436,
     "spd_b": 0.6777777777777778
   },
-  "九重虎乃湯": {
+  "九重虎の湯": {
     "pax_a": 1370,
     "pax_b": 1942,
     "adr_a": 16688,
@@ -1173,7 +1173,7 @@ Object.assign(window.GAS_MONTHLY["2025-05"] = window.GAS_MONTHLY["2025-05"] || {
     "spd_a": 29150,
     "spd_b": 0.6989247311827957
   },
-  "九重虎乃湯": {
+  "九重虎の湯": {
     "pax_a": 2006,
     "pax_b": 1980.0000000000005,
     "adr_a": 17353,
@@ -1275,7 +1275,7 @@ Object.assign(window.GAS_MONTHLY["2025-04"] = window.GAS_MONTHLY["2025-04"] || {
     "spd_a": 27018,
     "spd_b": 0.7222222222222222
   },
-  "九重虎乃湯": {
+  "九重虎の湯": {
     "pax_a": 1909,
     "pax_b": 1992,
     "adr_a": 16170,
@@ -1365,7 +1365,7 @@ Object.assign(window.GAS_MONTHLY["2025-03"] = window.GAS_MONTHLY["2025-03"] || {
     "spd_a": 26753,
     "spd_b": 0.7813620071684588
   },
-  "九重虎乃湯": {
+  "九重虎の湯": {
     "pax_a": 1765,
     "pax_b": 1916,
     "adr_a": 17920,
@@ -1455,7 +1455,7 @@ Object.assign(window.GAS_MONTHLY["2025-02"] = window.GAS_MONTHLY["2025-02"] || {
     "spd_a": 23288,
     "spd_b": 0.7698412698412699
   },
-  "九重虎乃湯": {
+  "九重虎の湯": {
     "pax_a": 1436,
     "pax_b": 1665,
     "adr_a": 17729,
@@ -1555,7 +1555,7 @@ Object.assign(window.GAS_MONTHLY["2025-01"] = window.GAS_MONTHLY["2025-01"] || {
     "spd_a": 27447,
     "spd_b": 0.7491039426523297
   },
-  "九重虎乃湯": {
+  "九重虎の湯": {
     "pax_a": 1804,
     "pax_b": 2283.4,
     "adr_a": 15594,
@@ -1655,7 +1655,7 @@ Object.assign(window.GAS_MONTHLY["2024-12"] = window.GAS_MONTHLY["2024-12"] || {
     "spd_a": 29039,
     "spd_b": 0.8315412186379928
   },
-  "九重虎乃湯": {
+  "九重虎の湯": {
     "pax_a": 1523,
     "pax_b": 2082,
     "adr_a": 15910,
@@ -1775,7 +1775,7 @@ Object.assign(window.GAS_MONTHLY["2024-11"] = window.GAS_MONTHLY["2024-11"] || {
     "spd_a": 30047,
     "spd_b": 0.8888888888888888
   },
-  "九重虎乃湯": {
+  "九重虎の湯": {
     "pax_a": 2144,
     "pax_b": 1463,
     "adr_a": 16007,
@@ -1895,7 +1895,7 @@ Object.assign(window.GAS_MONTHLY["2024-10"] = window.GAS_MONTHLY["2024-10"] || {
     "spd_a": 27899,
     "spd_b": 0.8387096774193549
   },
-  "九重虎乃湯": {
+  "九重虎の湯": {
     "pax_a": 2022,
     "pax_b": 2063.6000000000004,
     "adr_a": 14153,
@@ -2015,7 +2015,7 @@ Object.assign(window.GAS_MONTHLY["2024-09"] = window.GAS_MONTHLY["2024-09"] || {
     "spd_a": 28327,
     "spd_b": 0.7518518518518519
   },
-  "九重虎乃湯": {
+  "九重虎の湯": {
     "pax_a": 1688,
     "pax_b": 2212,
     "adr_a": 14733,
@@ -2135,7 +2135,7 @@ Object.assign(window.GAS_MONTHLY["2024-08"] = window.GAS_MONTHLY["2024-08"] || {
     "spd_a": 30786,
     "spd_b": 0.72
   },
-  "九重虎乃湯": {
+  "九重虎の湯": {
     "pax_a": 2100.3,
     "pax_b": 2346,
     "adr_a": 19155,
@@ -2255,7 +2255,7 @@ Object.assign(window.GAS_MONTHLY["2024-07"] = window.GAS_MONTHLY["2024-07"] || {
     "spd_a": 28344,
     "spd_b": 0.71
   },
-  "九重虎乃湯": {
+  "九重虎の湯": {
     "pax_a": 1723,
     "pax_b": 1973,
     "adr_a": 14973,
@@ -2375,7 +2375,7 @@ Object.assign(window.GAS_MONTHLY["2024-06"] = window.GAS_MONTHLY["2024-06"] || {
     "spd_a": 27986,
     "spd_b": 0.6888888888888889
   },
-  "九重虎乃湯": {
+  "九重虎の湯": {
     "pax_a": 1551,
     "pax_b": 1463,
     "adr_a": 14669,
@@ -2495,7 +2495,7 @@ Object.assign(window.GAS_MONTHLY["2024-05"] = window.GAS_MONTHLY["2024-05"] || {
     "spd_a": 29778,
     "spd_b": 0.7419354838709677
   },
-  "九重虎乃湯": {
+  "九重虎の湯": {
     "pax_a": 2095,
     "pax_b": 1790.8000000000004,
     "adr_a": 15576,
@@ -2615,7 +2615,7 @@ Object.assign(window.GAS_MONTHLY["2024-04"] = window.GAS_MONTHLY["2024-04"] || {
     "spd_a": 28352,
     "spd_b": 0.669
   },
-  "九重虎乃湯": {
+  "九重虎の湯": {
     "pax_a": 1760,
     "pax_b": 1630.1999999999998,
     "adr_a": 15650,
@@ -2735,7 +2735,7 @@ Object.assign(window.GAS_MONTHLY["2024-03"] = window.GAS_MONTHLY["2024-03"] || {
     "spd_a": 28866,
     "spd_b": 0.7526881720430108
   },
-  "九重虎乃湯": {
+  "九重虎の湯": {
     "pax_a": 2134,
     "pax_b": 1700.5999999999997,
     "adr_a": 15936,
@@ -2855,7 +2855,7 @@ Object.assign(window.GAS_MONTHLY["2024-02"] = window.GAS_MONTHLY["2024-02"] || {
     "spd_a": 26634,
     "spd_b": 0.7394636015325671
   },
-  "九重虎乃湯": {
+  "九重虎の湯": {
     "pax_a": 1623,
     "pax_b": 1751.1999999999991,
     "adr_a": 17041,
@@ -2933,7 +2933,7 @@ Object.assign(window.GAS_MONTHLY["2024-01"] = window.GAS_MONTHLY["2024-01"] || {
     "spd_a": 27660,
     "spd_b": 0.7526881720430108
   },
-  "九重虎乃湯": {
+  "九重虎の湯": {
     "pax_a": 1776,
     "pax_b": 1683.0000000000007,
     "adr_a": 16398,
@@ -3023,7 +3023,7 @@ Object.assign(window.GAS_MONTHLY["2023-12"] = window.GAS_MONTHLY["2023-12"] || {
     "spd_a": 27590,
     "spd_b": 0.8
   },
-  "九重虎乃湯": {
+  "九重虎の湯": {
     "pax_a": 1813,
     "pax_b": 1764.3999999999996,
     "adr_a": 17497,
@@ -3113,7 +3113,7 @@ Object.assign(window.GAS_MONTHLY["2023-11"] = window.GAS_MONTHLY["2023-11"] || {
     "spd_a": 25856,
     "spd_b": 0.8518518518518519
   },
-  "九重虎乃湯": {
+  "九重虎の湯": {
     "pax_a": 2194,
     "pax_b": 1896.4000000000005,
     "adr_a": 14535,
@@ -3203,7 +3203,7 @@ Object.assign(window.GAS_MONTHLY["2023-10"] = window.GAS_MONTHLY["2023-10"] || {
     "spd_a": 24463,
     "spd_b": 0.823
   },
-  "九重虎乃湯": {
+  "九重虎の湯": {
     "pax_a": 2275,
     "pax_b": 1951.4000000000003,
     "adr_a": 13821,
@@ -3293,7 +3293,7 @@ Object.assign(window.GAS_MONTHLY["2023-09"] = window.GAS_MONTHLY["2023-09"] || {
     "spd_a": 24657,
     "spd_b": 0.677
   },
-  "九重虎乃湯": {
+  "九重虎の湯": {
     "pax_a": 1897,
     "pax_b": 1628.0000000000002,
     "adr_a": 14289,
@@ -3383,7 +3383,7 @@ Object.assign(window.GAS_MONTHLY["2023-08"] = window.GAS_MONTHLY["2023-08"] || {
     "spd_a": 28092,
     "spd_b": 0.75
   },
-  "九重虎乃湯": {
+  "九重虎の湯": {
     "pax_a": 2448,
     "pax_b": 2087.7999999999997,
     "adr_a": 17250,
@@ -3473,7 +3473,7 @@ Object.assign(window.GAS_MONTHLY["2023-07"] = window.GAS_MONTHLY["2023-07"] || {
     "spd_a": 25753,
     "spd_b": 0.7
   },
-  "九重虎乃湯": {
+  "九重虎の湯": {
     "pax_a": 2071,
     "pax_b": 1669.7999999999995,
     "adr_a": 13805,
@@ -3563,7 +3563,7 @@ Object.assign(window.GAS_MONTHLY["2023-06"] = window.GAS_MONTHLY["2023-06"] || {
     "spd_a": 23993,
     "spd_b": 0.5814814814814815
   },
-  "九重虎乃湯": {
+  "九重虎の湯": {
     "pax_a": 1744,
     "pax_b": 1741,
     "adr_a": 11757,
@@ -3675,7 +3675,7 @@ Object.assign(window.GAS_MONTHLY["2023-05"] = window.GAS_MONTHLY["2023-05"] || {
     "spd_a": 26715,
     "spd_b": 0.6164874551971327
   },
-  "九重虎乃湯": {
+  "九重虎の湯": {
     "pax_a": 2079,
     "pax_b": 1795.2000000000003,
     "adr_a": 13126,

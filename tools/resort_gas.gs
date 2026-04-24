@@ -5,6 +5,8 @@
 // 旅館: B3(1)=稼働率予算 C3(2)=ADR予算 D3(3)=RevPAR予算 E3(4)=宿泊客数予算 F3(5)=客単価予算
 // ゴルフ: B3(1)=稼働率予算 C3(2)=組数予算 D3(3)=来場者数予算 E3(4)=客単価予算 F3(5)=ADR予算
 
+const BUDGET_SHEET_ID_ = '13X7r8VZkODGbIalBNQ15QarjhloR-FI-6D5f3uLErP0';
+
 const FACILITIES = [
   { id: '1TpeXg8S3j3tDY8ifqYAfg_xDW7VGdw-_WtP3lCrT5Ck', name: '宮若虎の湯',    type: 'ryokan' },
   { id: '1FOfNps2-dP0wIrBkJulj-Wn4vdTxftvv8ctVf-y0qEM', name: '古民家煉り',    type: 'ryokan' },
@@ -22,6 +24,16 @@ const FACILITIES = [
 function doGet(e) {
   try {
     const cb = (e.parameter.callback || '').replace(/[^a-zA-Z0-9_]/g, '');
+
+    // ── budget_ping: 診断（スプレッドシートアクセスなし） ──
+    if (e.parameter.budget_ping) {
+      var pingResult = { status: 'ok', ping: true, version: 87, ts: new Date().toISOString() };
+      return cb ? jsonpResponse(pingResult, cb) : jsonResponse(pingResult);
+    }
+
+    // ── budget_get / budget_save: インバウンド予算 ──
+    if (e.parameter.budget_get) return fetchBudgetData_(e, cb);
+    if (e.parameter.budget_save) return saveBudgetFacility_(e, cb);
 
     // ── ir=1: 株価・財務・アナリスト・ニュースを返す ──
     if (e.parameter.ir) {
@@ -85,7 +97,9 @@ function doGet(e) {
     return cb ? jsonpResponse(result, cb) : jsonResponse(result);
 
   } catch (outerErr) {
-    return jsonResponse({ error: outerErr.message });
+    var ocb = (e && e.parameter && e.parameter.callback || '').replace(/[^a-zA-Z0-9_]/g, '');
+    var errObj = { error: outerErr.message };
+    return ocb ? jsonpResponse(errObj, ocb) : jsonResponse(errObj);
   }
 }
 
@@ -357,5 +371,101 @@ function fetchIRData(cb) {
   } catch(err) {
     var errData = { ir: true, error: err.message };
     return cb ? jsonpResponse(errData, cb) : jsonResponse(errData);
+  }
+}
+
+
+// ── 予算データ取得（JSONP対応） ──
+// シート構造: A=facility, B=ADR, C=month(YYYY-MM), D=KOR, E=TWN, F=HKG, G=CHA, H=EUR
+var BUDGET_NATS_ = ['KOR','TWN','HKG','CHA','EUR'];
+
+function fetchBudgetData_(e, cb) {
+  try {
+    var fy = e.parameter.fy || '';
+    var ss = SpreadsheetApp.openById(BUDGET_SHEET_ID_);
+    var sheet = ss.getSheetByName('FY' + fy);
+    if (!sheet) {
+      var r = { status: 'ok', budget: true, fy: fy, facilities: {} };
+      return cb ? jsonpResponse(r, cb) : jsonResponse(r);
+    }
+    var rows = sheet.getDataRange().getValues();
+    var facs = {};
+    for (var i = 1; i < rows.length; i++) {
+      var name = String(rows[i][0] || '').trim();
+      if (!name) continue;
+      var adr = Number(rows[i][1]) || 0;
+      var rawMonth = rows[i][2];
+      var month;
+      if (rawMonth instanceof Date) {
+        month = rawMonth.getFullYear() + '-' + String(rawMonth.getMonth() + 1).padStart(2, '0');
+      } else {
+        month = String(rawMonth || '').trim();
+      }
+      if (!month) continue;
+      if (!facs[name]) facs[name] = { adr: adr, monthly: {} };
+      facs[name].adr = adr;
+      var md = {};
+      for (var n = 0; n < BUDGET_NATS_.length; n++) {
+        md[BUDGET_NATS_[n]] = Number(rows[i][3 + n]) || 0;
+      }
+      facs[name].monthly[month] = md;
+    }
+    var result = { status: 'ok', budget: true, fy: fy, facilities: facs };
+    return cb ? jsonpResponse(result, cb) : jsonResponse(result);
+  } catch(err) {
+    var errResult = { status: 'error', error: err.message };
+    return cb ? jsonpResponse(errResult, cb) : jsonResponse(errResult);
+  }
+}
+
+// ── 1施設予算保存（JSONP対応） ──
+// data = { adr, monthly: { "YYYY-MM": { KOR, TWN, HKG, CHA, EUR } } }
+function saveBudgetFacility_(e, cb) {
+  try {
+    var fy = e.parameter.fy || '';
+    var facName = e.parameter.fac || '';
+    var dataStr = e.parameter.data || '{}';
+    var data;
+    try { data = JSON.parse(dataStr); } catch(pe) {
+      var perr = { status: 'error', error: 'JSON parse error' };
+      return cb ? jsonpResponse(perr, cb) : jsonResponse(perr);
+    }
+    var ss = SpreadsheetApp.openById(BUDGET_SHEET_ID_);
+    var sheetName = 'FY' + fy;
+    var sheet = ss.getSheetByName(sheetName);
+    if (!sheet) {
+      sheet = ss.insertSheet(sheetName);
+      sheet.getRange(1, 1, 1, 8).setValues([['facility','ADR','month','KOR','TWN','HKG','CHA','EUR']]);
+    }
+    // delete existing rows for this facility
+    var rows = sheet.getDataRange().getValues();
+    for (var i = rows.length - 1; i >= 1; i--) {
+      if (String(rows[i][0]).trim() === facName) sheet.deleteRow(i + 1);
+    }
+    // append new rows
+    var adr = data.adr || 0;
+    var monthly = data.monthly || {};
+    var months = Object.keys(monthly).sort();
+    var newRows = [];
+    for (var m = 0; m < months.length; m++) {
+      var md = monthly[months[m]];
+      var row = [facName, adr, months[m]];
+      for (var n = 0; n < BUDGET_NATS_.length; n++) {
+        row.push(Number(md[BUDGET_NATS_[n]]) || 0);
+      }
+      newRows.push(row);
+    }
+    if (newRows.length > 0) {
+      var lastRow = sheet.getLastRow();
+      var range = sheet.getRange(lastRow + 1, 1, newRows.length, 8);
+      // C列(month)をテキスト形式に設定してDate自動変換を防ぐ
+      sheet.getRange(lastRow + 1, 3, newRows.length, 1).setNumberFormat('@');
+      range.setValues(newRows);
+    }
+    var ok = { status: 'ok', budget_save: true, facility: facName, fy: fy };
+    return cb ? jsonpResponse(ok, cb) : jsonResponse(ok);
+  } catch(err) {
+    var errResult = { status: 'error', error: err.message };
+    return cb ? jsonpResponse(errResult, cb) : jsonResponse(errResult);
   }
 }
