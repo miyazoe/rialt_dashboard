@@ -34,6 +34,7 @@ function doGet(e) {
     // ── budget_get / budget_save: インバウンド予算 ──
     if (e.parameter.budget_get) return fetchBudgetData_(e, cb);
     if (e.parameter.budget_save) return saveBudgetFacility_(e, cb);
+    if (e.parameter.budget_save_row) return saveBudgetRow_(e, cb);
 
     // ── ir=1: 株価・財務・アナリスト・ニュースを返す ──
     if (e.parameter.ir) {

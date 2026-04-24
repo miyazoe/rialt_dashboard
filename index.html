@@ -14689,7 +14689,8 @@ document.getElementById('import-btn').addEventListener('click', openPasteDialog)
 
     var _BM_GAS_URL = 'https://script.google.com/a/macros/retail-ai.jp/s/AKfycbwT4eHF5q--bGyD22l5WnmM6115C2hImYIXj-dHN92fragEWvG-au4LgGh7GqgAZdmXfw/exec';
     var _bmSaveTimer = null;
-    var _bmDirtyFacs = new Set();
+    var _bmDirtyCells = new Set(); // "fac::ym" for room-count changes
+    var _bmDirtyADR   = new Set(); // facility names for ADR changes
 
     // ── JSONP GETによる予算読み書き（IRタブと同じパターン） ──
 
@@ -14760,7 +14761,41 @@ document.getElementById('import-btn').addEventListener('click', openPasteDialog)
     }
 
     // 全施設を順次JSONP保存
-    function _bmSaveAllFacilities(fy, facilities, onDone) {
+    // JSONP GET: 1行（施設×月）予算保存
+    function _bmJsonpSaveRow(fy, facName, month, adr, monthData, callback) {
+      var cbName = '_bmSaveRowCb' + Date.now() + '_' + Math.random().toString(36).slice(2,6);
+      var script = document.createElement('script');
+      var timer = setTimeout(function() {
+        delete window[cbName];
+        if (script.parentNode) script.parentNode.removeChild(script);
+        if (callback) callback(false);
+      }, 20000);
+      window[cbName] = function(res) {
+        clearTimeout(timer);
+        delete window[cbName];
+        if (script.parentNode) script.parentNode.removeChild(script);
+        if (callback) callback(res && res.status === 'ok');
+      };
+      script.onerror = function() {
+        clearTimeout(timer); delete window[cbName];
+        if (script.parentNode) script.parentNode.removeChild(script);
+        if (callback) callback(false);
+      };
+      script.src = _BM_GAS_URL
+        + '?budget_save_row=1&fy=' + encodeURIComponent(fy)
+        + '&fac='   + encodeURIComponent(facName)
+        + '&month=' + encodeURIComponent(month)
+        + '&adr='   + encodeURIComponent(adr)
+        + '&KOR='   + encodeURIComponent(monthData.KOR||0)
+        + '&TWN='   + encodeURIComponent(monthData.TWN||0)
+        + '&HKG='   + encodeURIComponent(monthData.HKG||0)
+        + '&CHA='   + encodeURIComponent(monthData.CHA||0)
+        + '&EUR='   + encodeURIComponent(monthData.EUR||0)
+        + '&callback=' + cbName;
+      document.head.appendChild(script);
+    }
+
+        function _bmSaveAllFacilities(fy, facilities, onDone) {
       var names = Object.keys(facilities);
       if (names.length === 0) { if (onDone) onDone(true); return; }
       var idx = 0;
@@ -15207,10 +15242,10 @@ document.getElementById('import-btn').addEventListener('click', openPasteDialog)
       var newFyEl = document.getElementById('budget-fy-sel');
       if (newFyEl) newFyEl.addEventListener('change', function() { var c = document.getElementById('budget-screen-content'); if (c) delete c.dataset.gasLoaded; renderBudgetScreen(); });
       container.querySelectorAll('.bm-plan-input').forEach(function(inp) {
-        inp.addEventListener('input', function() { _bmRecalcRow(this, container); _bmDirtyFacs.add(this.dataset.fac); _bmAutoSave(container); });
+        inp.addEventListener('input', function() { _bmRecalcRow(this, container); _bmDirtyCells.add(this.dataset.fac + '::' + this.dataset.ym); _bmAutoSave(container); });
       });
       container.querySelectorAll('.bm-adr-input').forEach(function(inp) {
-        inp.addEventListener('input', function() { _bmRecalcFac(this, container); _bmDirtyFacs.add(this.dataset.fac); _bmAutoSave(container); });
+        inp.addEventListener('input', function() { _bmRecalcFac(this, container); _bmDirtyADR.add(this.dataset.fac); _bmAutoSave(container); });
       });
       var expBtn = document.getElementById('bm-export-btn');
       if (expBtn) expBtn.addEventListener('click', function() { _bmExport(); });
@@ -15323,16 +15358,19 @@ document.getElementById('import-btn').addEventListener('click', openPasteDialog)
         if (typeof window._renderInbound === 'function') window._renderInbound();
       }
       var badge = document.getElementById('bm-save-badge');
-      // Save only dirty facilities (diff save)
-      var dirtyNames = Array.from(_bmDirtyFacs).filter(function(n) { return data.facilities[n]; });
-      if (dirtyNames.length === 0) return;
-      var dirtyData = {};
-      dirtyNames.forEach(function(n) { dirtyData[n] = data.facilities[n]; });
-      _bmDirtyFacs.clear();
-      if (badge) { badge.textContent = '\u4fdd\u5b58\u4e2d...' + '(' + dirtyNames.length + '\u65bd\u8a2d)'; badge.style.color = '#d97706'; }
-      _bmSaveAllFacilities(fy, dirtyData, function(ok) {
-        if (badge) {
-          if (ok) {
+      var cells = Array.from(_bmDirtyCells);
+      var adrFacs = Array.from(_bmDirtyADR);
+      if (cells.length === 0 && adrFacs.length === 0) return;
+      _bmDirtyCells.clear();
+      _bmDirtyADR.clear();
+
+      var total = cells.length + adrFacs.length;
+      var done = 0; var allOk = true;
+      function finish(ok) {
+        if (!ok) allOk = false;
+        done++;
+        if (done >= total && badge) {
+          if (allOk) {
             badge.textContent = '\u2713 \u4fdd\u5b58\u5b8c\u4e86 (' + new Date().toLocaleTimeString() + ')';
             badge.style.color = '#059669';
           } else {
@@ -15340,6 +15378,22 @@ document.getElementById('import-btn').addEventListener('click', openPasteDialog)
             badge.style.color = '#dc2626';
           }
         }
+      }
+      if (badge) { badge.textContent = '\u4fdd\u5b58\u4e2d... (' + total + '\u4ef6)'; badge.style.color = '#d97706'; }
+
+      // Cell-level saves (room count changes): 1 GAS call per changed cell
+      cells.forEach(function(key) {
+        var parts = key.split('::'); var fac = parts[0]; var ym = parts[1];
+        var fd = data.facilities[fac];
+        if (!fd || !fd.monthly[ym]) { finish(true); return; }
+        _bmJsonpSaveRow(fy, fac, ym, fd.adr, fd.monthly[ym], finish);
+      });
+
+      // ADR-level saves (ADR changes): 1 GAS call per facility (all months)
+      adrFacs.forEach(function(fac) {
+        var fd = data.facilities[fac];
+        if (!fd) { finish(true); return; }
+        _bmJsonpSaveFacility(fy, fac, fd, finish);
       });
     }
 
