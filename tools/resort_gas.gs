@@ -470,3 +470,51 @@ function saveBudgetFacility_(e, cb) {
     return cb ? jsonpResponse(errResult, cb) : jsonResponse(errResult);
   }
 }
+
+// ── 1行予算保存（施設×月、JSONP対応） ──
+// params: fy, fac, month(YYYY-MM), adr, KOR, TWN, HKG, CHA, EUR
+function saveBudgetRow_(e, cb) {
+  try {
+    var fy      = e.parameter.fy    || '';
+    var facName = e.parameter.fac   || '';
+    var month   = e.parameter.month || '';
+    var adr     = Number(e.parameter.adr) || 0;
+    if (!fy || !facName || !month) {
+      var perr = { status: 'error', error: 'missing params' };
+      return cb ? jsonpResponse(perr, cb) : jsonResponse(perr);
+    }
+    var nats = {
+      KOR: Number(e.parameter.KOR)||0, TWN: Number(e.parameter.TWN)||0,
+      HKG: Number(e.parameter.HKG)||0, CHA: Number(e.parameter.CHA)||0,
+      EUR: Number(e.parameter.EUR)||0
+    };
+    var ss = SpreadsheetApp.openById(BUDGET_SHEET_ID_);
+    var sheetName = 'FY' + fy;
+    var sheet = ss.getSheetByName(sheetName);
+    if (!sheet) {
+      sheet = ss.insertSheet(sheetName);
+      sheet.getRange(1, 1, 1, 8).setValues([['facility','ADR','month','KOR','TWN','HKG','CHA','EUR']]);
+    }
+    var rows = sheet.getDataRange().getValues();
+    var targetRow = -1;
+    for (var i = 1; i < rows.length; i++) {
+      if (String(rows[i][0]).trim() === facName && String(rows[i][2]).trim() === month) {
+        targetRow = i + 1; // 1-based
+        break;
+      }
+    }
+    var newRow = [facName, adr, month, nats.KOR, nats.TWN, nats.HKG, nats.CHA, nats.EUR];
+    if (targetRow > 0) {
+      sheet.getRange(targetRow, 1, 1, 8).setValues([newRow]);
+    } else {
+      var lastRow = sheet.getLastRow();
+      sheet.getRange(lastRow + 1, 3, 1, 1).setNumberFormat('@');
+      sheet.getRange(lastRow + 1, 1, 1, 8).setValues([newRow]);
+    }
+    var ok = { status: 'ok', budget_save_row: true, facility: facName, month: month, fy: fy };
+    return cb ? jsonpResponse(ok, cb) : jsonResponse(ok);
+  } catch(err) {
+    var errResult = { status: 'error', error: err.message };
+    return cb ? jsonpResponse(errResult, cb) : jsonResponse(errResult);
+  }
+}
