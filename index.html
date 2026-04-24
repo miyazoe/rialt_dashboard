@@ -3861,8 +3861,15 @@ body { background-image: none; }
 #tours-table-wrap { flex: 1; overflow: auto; padding: 10px 14px; background: var(--rs-bg-app); }
 .tours-screen { display: none; flex: 1; flex-direction: column; overflow: hidden; }
 .tours-screen.active { display: flex; }
-.tours-sub-nav { border-bottom-color: var(--rs-border-default); background: var(--rs-bg-surface); }
-.tours-sub-btn { color: var(--rs-ink-500); }
+.tours-sub-nav {
+  display: flex; gap: 0; border-bottom: 2px solid var(--rs-border-default);
+  background: var(--rs-bg-surface); flex-shrink: 0; padding: 0 14px;
+}
+.tours-sub-btn {
+  padding: 8px 18px; font-size: 11px; font-weight: 600; cursor: pointer;
+  border: none; background: none; color: var(--rs-ink-500);
+  border-bottom: 2px solid transparent; margin-bottom: -2px;
+}
 .tours-sub-btn.active { color: var(--rs-navy-600); border-bottom-color: var(--rs-navy-600); }
 .tours-sub-btn:hover { color: var(--rs-navy-600); }
 
@@ -3892,6 +3899,9 @@ body { background-image: none; }
   border-top: 2px solid var(--rs-navy-400);
 }
 
+.tours-summary-wrap { flex: 1; overflow: auto; padding: 10px 14px; background: var(--rs-bg-app); }
+.tours-month-total td { font-weight: 700; background: var(--rs-navy-50); border-top: 2px solid var(--rs-navy-400); color: var(--rs-navy-900); }
+.tours-month-total td.total-cell { font-size: 12px; }
 .tours-csv-btn { background: var(--rs-success-600); border-radius: var(--rs-r-sm); }
 .tours-csv-btn:hover { background: var(--rs-success-700); }
 
