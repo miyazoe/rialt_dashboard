@@ -5449,6 +5449,7 @@ body {
 <script src="ota_data.js?v=2"></script>
 <script src="tours_data.js"></script>
 <script src="inbound_budget.js"></script>
+<script src="inbound_budget_2025.js"></script>
 <script src="ga_monthly.js"></script>
 <script src="tgr_facts.js"></script>
 <script>
@@ -14816,6 +14817,9 @@ document.getElementById('import-btn').addEventListener('click', openPasteDialog)
     }
 
     function _bmLoadFY(fy) {
+      // Check seed files (e.g. window.INBOUND_BUDGET_2025)
+      var seed = window['INBOUND_BUDGET_' + fy];
+      if (seed && seed.fyLabel === String(fy)) return JSON.parse(JSON.stringify(seed));
       var ib = window.INBOUND_BUDGET;
       if (ib && ib.fyLabel === String(fy)) return JSON.parse(JSON.stringify(ib));
       return _bmCreateEmpty(fy);
@@ -14849,6 +14853,10 @@ document.getElementById('import-btn').addEventListener('click', openPasteDialog)
       var set = {};
       var ib = window.INBOUND_BUDGET;
       if (ib && ib.fyLabel) set[ib.fyLabel] = true;
+      // Include any window.INBOUND_BUDGET_XXXX seed files
+      for (var y = 2020; y <= 2035; y++) {
+        if (window['INBOUND_BUDGET_' + y]) set[String(y)] = true;
+      }
       for (var i = 0; i < localStorage.length; i++) {
         var k = localStorage.key(i);
         var mm = k.match(/^inbound_budget_fy_(\d{4})$/);
