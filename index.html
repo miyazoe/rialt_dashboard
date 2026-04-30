@@ -10871,6 +10871,9 @@ document.getElementById('import-btn').addEventListener('click', openPasteDialog)
     if (!gm) return ret;
     if (ret.rev_a == null && gm.rev_a != null) ret.rev_a = gm.rev_a;
     if (ret.rev_b == null && gm.rev_b != null) ret.rev_b = gm.rev_b;
+    // rev_a導出: 既存gas_data.jsにrev_aがない場合、客単価(spd_a) × 来場者数(pax_a)で復元
+    if (ret.rev_a == null && gm.spd_a != null && gm.spd_a > 0 && gm.pax_a != null && gm.pax_a > 0)
+      ret.rev_a = Math.round(gm.spd_a * gm.pax_a);
     if (ret.pax_a == null && gm.pax_a != null) ret.pax_a = gm.pax_a;
     if (ret.adr_a == null && gm.adr_a != null) ret.adr_a = gm.adr_a;
     if (ret.occ_a == null && gm.occ_a != null) ret.occ_a = gm.occ_a;
