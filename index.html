@@ -10681,6 +10681,8 @@ document.getElementById('import-btn').addEventListener('click', openPasteDialog)
     (json.ryokan || []).forEach(function(fac) {
       if (fac.error) return;
       var mo = fac.monthly || {};
+      var rev_a = mo.rev_actual > 0 ? mo.rev_actual : null;
+      var rev_b = mo.rev_budget  > 0 ? mo.rev_budget  : null;
       var pax_a = mo.pax_actual  > 0 ? mo.pax_actual  : null;
       var pax_b = mo.pax_budget  > 0 ? mo.pax_budget  : null;
       var adr_a = mo.adr         > 0 ? mo.adr         : null;
@@ -10692,11 +10694,13 @@ document.getElementById('import-btn').addEventListener('click', openPasteDialog)
       var spd_a = (mo.pax_actual > 0 && mo.rev_actual > 0) ? Math.round(mo.rev_actual / mo.pax_actual) : null;
       var spd_b = mo.spd_b       > 0 ? mo.spd_b       : null;
       if (pax_a != null || adr_a != null || occ_a != null)
-        result[fac.facility] = { pax_a: pax_a, pax_b: pax_b, adr_a: adr_a, adr_b: adr_b, occ_a: occ_a, occ_b: occ_b, rvp_a: rvp_a, rvp_b: rvp_b, spd_a: spd_a, spd_b: spd_b };
+        result[fac.facility] = { rev_a: rev_a, rev_b: rev_b, pax_a: pax_a, pax_b: pax_b, adr_a: adr_a, adr_b: adr_b, occ_a: occ_a, occ_b: occ_b, rvp_a: rvp_a, rvp_b: rvp_b, spd_a: spd_a, spd_b: spd_b };
     });
     (json.golf || []).forEach(function(fac) {
       if (fac.error) return;
       var mo = fac.monthly || {};
+      var rev_a = mo.rev_actual > 0 ? mo.rev_actual : null;
+      var rev_b = mo.rev_budget  > 0 ? mo.rev_budget  : null;
       var pax_a = mo.pax_actual  > 0 ? mo.pax_actual  : null;
       var pax_b = mo.pax_budget  > 0 ? mo.pax_budget  : null;
       var unit_a = mo.unit_actual > 0 ? mo.unit_actual : null;
@@ -10706,7 +10710,7 @@ document.getElementById('import-btn').addEventListener('click', openPasteDialog)
       var spd_a = (mo.pax_actual > 0 && mo.rev_actual > 0) ? Math.round(mo.rev_actual / mo.pax_actual) : null;
       var spd_b = mo.spd_b       > 0 ? mo.spd_b       : null;
       if (pax_a != null || occ_a != null)
-        result[fac.facility] = { pax_a: pax_a, pax_b: pax_b, unit_a: unit_a, unit_b: unit_b, occ_a: occ_a, occ_b: occ_b, spd_a: spd_a, spd_b: spd_b };
+        result[fac.facility] = { rev_a: rev_a, rev_b: rev_b, pax_a: pax_a, pax_b: pax_b, unit_a: unit_a, unit_b: unit_b, occ_a: occ_a, occ_b: occ_b, spd_a: spd_a, spd_b: spd_b };
     });
     return { month: month, data: result };
   }
@@ -10840,7 +10844,7 @@ document.getElementById('import-btn').addEventListener('click', openPasteDialog)
   // 実施設マスタ（合計・本社除く）
   var RESORT_FACS = [
     { pl: '九重久織亭',   gas: '九重久織亭',   type: 'ryokan', rooms: 9,  manager: '鈴木 亮輔',  deputy: null },
-    { pl: 'ロッジ虎の湯', gas: '九重虎の湯',   type: 'ryokan', tableKey: '九重虎の湯', rooms: 34, manager: '鐘ヶ江 芳紀', deputy: '大塚 卓己 / 森 和博' },
+    { pl: 'ロッジ虎の湯', gas: '九重虎乃湯',   type: 'ryokan', tableKey: '九重虎の湯', rooms: 34, manager: '鐘ヶ江 芳紀', deputy: '大塚 卓己 / 森 和博' },
     { pl: '宮若虎の湯',   gas: '宮若虎の湯',   type: 'ryokan', rooms: 8,  manager: '久保 公美',  deputy: null },
     { pl: '小塚久の葉',   gas: '小塚久の葉',   type: 'ryokan', rooms: 8,  manager: '宮﨑 輝仁',  deputy: null },
     { pl: '仙石原久の葉', gas: '仙石原久の葉', type: 'ryokan', rooms: 9,  manager: '中川 洋',    deputy: 'ラミチャニ アニタ' },
@@ -10865,6 +10869,8 @@ document.getElementById('import-btn').addEventListener('click', openPasteDialog)
     var gn = facGasName(facPlName);
     var gm = window.GAS_MONTHLY[ym] && window.GAS_MONTHLY[ym][gn];
     if (!gm) return ret;
+    if (ret.rev_a == null && gm.rev_a != null) ret.rev_a = gm.rev_a;
+    if (ret.rev_b == null && gm.rev_b != null) ret.rev_b = gm.rev_b;
     if (ret.pax_a == null && gm.pax_a != null) ret.pax_a = gm.pax_a;
     if (ret.adr_a == null && gm.adr_a != null) ret.adr_a = gm.adr_a;
     if (ret.occ_a == null && gm.occ_a != null) ret.occ_a = gm.occ_a;
