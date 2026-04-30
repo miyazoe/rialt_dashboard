@@ -12,7 +12,8 @@
 | `resort_table.js` | TGR月次PLデータ | TGR全施設の売上・達成率が表示されない |
 | `gas_data.js` | GAS補完データ（ホテルKPI） | **ホテルの稼働率・ADR・RevPAR・来場者数・客単価が「—」になる** |
 | `tours_data.js` | TOURS予約データ（666件） | **TOURS売上が700万に激減する**（GASフォールバックで不完全データ） |
-| `inbound_budget.js` | インバウンド予算データ | 予算対比セクションが空になる |
+| `inbound_budget.js` | インバウンド予算データ FY2026 | 予算対比セクションが空になる |
+| `inbound_budget_2025.js` | インバウンド予算データ FY2025 | FY2025切替時に予算データが表示されない |
 
 > ⚠️ これらのファイルが欠落するバグは過去4回発生。ローカルでは存在するためローカルテストでは発見できない。
 
@@ -44,7 +45,8 @@
 | `tools/generate_ota_js.py` | ota_monthly.csv → ota_data.js 生成スクリプト |
 | `ota_data.js` | OTA月次明細データ（`window.OTA_DATA`、generate_ota_js.pyで生成） |
 | `data/tgr/ota_monthly.csv` | OTA月次明細（縦型: 施設名,年月,合計売上,ダイレクトイン,トリプラ,OTA売上,OTA比率,直販比率） |
-| `inbound_budget.js` | インバウンド予算データ（`window.INBOUND_BUDGET`、generate_inbound_budget.pyで生成） |
+| `inbound_budget.js` | インバウンド予算データ FY2026（`window.INBOUND_BUDGET`、generate_inbound_budget.pyで生成） |
+| `inbound_budget_2025.js` | インバウンド予算データ FY2025（`window.INBOUND_BUDGET_2025`、2025ホテルインバウンド.xlsxから手動生成・月+12シフト済み） |
 | `tools/generate_inbound_budget.py` | 金堀_インバウンド計画.xlsx → inbound_budget.js 生成スクリプト |
 | `notebooklm_prompt.md` | NotebookLM 用抽出プロンプト集 |
 | `news/generate_news_data.py` | Excel → news_data.js 生成スクリプト |
@@ -231,11 +233,12 @@ window.RESORT_TABLE = {
 
 ### GAS Web App
 - **デプロイURL**: `https://script.google.com/a/macros/retail-ai.jp/s/AKfycbwT4eHF5q--bGyD22l5WnmM6115C2hImYIXj-dHN92fragEWvG-au4LgGh7GqgAZdmXfw/exec`
-- **現在のバージョン**: v6+budget（@91 / 2026/04/23）
+- **現在のバージョン**: v94（2026/05/01）
 - **ルーティング**:
   - `?budget_ping=1` → 診断エンドポイント（スプレッドシートアクセスなし）
   - `?budget_get=1&fy=YYYY` → 予算データ取得（JSONP対応）
-  - `?budget_save=1&fy=YYYY&fac=NAME&data=JSON` → 1施設予算保存（JSONP対応）
+  - `?budget_save=1&fy=YYYY&fac=NAME&data=JSON` → 1施設全月予算保存（JSONP対応）
+  - `?budget_save_row=1&fy=YYYY&fac=NAME&month=YYYY-MM&adr=N&KOR=N&TWN=N&HKG=N&CHA=N&EUR=N` → 1セル（施設×月）保存（JSONP対応）
   - `?ir=1[&callback=xxx]` → `fetchIRData()` 呼び出し（5社比較データ、JSONP対応）
   - `?facility=xxx&month=YYYY-MM` → TGR施設日別売上データ
   - その他 → 月次集約データ
@@ -244,8 +247,12 @@ window.RESORT_TABLE = {
   - 列構成: A=facility, B=ADR, C=month(YYYY-MM/テキスト形式), D=KOR, E=TWN, F=HKG, G=CHA, H=EUR
   - 1施設×1月＝1行（12施設×12ヶ月＝144行/FY）
   - ⚠️ C列はテキスト形式必須（Date自動変換でキー不一致が発生する）
-- **予算通信方式**: JSONP GET（IR/TOURSと同じパターン）。読み取り=`_bmJsonpLoad`、書き込み=`_bmJsonpSaveFacility`×施設数（順次実行、1.5秒デバウンス）
+- **予算通信方式**: JSONP GET（IR/TOURSと同じパターン）
+  - 読み取り: `_bmJsonpLoad`
+  - 書き込み（ADR変更）: `_bmJsonpSaveFacility`×施設数（順次実行、1.5秒デバウンス）
+  - 書き込み（室数変更）: `_bmJsonpSaveRow`×変更セル数（1セル1リクエスト、差分のみ）
 - **予算データフロー**: GAS読込→enrichment(total/budget/annual/shortName計算)→INBOUND_BUDGET設定→レンダリング。GAS空の場合はinbound_budget.jsからシード
+- **差分保存**: `_bmDirtyCells = new Set()` に "施設::YYYY-MM" キーを蓄積 → 保存時に変更セルのみ`budget_save_row`を呼ぶ。ADR変更は`_bmDirtyADR = new Set()`で施設単位
 
 ### GAS IR機能（fetchIRData） — v62: 5社比較
 - **対象5社**: トライアル(141A.T)、PPIH(7532.T)、ユニクロ/FR(9983.T)、コスモス薬品(3349.T)、イオン(8267.T)
