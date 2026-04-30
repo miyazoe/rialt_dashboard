@@ -4261,6 +4261,43 @@ body {
 /* =========================================================
    END RS COMPONENT MAPPING v2
    ========================================================= */
+
+/* ── 競合価格モニター (pmon) ────────────────────────────── */
+#tours-screen-price { overflow: auto; background: #f4f6f9; }
+.pmon-header { background: #1e3a5f; color: #fff; padding: 14px 24px; display:flex; align-items:center; }
+.pmon-title  { font-size: 16px; font-weight: 700; margin-right: 12px; }
+.pmon-sub    { font-size: 12px; opacity: .7; }
+.pmon-controls {
+  padding: 12px 24px; display: flex; align-items: center;
+  gap: 12px; flex-wrap: wrap;
+  border-bottom: 1px solid #dde3ed; background: #fff;
+}
+.pmon-area-btn, .pmon-cat-btn {
+  padding: 7px 18px; border: 1.5px solid #dde3ed; border-radius: 20px;
+  background: #fff; cursor: pointer; font-size: 13px; font-weight: 600;
+  color: #6b7280; transition: all .15s;
+}
+.pmon-area-btn.active, .pmon-cat-btn.active {
+  background: #1e3a5f; border-color: #1e3a5f; color: #fff;
+}
+.pmon-controls label { font-size: 13px; color: #6b7280; }
+.pmon-controls select { padding: 6px 10px; border: 1px solid #dde3ed; border-radius: 6px; font-size: 13px; background: #fff; }
+.pmon-body  { padding: 20px 24px; }
+.pmon-card  { background: #fff; border-radius: 10px; padding: 20px; box-shadow: 0 1px 4px rgba(0,0,0,.06); margin-bottom: 16px; }
+.pmon-card-h2 { font-size: 14px; font-weight: 700; color: #1e3a5f; margin-bottom: 12px; }
+.pmon-legend { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 10px; }
+.pmon-legend-item { display: flex; align-items: center; gap: 5px; font-size: 12px; }
+.pmon-legend-dot  { width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; }
+.pmon-summary-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.pmon-summary-table th { background: #1e3a5f; color: #fff; padding: 8px 12px; text-align: left; font-weight: 600; font-size: 12px; }
+.pmon-summary-table td { padding: 8px 12px; border-bottom: 1px solid #dde3ed; vertical-align: top; }
+.pmon-summary-table tr:last-child td { border-bottom: none; }
+.pmon-own-row  { background: #eef3fb; font-weight: 700; }
+.pmon-diff-up  { color: #dc2626; }
+.pmon-diff-dn  { color: #16a34a; }
+.pmon-plan-list { font-size: 11px; color: #6b7280; margin-top: 4px; line-height: 1.6; }
+.pmon-plan-list span { display: block; }
+.pmon-price-range { font-size: 11px; color: #6b7280; margin-top: 2px; }
 </style>
 </head>
 <body class="rs-root">
@@ -5004,6 +5041,7 @@ body {
     <button class="tours-sub-btn" data-tours-sub="facility">&#x1F3E8; &#26045;&#35373;&#36899;&#25658;</button>
     <button class="tours-sub-btn" data-tours-sub="detail">&#x1F4CB; &#26126;&#32048;</button>
     <button class="tours-sub-btn" data-tours-sub="budget">&#x1F4CB; &#20104;&#31639;&#20445;&#23432;</button>
+    <button class="tours-sub-btn" data-tours-sub="price">&#x1F4B9; 競合価格</button>
   </div>
   <!-- ダッシュボード -->
   <div class="tours-screen active" id="tours-screen-dashboard" style="overflow:auto;padding:12px;background:#f4f6f9;">
@@ -5066,22 +5104,27 @@ body {
   </div>
   <!-- 施設連携 -->
   <div class="tours-screen" id="tours-screen-facility" style="overflow:auto;padding:12px;background:#f4f6f9;">
-    <div id="tours-facility-content">
-      <div style="background:#fff;border-radius:8px;padding:12px;border:1px solid #e2e8f0;margin-bottom:12px;">
-        <div style="font-size:12px;font-weight:600;color:#1f2937;margin-bottom:8px;">送客先施設 ランキング</div>
-        <canvas id="tours-facility-bar" height="260"></canvas>
+  <!-- ① 施設ランキング (L0) -->
+  <div id="tfd-l0">
+    <div id="tfd-rank-table"></div>
+  </div>
+  <!-- ④⑥ 施設詳細 (L1) -->
+  <div id="tfd-l1" style="display:none;">
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">
+      <button id="tfd-back-btn" style="font-size:11px;padding:4px 14px;border:1px solid #d1d5db;border-radius:4px;background:#fff;cursor:pointer;color:#2563eb;font-weight:600;">&#8592; 施設一覧</button>
+      <span id="tfd-fac-title" style="font-size:14px;font-weight:700;color:#1e3a5f;"></span>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+      <div style="background:#fff;border-radius:8px;padding:12px;border:1px solid #e2e8f0;">
+        <div style="font-size:12px;font-weight:700;color:#1e3a5f;margin-bottom:8px;">④ チャンネル別売上（OTAデータ）</div>
+        <div id="tfd-channel-content"></div>
       </div>
-      <div style="display:flex;gap:12px;">
-        <div style="flex:1;background:#fff;border-radius:8px;padding:12px;border:1px solid #e2e8f0;">
-          <div style="font-size:12px;font-weight:600;color:#1f2937;margin-bottom:8px;">ゴルフ場 / ホテル 構成比</div>
-          <canvas id="tours-facility-type-pie" height="200"></canvas>
-        </div>
-        <div style="flex:1;background:#fff;border-radius:8px;padding:12px;border:1px solid #e2e8f0;">
-          <div style="font-size:12px;font-weight:600;color:#1f2937;margin-bottom:8px;">自社TGR vs 外部施設</div>
-          <canvas id="tours-facility-own-pie" height="200"></canvas>
-        </div>
+      <div style="background:#fff;border-radius:8px;padding:12px;border:1px solid #e2e8f0;">
+        <div style="font-size:12px;font-weight:700;color:#1e3a5f;margin-bottom:8px;">⑥ アクセス数・成約率（GA）</div>
+        <div id="tfd-ga-content"></div>
       </div>
     </div>
+  </div>
   </div>
   <!-- 明細 -->
   <div class="tours-screen" id="tours-screen-detail">
@@ -5098,7 +5141,56 @@ body {
   <div class="tours-screen" id="tours-screen-budget" style="overflow:auto;padding:0;background:#f4f6f9;">
     <div id="budget-screen-content" style="padding:12px;"></div>
   </div>
-</div><!-- end outer-tours -->
+
+  <!-- 競合価格モニター -->
+  <div class="tours-screen" id="tours-screen-price">
+    <div class="pmon-header">
+      <span class="pmon-title">TGR 競合価格モニター</span>
+      <span id="pmon-subtitle" class="pmon-sub">宮若エリア ホテル・ゴルフ場 平均価格時系列（プラン別）</span>
+    </div>
+    <div class="pmon-controls">
+      <label>エリア
+        <select id="pmon-area-sel" style="padding:6px 10px;border:1px solid #dde3ed;border-radius:6px;font-size:13px;background:#fff;">
+          <option value="宮若">宮若</option>
+          <option value="阿蘇">阿蘇</option>
+          <option value="九重">九重</option>
+          <option value="大分">大分</option>
+          <option value="箱根">箱根</option>
+        </select>
+      </label>
+      <button class="pmon-cat-btn active" data-cat="hotel">ホテル・旅館</button>
+      <button class="pmon-cat-btn" data-cat="golf">ゴルフ場</button>
+      <label>施設
+        <select id="pmon-fac-sel" style="padding:6px 10px;border:1px solid #dde3ed;border-radius:6px;font-size:13px;background:#fff;max-width:180px;">
+          <option value="">── 全施設 ──</option>
+        </select>
+      </label>
+      <label>表示期間
+        <select id="pmon-range">
+          <option value="30">直近30日</option>
+          <option value="60">直近60日</option>
+          <option value="90">直近90日</option>
+          <option value="0">全期間</option>
+        </select>
+      </label>
+      <span id="pmon-last-updated" style="margin-left:auto;font-size:12px;color:#6b7280;">—</span>
+    </div>
+    <div class="pmon-body">
+      <div style="margin-bottom:8px;display:flex;align-items:center;gap:10px;">
+        <button id="pmon-back-btn" style="display:none;padding:5px 14px;border:1.5px solid #dde3ed;border-radius:16px;background:#fff;cursor:pointer;font-size:12px;color:#1e3a5f;font-weight:600;">← 全施設に戻る</button>
+        <span id="pmon-table-note" style="font-size:11px;color:#6b7280;"></span>
+      </div>
+      <div class="pmon-card">
+        <div id="pmon-chart-title" class="pmon-card-h2">自社・競合 平均価格推移（1泊2名・税込）</div>
+        <div id="pmon-legend" class="pmon-legend"></div>
+        <canvas id="pmon-chart-canvas" height="80"></canvas>
+      </div>
+      <div class="pmon-card">
+        <div class="pmon-card-h2">最新価格サマリー（最終収集日）</div>
+        <table class="pmon-summary-table" id="pmon-table"></table>
+      </div>
+    </div>
+  </div></div><!-- end outer-tours -->
 <!-- RESORT CONTENT -->
 <div class="outer-content" id="outer-resort">
   <div class="resort-header">
@@ -5114,13 +5206,6 @@ body {
   </div>
   <!-- KPI バナー -->
   <div id="resort-kpi-banner" style="display:flex;gap:10px;padding:8px 14px;background:#fff;border-bottom:1px solid #e2e8f0;flex-shrink:0;"></div>
-  <!-- サブタブナビ -->
-  <div class="resort-sub-nav" id="resort-sub-nav" style="display:flex;gap:0;background:#fff;border-bottom:1px solid #e2e8f0;flex-shrink:0;">
-    <button class="resort-sub-btn active" data-resort-sub="pl" style="padding:7px 16px;font-size:12px;font-weight:500;border:none;background:none;cursor:pointer;border-bottom:2px solid #2563eb;color:#2563eb;">&#x1F4CA; &#26045;&#35373;PL</button>
-    <button class="resort-sub-btn" data-resort-sub="inbound" style="padding:7px 16px;font-size:12px;font-weight:500;border:none;background:none;cursor:pointer;border-bottom:2px solid transparent;color:#6b7280;">&#x2708; &#12452;&#12531;&#12496;&#12454;&#12531;&#12489;</button>
-    <button class="resort-sub-btn" data-resort-sub="channel" style="padding:7px 16px;font-size:12px;font-weight:500;border:none;background:none;cursor:pointer;border-bottom:2px solid transparent;color:#6b7280;">&#x1F4E1; &#12481;&#12515;&#12531;&#12493;&#12523;</button>
-
-  </div>
   <!-- 施設PL スクリーン（既存） -->
   <div class="resort-screen active" id="resort-screen-pl" style="flex:1;overflow:auto;display:flex;flex-direction:column;">
     <div class="resort-body" style="flex:1;overflow:auto;">
@@ -5173,97 +5258,7 @@ body {
             <div id="yoy-table-title" style="font-size:12px;font-weight:600;color:#1f2937;margin-bottom:8px;">&#26376;&#21029;&#35443;&#32048;</div>
             <div id="yoy-detail-table"></div>
           </div>
-          <div id="yoy-axes" style="display:flex;gap:12px;margin-bottom:8px;">
-            <div id="yoy-ax-channel" class="yoy-axis-card" style="flex:1;background:#fff;border-radius:8px;padding:12px;border:1px solid #e2e8f0;cursor:pointer;transition:border-color 0.2s,box-shadow 0.2s;">
-              <div style="font-size:18px;margin-bottom:2px;">&#x1F4E1;</div>
-              <div style="font-size:12px;font-weight:600;color:#1f2937;">&#12481;&#12515;&#12493;&#12523;&#21029;&#20998;&#26512;</div>
-              <div style="font-size:10px;color:#6b7280;margin-top:2px;">&#12376;&#12419;&#12425;&#12435;&#12539;&#27005;&#22825;&#12539;Booking.com &#31561;</div>
-            </div>
-            <div id="yoy-ax-tours" class="yoy-axis-card" style="flex:1;background:#fff;border-radius:8px;padding:12px;border:1px solid #e2e8f0;cursor:pointer;transition:border-color 0.2s,box-shadow 0.2s;">
-              <div style="font-size:18px;margin-bottom:2px;">&#x2708;</div>
-              <div style="font-size:12px;font-weight:600;color:#1f2937;">&#20104;&#32004;&#20803;&#20998;&#26512;</div>
-              <div style="font-size:10px;color:#6b7280;margin-top:2px;">&#22269;&#20869; vs &#12452;&#12531;&#12496;&#12454;&#12531;&#12489;</div>
-            </div>
-          </div>
-          <div id="yoy-channel-detail" style="display:none;">
-            <div style="background:#fff;border-radius:8px;padding:12px;border:1px solid #e2e8f0;margin-bottom:8px;">
-              <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
-                <button id="yoy-ch-back" style="background:#f1f5f9;border:1px solid #e2e8f0;border-radius:4px;padding:3px 10px;cursor:pointer;font-size:11px;color:#2563eb;">&larr; &#25147;&#12427;</button>
-                <span style="font-size:12px;font-weight:600;color:#1f2937;">OTA&#12481;&#12515;&#12493;&#12523;&#21029; &#22770;&#19978;&#25512;&#31227;</span>
-              </div>
-              <canvas id="yoy-channel-chart" height="260"></canvas>
-            </div>
-            <div style="background:#fff;border-radius:8px;padding:12px;border:1px solid #e2e8f0;">
-              <div style="font-size:12px;font-weight:600;color:#1f2937;margin-bottom:8px;">&#12481;&#12515;&#12493;&#12523;&#21029; &#22770;&#19978;&#27604;&#36611;</div>
-              <div id="yoy-channel-table"></div>
-            </div>
-          </div>
         </div>
-      </div>
-    </div>
-  </div>
-  <!-- インバウンド スクリーン -->
-  <div class="resort-screen" id="resort-screen-inbound" style="flex:1;overflow:auto;padding:8px;background:#f4f6f9;display:none;">
-    <div style="display:flex;gap:8px;margin-bottom:8px;">
-      <div id="resort-inbound-bar" style="flex:1;background:#fff;border-radius:6px;padding:10px;border:1px solid #e2e8f0;">
-        <div style="font-size:11px;font-weight:600;color:#6b7280;margin-bottom:4px;">&#12452;&#12531;&#12496;&#12454;&#12531;&#12489;&#21512;&#35336;</div>
-        <div id="resort-inbound-bar-content"></div>
-      </div>
-      <div id="resort-inbound-cards" style="display:flex;gap:8px;flex:2;"></div>
-    </div>
-    <div style="display:flex;gap:8px;">
-      <div style="flex:3;background:#fff;border-radius:6px;padding:10px;border:1px solid #e2e8f0;">
-        <div style="font-size:11px;font-weight:600;color:#1f2937;margin-bottom:6px;">&#26053;&#34892;&#20250;&#31038; TOP10&#65288;&#12463;&#12522;&#12483;&#12463;&#12391;TOURS&#12408;&#65289;</div>
-        <div id="resort-agency-ranking"></div>
-      </div>
-      <div style="flex:2;background:#fff;border-radius:6px;padding:10px;border:1px solid #e2e8f0;">
-        <div style="font-size:11px;font-weight:600;color:#1f2937;margin-bottom:6px;">&#22269;&#21029;&#12539;&#26376;&#21029;&#25512;&#31227;</div>
-        <div id="resort-inbound-monthly"></div>
-      </div>
-    </div>
-    <!-- Budget vs Actual section -->
-    <div style="margin-top:8px;background:#fff;border-radius:6px;padding:10px;border:1px solid #e2e8f0;">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
-        <div style="font-size:12px;font-weight:700;color:#1f2937;">&#9889; &#12452;&#12531;&#12496;&#12454;&#12531;&#12489;&#20104;&#31639;&#23550;&#27604;&#65288;&#20170;&#26399;&#23455;&#32318; vs &#26469;&#26399;&#35336;&#30011;&#65289;</div><div style="display:flex;gap:4px;"><button id="budget-edit-btn" onclick="document.querySelector('[data-outer=tours]').click();setTimeout(function(){var b=document.querySelector('[data-tours-sub=budget]');if(b)b.click();},100);" style="font-size:9px;padding:2px 8px;border:1px solid #d1d5db;border-radius:3px;background:#f9fafb;cursor:pointer;color:#4b5563;">&#9998; &#32232;&#38598;</button><button id="budget-export-btn" onclick="if(window.INBOUND_BUDGET){var js='// inbound_budget.js\nwindow.INBOUND_BUDGET = '+JSON.stringify(window.INBOUND_BUDGET,null,2)+';\n';var b=new Blob([js],{type:'text/javascript'});var a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='inbound_budget.js';a.click();}else{alert('No data');}" style="font-size:9px;padding:2px 8px;border:1px solid #d1d5db;border-radius:3px;background:#f9fafb;cursor:pointer;color:#4b5563;">&#128190; &#20986;&#21147;</button><button id="budget-import-btn" onclick="document.querySelector('[data-outer=tours]').click();setTimeout(function(){var b=document.querySelector('[data-tours-sub=budget]');if(b)b.click();},100);" style="font-size:9px;padding:2px 8px;border:1px solid #d1d5db;border-radius:3px;background:#f9fafb;cursor:pointer;color:#4b5563;">&#128196; &#21462;&#36796;</button><button id="budget-reset-btn" onclick="localStorage.removeItem('inbound_budget_override_v1');var s=document.createElement('script');s.src='inbound_budget.js?_='+Date.now();s.onload=function(){if(typeof window._renderInbound==='function')window._renderInbound();};document.head.appendChild(s);this.style.display='none';" style="font-size:9px;padding:2px 8px;border:1px solid #d1d5db;border-radius:3px;background:#fff0f0;cursor:pointer;color:#dc2626;display:none;">&#128260; &#12522;&#12475;&#12483;&#12488;</button></div>
-        <div style="font-size:9px;color:#6b7280;" id="resort-budget-fy-label"></div>
-      </div>
-      <div id="resort-inbound-budget-table"></div>
-    </div>
-    <div style="display:flex;gap:8px;margin-top:8px;">
-      <div style="flex:1;background:#fff;border-radius:6px;padding:10px;border:1px solid #e2e8f0;">
-        <div style="font-size:11px;font-weight:600;color:#1f2937;margin-bottom:6px;">&#26469;&#26399;&#20104;&#31639; &#26376;&#21029;&#23460;&#25968;&#35336;&#30011;</div>
-        <div id="resort-budget-monthly-chart"></div>
-      </div>
-      <div style="flex:1;background:#fff;border-radius:6px;padding:10px;border:1px solid #e2e8f0;">
-        <div style="font-size:11px;font-weight:600;color:#1f2937;margin-bottom:6px;">&#22269;&#21029;&#27083;&#25104;&#27604;&#65288;&#20170;&#26399;&#23455;&#32318; vs &#26469;&#26399;&#35336;&#30011;&#65289;</div>
-        <div id="resort-budget-nat-compare"></div>
-      </div>
-    </div>
-  </div>
-
-  <!-- チャンネル スクリーン -->
-  <div class="resort-screen" id="resort-screen-channel" style="flex:1;overflow:auto;padding:8px;background:#f4f6f9;display:none;">
-    <div style="display:flex;gap:8px;margin-bottom:8px;">
-      <div style="flex:3;background:#fff;border-radius:6px;padding:10px;border:1px solid #e2e8f0;">
-        <div style="font-size:11px;font-weight:600;color:#1f2937;margin-bottom:6px;">OTA vs &#30452;&#36009; &#26376;&#27425;&#25512;&#31227;&#65288;&#20840;&#26045;&#35373;&#21512;&#35336;&#65289;</div>
-        <canvas id="resort-channel-ota-chart" height="200"></canvas>
-      </div>
-      <div style="flex:2;background:#fff;border-radius:6px;padding:10px;border:1px solid #e2e8f0;">
-        <div style="font-size:11px;font-weight:600;color:#1f2937;margin-bottom:6px;">&#26045;&#35373;&#21029; OTA&#27604;&#29575;&#65288;&#30452;&#36817;&#26376;&#65289;</div>
-        <div id="resort-ota-rate-table"></div>
-      </div>
-    </div>
-    <div style="display:flex;gap:8px;">
-      <div style="flex:3;background:#fff;border-radius:6px;padding:10px;border:1px solid #e2e8f0;">
-        <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
-          <span style="font-size:11px;font-weight:600;color:#1f2937;">&#33258;&#31038;HP &#27969;&#20837;&#20998;&#26512;&#65288;GA4&#65289;</span>
-          <select id="resort-ga-facility-sel" style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:4px;padding:2px 6px;font-size:11px;"><option value="all">&#20840;&#26045;&#35373;</option></select>
-        </div>
-        <canvas id="resort-ga-source-chart" height="200"></canvas>
-      </div>
-      <div style="flex:2;background:#fff;border-radius:6px;padding:10px;border:1px solid #e2e8f0;">
-        <div style="font-size:11px;font-weight:600;color:#1f2937;margin-bottom:6px;">&#12481;&#12515;&#12493;&#12523;&#21029;&#22770;&#19978;&#65288;&#20840;&#26045;&#35373;&#21512;&#35336;&#12539;&#30452;&#36817;&#26376;&#65289;</div>
-        <div id="resort-channel-breakdown-table"></div>
       </div>
     </div>
   </div>
@@ -5452,6 +5447,7 @@ body {
 <script src="inbound_budget_2025.js"></script>
 <script src="ga_monthly.js"></script>
 <script src="tgr_facts.js"></script>
+<script src="price_data.js"></script>
 <script>
 // Shared Gemini API key — works on all origins (local file:// and GitHub Pages)
 // To update: open this file in a text editor, search for PASTE_YOUR_KEY_HERE, replace with your key
@@ -10843,16 +10839,16 @@ document.getElementById('import-btn').addEventListener('click', openPasteDialog)
 
   // 実施設マスタ（合計・本社除く）
   var RESORT_FACS = [
-    { pl: '九重久織亭',   gas: '九重久織亭',   type: 'ryokan', rooms: 9 },
-    { pl: 'ロッジ虎の湯', gas: '九重虎の湯',   type: 'ryokan', tableKey: '九重虎の湯', rooms: 34 },
-    { pl: '宮若虎の湯',   gas: '宮若虎の湯',   type: 'ryokan', rooms: 8 },
-    { pl: '小塚久の葉',   gas: '小塚久の葉',   type: 'ryokan', rooms: 8 },
-    { pl: '仙石原久の葉', gas: '仙石原久の葉', type: 'ryokan', rooms: 9 },
-    { pl: '古民家煉り',   gas: '古民家煉り',   type: 'ryokan', rooms: 6 },
-    { pl: 'TSMART',       gas: 'Tsmart',        type: 'ryokan', tableKey: 'Tsmart' },
-    { pl: '若宮コース',   gas: '若宮コース',   type: 'golf' },
-    { pl: '大分コース',   gas: '大分コース',   type: 'golf' },
-    { pl: '阿蘇コース',   gas: '阿蘇コース',   type: 'golf' },
+    { pl: '九重久織亭',   gas: '九重久織亭',   type: 'ryokan', rooms: 9,  manager: '鈴木 亮輔',  deputy: null },
+    { pl: 'ロッジ虎の湯', gas: '九重虎の湯',   type: 'ryokan', tableKey: '九重虎の湯', rooms: 34, manager: '鐘ヶ江 芳紀', deputy: '大塚 卓己 / 森 和博' },
+    { pl: '宮若虎の湯',   gas: '宮若虎の湯',   type: 'ryokan', rooms: 8,  manager: '久保 公美',  deputy: null },
+    { pl: '小塚久の葉',   gas: '小塚久の葉',   type: 'ryokan', rooms: 8,  manager: '宮﨑 輝仁',  deputy: null },
+    { pl: '仙石原久の葉', gas: '仙石原久の葉', type: 'ryokan', rooms: 9,  manager: '中川 洋',    deputy: 'ラミチャニ アニタ' },
+    { pl: '古民家煉り',   gas: '古民家煉り',   type: 'ryokan', rooms: 6,  manager: '髙山 博章',  deputy: '大村 真徳 / 齋藤 由香' },
+    { pl: 'TSMART',       gas: 'Tsmart',        type: 'ryokan', tableKey: 'Tsmart', manager: '松井 生子', deputy: '伊藤 貴弘' },
+    { pl: '若宮コース',   gas: '若宮コース',   type: 'golf',   manager: '森脇 泰喜', deputy: '三岳 豊和' },
+    { pl: '大分コース',   gas: '大分コース',   type: 'golf',   manager: '伊藤 進',   deputy: '荒山 源太' },
+    { pl: '阿蘇コース',   gas: '阿蘇コース',   type: 'golf',   manager: '杉山 公一', deputy: null },
   ];
 
   var _inited = false, _currentMonth = null, _viewMode = 'single', _currentFac = null;
@@ -10946,12 +10942,19 @@ document.getElementById('import-btn').addEventListener('click', openPasteDialog)
     return res;
   }
   function availMonths() {
-    if (!window.RESORT_TABLE) return [];
     var seen = {}, arr = [];
-    (window.RESORT_TABLE.rows || []).forEach(function(r) {
-      var ym = r.year + '-' + String(r.month).padStart(2, '0');
-      if (!seen[ym]) { seen[ym] = true; arr.push(ym); }
-    });
+    if (window.RESORT_TABLE) {
+      (window.RESORT_TABLE.rows || []).forEach(function(r) {
+        var ym = r.year + '-' + String(r.month).padStart(2, '0');
+        if (!seen[ym]) { seen[ym] = true; arr.push(ym); }
+      });
+    }
+    // GAS_MONTHLYにある月もセレクタに追加（resort_table.jsにない最新月対応）
+    if (window.GAS_MONTHLY) {
+      Object.keys(window.GAS_MONTHLY).forEach(function(ym) {
+        if (!seen[ym]) { seen[ym] = true; arr.push(ym); }
+      });
+    }
     return arr.sort().reverse();
   }
   function ymLabel(m) { return m ? m.replace(/-0?/, '年') + '月' : ''; }
@@ -11049,7 +11052,13 @@ document.getElementById('import-btn').addEventListener('click', openPasteDialog)
       return ytdRet;
     }
     var d = getPlRow(facName, ym);
-    if (!d) return null;
+    if (!d) {
+      // GAS-onlyモード: RESORT_TABLEにない最新月はGASデータのみで表示
+      var gasOnly = { rev_a:null, rev_b:null, gp_a:null, op_a:null, op_b:null, lc_a:null, lc_b:null,
+        occ_a:null, occ_b:null, adr_a:null, adr_b:null, rvp_a:null, rvp_b:null, pax_a:null, pax_b:null, spd_a:null, spd_b:null };
+      gasOnly = suppFromGas(facName, ym, gasOnly);
+      return Object.values(gasOnly).some(function(v){return v!=null;}) ? gasOnly : null;
+    }
     var ret = {
       rev_a: nv(d['売上高合計_実績']), rev_b: nv(d['売上高合計_予算']),
       gp_a: nv(d['売上総利益_実績']),
@@ -11268,9 +11277,11 @@ document.getElementById('import-btn').addEventListener('click', openPasteDialog)
       var css = isAgg ? 'resort-agg-row' : 'resort-fac-row';
       var nc = isAgg ? '<td class="resort-fac-name resort-agg-name">'+nm+'</td>' : '<td class="resort-fac-name">'+nm+'</td>';
       var attr = isAgg ? '' : ' data-fac="'+row.fac.pl+'"';
-      if (row.noData) return '<tr class="'+css+'"'+attr+'>'+nc+'<td colspan="13" style="color:#9ca3af">—</td></tr>';
+      var mgrTxt = (!isAgg && row.fac.manager) ? row.fac.manager + (row.fac.deputy ? '<span class="resort-sub">'+row.fac.deputy+'</span>' : '') : '';
+      var mc = '<td class="resort-num" style="text-align:left;min-width:80px">'+mgrTxt+'</td>';
+      if (row.noData) return '<tr class="'+css+'"'+attr+'>'+nc+mc+'<td colspan="13" style="color:#9ca3af">—</td></tr>';
       var c = rowColors(row);
-      return '<tr class="'+css+'"'+attr+'>'+nc
+      return '<tr class="'+css+'"'+attr+'>'+nc+mc
         + numCell(fmtM(row.rev_a), fmtM(row.rev_b))
         + rateCell(row.rate, c.ac)
         + barCell(c.bw, c.ac)
@@ -11292,6 +11303,7 @@ document.getElementById('import-btn').addEventListener('click', openPasteDialog)
       var c = rowColors(row);
       return '<tr class="resort-tgr-data-row">'
         + '<td class="resort-fac-name resort-agg-name">TGR 全体</td>'
+        + '<td class="resort-num"></td>'
         + numCell(fmtM(row.rev_a), fmtM(row.rev_b))
         + rateCell(row.rate, c.ac)
         + barCell(c.bw, c.ac)
@@ -11305,6 +11317,7 @@ document.getElementById('import-btn').addEventListener('click', openPasteDialog)
     }
     var hdr = '<thead><tr>'
       + '<th class="resort-th-fac">施設</th>'
+      + '<th class="resort-th-fac" style="min-width:80px">支配人<span class="resort-th-sub">副支配人</span></th>'
       + '<th class="resort-th-num">売上(千)<span class="resort-th-sub">実績/予算</span></th>'
       + '<th class="resort-th-num">達成率</th>'
       + '<th class="resort-th-bar"></th>'
@@ -11322,16 +11335,16 @@ document.getElementById('import-btn').addEventListener('click', openPasteDialog)
     var html = '<div class="resort-period-label">' + periodLabel + '</div>';
     html += '<div class="resort-l1-table-wrap"><table class="resort-table">' + hdr + '<tbody>';
     // 旅館事業 section
-    html += '<tr class="resort-section-hdr"><td colspan="14">▶ 旅館事業</td></tr>';
+    html += '<tr class="resort-section-hdr"><td colspan="15">▶ 旅館事業</td></tr>';
     ryRows.forEach(function(r) { html += trRow(r, false); });
     if (!ryAgg.noData) html += trRow(ryAgg, true);
     // ゴルフ事業 section
-    html += '<tr class="resort-section-hdr"><td colspan="14">▶ ゴルフ事業</td></tr>';
+    html += '<tr class="resort-section-hdr"><td colspan="15">▶ ゴルフ事業</td></tr>';
     gfRows.forEach(function(r) { html += trRow(r, false); });
     if (!gfAgg.noData) html += trRow(gfAgg, true);
     // TGR 全体 section
     if (!tgrRow.noData) {
-      html += '<tr class="resort-section-hdr resort-tgr-hdr"><td colspan="14">TGR 全体</td></tr>';
+      html += '<tr class="resort-section-hdr resort-tgr-hdr"><td colspan="15">TGR 全体</td></tr>';
       html += trTgr(tgrRow);
     }
     html += '</tbody></table></div>';
@@ -11932,29 +11945,7 @@ document.getElementById('import-btn').addEventListener('click', openPasteDialog)
 
 
   // ── TGR サブタブ切替 ───────────────────────────────────────────────────
-  function initTgrSubTabs() {
-    document.querySelectorAll('.resort-sub-btn').forEach(function(btn) {
-      btn.addEventListener('click', function() {
-        document.querySelectorAll('.resort-sub-btn').forEach(function(b) {
-          b.classList.remove('active');
-          b.style.borderBottom = '2px solid transparent';
-          b.style.color = '#6b7280';
-        });
-        document.querySelectorAll('.resort-screen').forEach(function(s) {
-          s.style.display = 'none';
-        });
-        btn.classList.add('active');
-        btn.style.borderBottom = '2px solid #2563eb';
-        btn.style.color = '#2563eb';
-        var sc = document.getElementById('resort-screen-' + btn.dataset.resortSub);
-        if (sc) sc.style.display = '';
-        var sub = btn.dataset.resortSub;
-        if (sub === 'inbound')  renderInbound();
-        else if (sub === 'channel') renderChannelOta();
-        else if (sub === 'drill') renderDrill();
-      });
-    });
-  }
+
 
   // ── TGR KPI バナー（3枚）──────────────────────────────────────────────
   function renderTgrKpiBanner() {
@@ -11966,39 +11957,8 @@ document.getElementById('import-btn').addEventListener('click', openPasteDialog)
     var tgr = calcRow({ pl: 'TGR全体', type: 'total', label: 'TGR 全体' }, ym, _viewMode);
     var tgrRate = tgr && !tgr.noData && tgr.rate != null ? Math.round(tgr.rate) : null;
     var tgrRevA  = tgr && !tgr.noData ? tgr.rev_a : null;
-
-    // インバウンド集計（TOURSデータから）
-    var inbTotal = 0, inbKor = 0, inbTwn = 0;
-    var td = window.TOURS_DATA || window._toursData;
-    if (td && td.bookings) {
-      var p = ym.split('-'), cy = +p[0], cm = +p[1];
-      var nendo = (cm >= 7 ? cy : cy - 1) + '年度';
-      td.bookings.forEach(function(b){
-        if (b.source === undefined) return; // skip old format
-        // 年度フィルタ（簡易）
-        var tn = b.tsuki ? String(b.tsuki) : '';
-        var bNendo = tn.length >= 6 ? (function(){
-          var by = parseInt(tn.substring(0,4),10);
-          var bm = parseInt(tn.substring(4,6),10);
-          return (bm>=7?by:by-1)+'年度';
-        })() : '';
-        if (bNendo !== nendo) return;
-        inbTotal += b.total || 0;
-        if (b.nationality === 'KOR') inbKor += b.total || 0;
-        if (b.nationality === 'TWN') inbTwn += b.total || 0;
-      });
-    }
-
-    // OTA依存率（最新月）
-    var otaRate = null;
-    if (window.OTA_DATA && window.OTA_DATA.byFacility) {
-      var all = { ota: 0, total: 0 };
-      Object.values(window.OTA_DATA.byFacility).forEach(function(fData){
-        var m = fData[ym];
-        if (m) { all.ota += m.ota || 0; all.total += m.total || 0; }
-      });
-      otaRate = all.total > 0 ? Math.round(all.ota / all.total * 100) : null;
-    }
+    var tgrRevB  = tgr && !tgr.noData ? tgr.rev_b : null;
+    var tgrOpA   = tgr && !tgr.noData ? tgr.op_a : null;
 
     function bCard(title, main, sub, color) {
       return '<div style="flex:1;background:#f8fafc;border-radius:6px;padding:8px 12px;border:1px solid #e2e8f0;min-width:120px;">'
@@ -12009,13 +11969,11 @@ document.getElementById('import-btn').addEventListener('click', openPasteDialog)
     }
 
     var rateColor = tgrRate == null ? '#6b7280' : tgrRate >= 100 ? '#059669' : tgrRate >= 80 ? '#d97706' : '#dc2626';
+    var opColor = tgrOpA == null ? '#6b7280' : tgrOpA >= 0 ? '#059669' : '#dc2626';
     el.innerHTML =
-      bCard('TGR 売上 (達成率)', tgrRate != null ? tgrRate+'%' : '—',
-            tgrRevA != null ? '¥'+fmtM(tgrRevA) : '', rateColor)
-      + bCard('インバウンド 売上',
-            inbTotal > 0 ? '¥'+fmtM(inbTotal) : '—',
-            inbTotal > 0 ? 'KOR:¥'+fmtM(inbKor)+' TWN:¥'+fmtM(inbTwn) : '', '#1f2937')
-      + bCard('OTA 依存率', otaRate != null ? otaRate+'%' : '—', '最新月', '#1f2937');
+      bCard('TGR 売上達成率', tgrRate != null ? tgrRate+'%' : '—',
+            tgrRevA != null ? '実績 ¥'+fmtM(tgrRevA) + (tgrRevB != null ? ' / 予算 ¥'+fmtM(tgrRevB) : '') : '', rateColor)
+      + bCard('TGR 営業利益', tgrOpA != null ? '¥'+fmtM(tgrOpA) : '—', '（当月）', opColor);
   }
 
   // ── インバウンド ペイン ──────────────────────────────────────────────────
@@ -13255,36 +13213,7 @@ document.getElementById('import-btn').addEventListener('click', openPasteDialog)
       kpiSel.addEventListener('change', function(){ if (_yoyCurrentFac) _renderYoYTab(_yoyCurrentFac); });
       kpiSel._bound = true;
     }
-    // Channel back button
-    var chBack = document.getElementById('yoy-ch-back');
-    if (chBack && !chBack._bound) {
-      chBack.addEventListener('click', function() {
-        _yoyChDetail = false;
-        document.getElementById('yoy-axes').style.display = 'flex';
-        document.getElementById('yoy-channel-detail').style.display = 'none';
-      });
-      chBack._bound = true;
-    }
-    // Axis card handlers
-    var axCh = document.getElementById('yoy-ax-channel');
-    if (axCh && !axCh._bound) {
-      axCh.addEventListener('click', function() {
-        _yoyChDetail = true;
-        document.getElementById('yoy-axes').style.display = 'none';
-        document.getElementById('yoy-channel-detail').style.display = '';
-        if (_yoyCurrentFac) _renderYoYChannel(_yoyCurrentFac);
-      });
-      axCh.addEventListener('mouseenter', function(){ axCh.style.borderColor='#2563eb'; axCh.style.boxShadow='0 2px 8px rgba(37,99,235,0.15)'; });
-      axCh.addEventListener('mouseleave', function(){ axCh.style.borderColor='#e2e8f0'; axCh.style.boxShadow='none'; });
-      axCh._bound = true;
-    }
-    // Axis: tours card
-    var axT = document.getElementById('yoy-ax-tours');
-    if (axT && !axT._bound) {
-      axT.addEventListener('mouseenter', function(){ axT.style.borderColor='#2563eb'; axT.style.boxShadow='0 2px 8px rgba(37,99,235,0.15)'; });
-      axT.addEventListener('mouseleave', function(){ axT.style.borderColor='#e2e8f0'; axT.style.boxShadow='none'; });
-      axT._bound = true;
-    }
+
 
     var fy = parseInt(fySel ? fySel.value : _currentFY());
     var kpi = kpiSel ? kpiSel.value : 'sales';
@@ -13563,6 +13492,7 @@ document.getElementById('import-btn').addEventListener('click', openPasteDialog)
     var TOURS_GAS_URL = 'https://script.google.com/a/macros/retail-ai.jp/s/AKfycbwT4eHF5q--bGyD22l5WnmM6115C2hImYIXj-dHN92fragEWvG-au4LgGh7GqgAZdmXfw/exec';
     var _toursData = null;
     var _inited    = false;
+    var _tfdState  = { selected: null, facMap: null, latestYM: null, initialized: false };
 
     // ── ユーティリティ ─────────────────────────────────────────────────────
     function p2(n) { return String(n).padStart(2,'0'); }
@@ -13635,7 +13565,7 @@ document.getElementById('import-btn').addEventListener('click', openPasteDialog)
           btn.classList.add('active');
           var screen = document.getElementById('tours-screen-' + btn.dataset.toursSub);
           if (screen) screen.classList.add('active');
-          if (btn.dataset.toursSub === 'budget') { renderBudgetScreen(); } else { renderTours(); }
+          if (btn.dataset.toursSub === 'budget') { renderBudgetScreen(); } else if (btn.dataset.toursSub === 'price') { if(window._openPriceTab) window._openPriceTab(); } else { renderTours(); }
         });
       });
     }
@@ -13832,36 +13762,53 @@ document.getElementById('import-btn').addEventListener('click', openPasteDialog)
       var fmtPax = function(v){ return v+'\u540d'; };
       var fmtYen2 = function(v){ return '\xa5'+fmtNum(v); };
 
-      // 来期予算参考カード（年度累計 + 今月）
+      // 今期予算対比カード（今期FYのINBOUND_BUDGETを参照）
       var budgetCard = '';
-      var ib = window.INBOUND_BUDGET;
-      if (ib && ib.facilities) {
-        var budAnnual = 0;
-        Object.values(ib.facilities).forEach(function(fd) {
-          budAnnual += fd.annual.budget || 0;
-        });
-        // 来期予算の今月分
-        var budMonth = 0;
+      var curIb = (cy && window['INBOUND_BUDGET_' + cy]) ? window['INBOUND_BUDGET_' + cy]
+                : (window.INBOUND_BUDGET && String(window.INBOUND_BUDGET.fyLabel) === String(cy) ? window.INBOUND_BUDGET : null);
+      if (curIb && curIb.facilities) {
+        var budAnnual = 0, budMonth = 0;
         var nowYM = new Date().getFullYear() + '-' + String(new Date().getMonth()+1).padStart(2,'0');
-        // 来期の対応月: 来期FYの同じ月
-        Object.values(ib.facilities).forEach(function(fd) {
-          if (fd.monthly && fd.monthly[nowYM]) {
-            budMonth += fd.monthly[nowYM].budget || 0;
-          }
+        Object.values(curIb.facilities).forEach(function(fd) {
+          budAnnual += (fd.annual && fd.annual.budget) ? fd.annual.budget : 0;
+          if (fd.monthly && fd.monthly[nowYM]) budMonth += fd.monthly[nowYM].budget || 0;
         });
+        function _achCls(actual, budget) {
+          if (!budget) return 'flat';
+          return actual >= budget ? 'up' : 'down';
+        }
+        function _achText(actual, budget) {
+          if (!budget) return '\u2014';
+          return (actual / budget * 100).toFixed(1) + '%';
+        }
+        var _row = function(lbl, bud, act) {
+          var cls = _achCls(act, bud), txt = _achText(act, bud);
+          return '<tr style="border-top:1px dashed var(--rs-border-soft);">'
+            + '<td class="tours-kpi-sublbl" style="padding:3px 4px 3px 0;">' + lbl + '</td>'
+            + '<td class="tours-kpi-val" style="text-align:right;padding:3px 20px 3px 2px;">' + fmtYen2(bud) + '</td>'
+            + '<td class="tours-kpi-val" style="text-align:right;padding:3px 2px;">' + fmtYen2(act) + '</td>'
+            + '<td class="tours-kpi-yoy ' + cls + '" style="text-align:right;padding:3px 0 3px 8px;font-size:13px;">' + txt + '</td>'
+            + '</tr>';
+        };
+        var _bRow = function(lbl, bud, act) {
+          var cls = _achCls(act, bud), txt = _achText(act, bud);
+          return '<div class="tours-kpi-row-item">'
+            + '<span class="tours-kpi-sublbl">' + lbl + '</span>'
+            + '<span class="tours-kpi-val" style="flex:1;padding-right:20px;">' + fmtYen2(bud) + '</span>'
+            + '<span class="tours-kpi-val" style="flex:1;">' + fmtYen2(act) + '</span>'
+            + '<span class="tours-kpi-yoy ' + cls + '" style="font-size:13px;">' + txt + '</span>'
+            + '</div>';
+        };
         budgetCard = '<div class="tours-kpi-card budget">'
-          +'<div class="tours-kpi-lbl">\u6765\u671F\u4E88\u7B97\uFF08FY'+ib.fyLabel+'\uFF09</div>'
-          +'<table style="width:100%;font-size:10px;border-collapse:collapse;margin-top:4px;">'
-          +'<tr><td></td><td style="text-align:right;color:#6b7280;font-size:9px;padding:1px 2px;">\u4E88\u7B97</td>'
-          +'<td style="text-align:right;color:#6b7280;font-size:9px;padding:1px 2px;">\u4ECA\u671F\u5B9F\u7E3E</td></tr>'
-          +'<tr><td style="font-size:9px;color:#6b7280;padding:2px 2px;">\u7D2F\u8A08</td>'
-          +'<td style="text-align:right;padding:2px 2px;font-weight:600;">\xa5'+fmtNum(budAnnual)+'</td>'
-          +'<td style="text-align:right;padding:2px 2px;font-weight:600;">\xa5'+fmtNum(yC.total)+'</td></tr>'
-          +'<tr><td style="font-size:9px;color:#6b7280;padding:2px 2px;">'+latestM+'\u6708</td>'
-          +'<td style="text-align:right;padding:2px 2px;font-weight:600;">\xa5'+fmtNum(budMonth)+'</td>'
-          +'<td style="text-align:right;padding:2px 2px;font-weight:600;">\xa5'+fmtNum(mC.total)+'</td></tr>'
-          +'</table>'
-          +'</div>';
+          + '<div class="tours-kpi-lbl" style="display:flex;align-items:baseline;gap:6px;">'
+          + '\u4E88\u7B97\u5BFE\u6BD4'
+          + '<span style="font-size:9px;color:var(--rs-ink-400);flex:1;text-align:left;padding-left:2px;">\u4E88\u7B97</span>'
+          + '<span style="font-size:9px;color:var(--rs-ink-400);flex:1;text-align:left;">\u5B9F\u7E3E</span>'
+          + '<span style="font-size:9px;color:var(--rs-ink-400);min-width:52px;text-align:right;">\u9054\u6210\u7387</span>'
+          + '</div>'
+          + _bRow('\u5E74\u5EA6\u7D2F\u8A08', budAnnual, yC.total)
+          + _bRow(mLbl, budMonth, mC.total)
+          + '</div>';
       }
 
       el.innerHTML = [
@@ -14616,40 +14563,319 @@ document.getElementById('import-btn').addEventListener('click', openPasteDialog)
     }
     function renderFacility() {
       if (!_toursData) return;
-      var sy = getVal('tours-year-sel');
-      var bks = _toursData.bookings.filter(function(b){
-        if (isHeaderTsuki(b.tsuki)) return false;
-        if (!(Number(b.total)>0)) return false;
-        if (sy!=='all' && toNendo(b.dateRaw,b.tsuki)!==sy) return false;
-        return true;
-      });
-      var facMap = {}, typeMap = {golf:0,hotel:0}, ownMap = {tgr:0,ext:0};
-      bks.forEach(function(b){
-        function addFac(name, fee, isGolf) {
-          if (!name) return;
-          if (!facMap[name]) facMap[name]={total:0,cnt:0};
-          facMap[name].total+=fee||0; facMap[name].cnt++;
-          if (isGolf) typeMap.golf+=fee||0; else typeMap.hotel+=fee||0;
-          if (isTgrFac(name)) ownMap.tgr+=fee||0; else ownMap.ext+=fee||0;
+      if (!_tfdState.initialized) {
+        _tfdState.initialized = true;
+        var bb = document.getElementById('tfd-back-btn');
+        if (bb) bb.addEventListener('click', function() { _tfdRenderL0(); });
+      }
+      _tfdBuildFacMap();
+      _tfdRenderL0();
+    }
+
+    // 施設×月 売上マップ構築
+    function _tfdBuildFacMap() {
+      var map = {};
+      _toursData.bookings.forEach(function(b) {
+        if (isHeaderTsuki(b.tsuki)) return;
+        var ts = String(b.tsuki || '');
+        if (ts.length !== 6) return;
+        var ym = ts.slice(0,4) + '-' + ts.slice(4,6);
+        if (ym >= '2099') return;
+        function addF(name, fee, isGolf) {
+          if (!name || !(Number(fee) > 0)) return;
+          if (!map[name]) map[name] = { monthly: {}, isGolf: isGolf };
+          map[name].monthly[ym] = (map[name].monthly[ym] || 0) + Number(fee);
         }
-        addFac(b.golfCourse, b.golfFee, true);
-        addFac(b.hotel1, b.hotel1Fee, false);
-        addFac(b.hotel2, b.hotel2Fee, false);
-        addFac(b.hotel3, b.hotel3Fee, false);
+        addF(b.golfCourse, b.golfFee, true);
+        addF(b.hotel1, b.hotel1Fee, false);
+        addF(b.hotel2, b.hotel2Fee, false);
+        addF(b.hotel3, b.hotel3Fee, false);
       });
-      var sorted = Object.entries(facMap).filter(function(e){return e[1].total>0;})
-        .sort(function(a,b){return b[1].total-a[1].total;}).slice(0,15);
-      drawHBarChart('tours-facility-bar', sorted.map(function(e){
-        return {label:e[0], value:e[1].total, color:isTgrFac(e[0])?'#2563eb':'#9ca3af'};
-      }));
-      drawPieChart('tours-facility-type-pie', [
-        {label:'ゴルフ場',color:'#2563eb',value:typeMap.golf},
-        {label:'ホテル',color:'#f59e0b',value:typeMap.hotel}
-      ]);
-      drawPieChart('tours-facility-own-pie', [
-        {label:'自社TGR',color:'#10b981',value:ownMap.tgr},
-        {label:'外部施設',color:'#e5e7eb',value:ownMap.ext}
-      ]);
+      var allYMs = [];
+      Object.values(map).forEach(function(d) {
+        Object.keys(d.monthly).forEach(function(ym) { allYMs.push(ym); });
+      });
+      allYMs.sort();
+      _tfdState.latestYM = allYMs[allYMs.length - 1] || '';
+      _tfdState.facMap = map;
+    }
+
+    // YM を n ヶ月シフト
+    function _tfdYMShift(ym, n) {
+      var p = ym.split('-'), y = parseInt(p[0]), m = parseInt(p[1]);
+      m += n;
+      while (m > 12) { m -= 12; y++; }
+      while (m <  1) { m += 12; y--; }
+      return y + '-' + String(m).padStart(2, '0');
+    }
+
+    // ① 施設ランキング表示 (L0)
+    function _tfdRenderL0() {
+      var l0 = document.getElementById('tfd-l0');
+      var l1 = document.getElementById('tfd-l1');
+      if (l0) l0.style.display = '';
+      if (l1) l1.style.display = 'none';
+      var rankDiv = document.getElementById('tfd-rank-table');
+      if (!rankDiv) return;
+      var map = _tfdState.facMap, lYM = _tfdState.latestYM;
+      if (!map || !lYM) { rankDiv.innerHTML = '<div style="color:#9ca3af;padding:20px;font-size:12px;">データなし</div>'; return; }
+      var lyYM = _tfdYMShift(lYM, -12);
+
+      var rows = Object.entries(map).map(function(e) {
+        var name = e[0], d = e[1];
+        var cur  = d.monthly[lYM]  || 0;
+        var prev = d.monthly[lyYM] || 0;
+        var yoy  = prev > 0 ? (cur / prev - 1) * 100 : null;
+        var t3 = 0, t3ly = 0;
+        for (var i = 0; i < 3; i++) {
+          t3   += d.monthly[_tfdYMShift(lYM, -i)]    || 0;
+          t3ly += d.monthly[_tfdYMShift(lYM, -i-12)] || 0;
+        }
+        var yoy3 = t3ly > 0 ? (t3 / t3ly - 1) * 100 : null;
+        return { name: name, isGolf: d.isGolf, cur: cur, prev: prev, yoy: yoy, t3: t3, yoy3: yoy3 };
+      });
+
+      rows.sort(function(a, b) {
+        if (a.yoy == null && b.yoy == null) return 0;
+        if (a.yoy == null) return 1;
+        if (b.yoy == null) return -1;
+        return a.yoy - b.yoy;
+      });
+
+      function yoyCell(v) {
+        if (v == null) return '<span style="color:#9ca3af;">前年なし</span>';
+        var s = (v >= 0 ? '+' : '') + v.toFixed(1) + '%';
+        var c = v >= 10 ? '#10b981' : v >= -5 ? '#d97706' : '#ef4444';
+        return '<span style="font-weight:700;color:' + c + ';">' + s + '</span>';
+      }
+      function yen(v) { return v ? '&#165;' + Math.round(v).toLocaleString() : '&#8212;'; }
+
+      var html = '<div style="background:#fff;border-radius:8px;border:1px solid #e2e8f0;overflow:hidden;">';
+      html += '<div style="padding:10px 14px;border-bottom:1px solid #e2e8f0;display:flex;align-items:center;gap:10px;">';
+      html += '<span style="font-size:13px;font-weight:700;color:#1e3a5f;">&#128202; 施設別パフォーマンス</span>';
+      html += '<span style="font-size:11px;color:#9ca3af;">基準月: ' + lYM + '　前年比ワースト順　クリックで④チャンネル・⑥GA詳細</span>';
+      html += '</div>';
+      html += '<div style="overflow-x:auto;"><table style="width:100%;border-collapse:collapse;font-size:12px;">';
+      html += '<thead><tr style="background:#f8fafc;">';
+      var hdrs = ['施設名','種別','直近月売上','前年同月比','3ヶ月累計','前年同期比'];
+      var alns = ['left','left','right','right','right','right'];
+      hdrs.forEach(function(h,i) {
+        html += '<th style="padding:7px 10px;text-align:'+alns[i]+';font-weight:600;color:#374151;border-bottom:2px solid #e2e8f0;white-space:nowrap;">'+h+'</th>';
+      });
+      html += '</tr></thead><tbody>';
+      rows.forEach(function(r, idx) {
+        var bg = idx%2===0 ? '#ffffff' : '#fafafa';
+        html += '<tr class="tfd-fac-row" data-fac="' + r.name + '" style="cursor:pointer;border-bottom:1px solid #f1f5f9;background:'+bg+';">';
+        html += '<td style="padding:8px 10px;font-weight:600;color:#1e3a5f;">'+r.name+'</td>';
+        html += '<td style="padding:8px 10px;color:#6b7280;">'+(r.isGolf?'&#9971; ゴルフ':'&#127968; ホテル')+'</td>';
+        html += '<td style="padding:8px 10px;text-align:right;">'+yen(r.cur)+'</td>';
+        html += '<td style="padding:8px 10px;text-align:right;">'+yoyCell(r.yoy)+'</td>';
+        html += '<td style="padding:8px 10px;text-align:right;">'+yen(r.t3)+'</td>';
+        html += '<td style="padding:8px 10px;text-align:right;">'+yoyCell(r.yoy3)+'</td>';
+        html += '</tr>';
+      });
+      html += '</tbody></table></div></div>';
+      rankDiv.innerHTML = html;
+
+      document.querySelectorAll('.tfd-fac-row').forEach(function(tr) {
+        tr.addEventListener('click', function() {
+          var r = rows.find(function(x) { return x.name === tr.dataset.fac; });
+          if (r) { _tfdState.selected = r; _tfdRenderL1(); }
+        });
+        tr.addEventListener('mouseover', function() { this.style.background = '#eff6ff'; });
+        tr.addEventListener('mouseout',  function() { this.style.background = ''; });
+      });
+    }
+
+    // L1: 施設詳細 (④ + ⑥)
+    function _tfdRenderL1() {
+      var l0 = document.getElementById('tfd-l0');
+      var l1 = document.getElementById('tfd-l1');
+      if (l0) l0.style.display = 'none';
+      if (l1) l1.style.display = '';
+      var r = _tfdState.selected;
+      var el = document.getElementById('tfd-fac-title');
+      if (el) el.textContent = r.name + (r.isGolf ? ' [ゴルフ]' : ' [ホテル]');
+      _tfdRenderChannel(r.name);
+      _tfdRenderGA(r.name);
+    }
+
+    // OTA 曖昧マッチ
+    function _tfdMatchOTA(facName) {
+      var od = window.OTA_DATA;
+      if (!od || !od.byFacility) return null;
+      var keys = Object.keys(od.byFacility);
+      if (od.byFacility[facName]) return od.byFacility[facName];
+      var k = keys.find(function(k) { return k.toLowerCase() === facName.toLowerCase(); });
+      if (k) return od.byFacility[k];
+      k = keys.find(function(k) { return k.includes(facName) || facName.includes(k); });
+      return k ? od.byFacility[k] : null;
+    }
+
+    // GA 曖昧マッチ
+    function _tfdMatchGA(facName) {
+      var gd = window.GA_MONTHLY;
+      if (!gd || !gd.byFacility) return null;
+      var keys = Object.keys(gd.byFacility);
+      if (gd.byFacility[facName]) return gd.byFacility[facName];
+      var k = keys.find(function(k) { return k.toLowerCase() === facName.toLowerCase(); });
+      if (k) return gd.byFacility[k];
+      k = keys.find(function(k) { return k.includes(facName) || facName.includes(k); });
+      return k ? gd.byFacility[k] : null;
+    }
+
+    // ④ OTA チャンネル分析
+    function _tfdRenderChannel(facName) {
+      var el = document.getElementById('tfd-channel-content');
+      if (!el) return;
+      var lYM = _tfdState.latestYM;
+      var facData = _tfdMatchOTA(facName);
+      if (!facData) {
+        el.innerHTML = '<div style="color:#9ca3af;font-size:12px;padding:16px 0;">OTAデータなし（ゴルフ場は非対象）</div>';
+        return;
+      }
+      var months = [];
+      for (var i = 11; i >= 0; i--) months.push(_tfdYMShift(lYM, -i));
+      var labels  = months.map(function(ym) { return ym.slice(5); });
+      var otaVals = months.map(function(ym) { return facData[ym] ? facData[ym].ota    / 10000 : 0; });
+      var dirVals = months.map(function(ym) { return facData[ym] ? facData[ym].direct / 10000 : 0; });
+      var curD = facData[lYM];
+      var chHtml = '';
+      if (curD && curD.channels) {
+        var chEntries = Object.entries(curD.channels).filter(function(e) { return e[1] > 0; }).sort(function(a,b) { return b[1]-a[1]; });
+        if (chEntries.length) {
+          chHtml += '<div style="font-size:11px;font-weight:700;color:#374151;margin:10px 0 4px;">'+lYM+' チャンネル別内訳</div>';
+          chHtml += '<table style="width:100%;border-collapse:collapse;font-size:11px;">';
+          var totOta = curD.ota || 1;
+          chEntries.forEach(function(e) {
+            var pct = (e[1]/totOta*100).toFixed(1);
+            var barW = Math.max(Math.round(e[1]/totOta*100),2);
+            chHtml += '<tr style="border-bottom:1px solid #f3f4f6;">';
+            chHtml += '<td style="padding:3px 4px;white-space:nowrap;color:#374151;">'+e[0]+'</td>';
+            chHtml += '<td style="padding:3px 4px;width:80px;"><div style="background:#2563eb;height:6px;width:'+barW+'%;border-radius:3px;min-width:2px;"></div></td>';
+            chHtml += '<td style="padding:3px 4px;text-align:right;color:#6b7280;white-space:nowrap;">&#165;'+Math.round(e[1]).toLocaleString()+' <span style="color:#9ca3af;">('+pct+'%)</span></td>';
+            chHtml += '</tr>';
+          });
+          chHtml += '</table>';
+        }
+      }
+      el.innerHTML = '<canvas id="tfd-ch-canvas" height="150" style="width:100%;display:block;"></canvas>' + chHtml;
+      var cv = document.getElementById('tfd-ch-canvas');
+      if (cv) _tfdDrawStackedBar(cv, labels, otaVals, dirVals);
+    }
+
+    // ⑥ GA 指標（セッション数・成約率）
+    function _tfdRenderGA(facName) {
+      var el = document.getElementById('tfd-ga-content');
+      if (!el) return;
+      var lYM = _tfdState.latestYM;
+      var gaFac = _tfdMatchGA(facName);
+      if (!gaFac) {
+        el.innerHTML = '<div style="color:#9ca3af;font-size:12px;padding:16px 0;">GAデータなし</div>';
+        return;
+      }
+      var months = [];
+      for (var i = 11; i >= 0; i--) months.push(_tfdYMShift(lYM, -i));
+      var labels    = months.map(function(ym) { return ym.slice(5); });
+      var sessions  = months.map(function(ym) { return gaFac[ym] ? gaFac[ym].sessions : null; });
+      var convRates = months.map(function(ym) { return gaFac[ym] ? +(gaFac[ym].convRate*100).toFixed(2) : null; });
+      var sumHtml = '<div style="font-size:11px;font-weight:700;color:#374151;margin:10px 0 4px;">直近3ヶ月</div>';
+      sumHtml += '<table style="width:100%;border-collapse:collapse;font-size:11px;">';
+      sumHtml += '<thead><tr style="background:#f8fafc;"><th style="padding:4px 6px;text-align:left;font-weight:600;">月</th><th style="padding:4px 6px;text-align:right;font-weight:600;">セッション</th><th style="padding:4px 6px;text-align:right;font-weight:600;">成約率</th><th style="padding:4px 6px;text-align:right;font-weight:600;">直帰率</th></tr></thead><tbody>';
+      months.slice(-3).forEach(function(ym) {
+        var d = gaFac[ym];
+        sumHtml += '<tr style="border-bottom:1px solid #f3f4f6;">';
+        sumHtml += '<td style="padding:4px 6px;">'+ym+'</td>';
+        sumHtml += '<td style="padding:4px 6px;text-align:right;">'+(d?d.sessions.toLocaleString():'&#8212;')+'</td>';
+        sumHtml += '<td style="padding:4px 6px;text-align:right;font-weight:600;color:#059669;">'+(d?(d.convRate*100).toFixed(2)+'%':'&#8212;')+'</td>';
+        sumHtml += '<td style="padding:4px 6px;text-align:right;color:#6b7280;">'+(d?(d.bounceRate*100).toFixed(1)+'%':'&#8212;')+'</td>';
+        sumHtml += '</tr>';
+      });
+      sumHtml += '</tbody></table>';
+      el.innerHTML = '<canvas id="tfd-ga-sess-canvas" height="120" style="width:100%;display:block;"></canvas>'
+        + '<canvas id="tfd-ga-conv-canvas" height="100" style="width:100%;display:block;margin-top:4px;"></canvas>'
+        + sumHtml;
+      _tfdDrawLine('tfd-ga-sess-canvas', labels, sessions,  'セッション数', '#2563eb');
+      _tfdDrawLine('tfd-ga-conv-canvas', labels, convRates, '成約率 (%)',  '#10b981');
+    }
+
+    // 積み上げ棒グラフ (OTA 濃青 + 直販 薄青)
+    function _tfdDrawStackedBar(canvas, labels, otaV, dirV) {
+      var W=canvas.parentElement?Math.max(canvas.parentElement.offsetWidth-24,200):400;
+      canvas.width=W;
+      var H=canvas.height||150;
+      var ctx=canvas.getContext('2d');
+      ctx.clearRect(0,0,W,H);
+      var pL=48,pR=72,pT=22,pB=26;
+      var n=labels.length, cW=W-pL-pR, cH=H-pT-pB;
+      var maxV=1;
+      for(var i=0;i<n;i++) maxV=Math.max(maxV,otaV[i]+dirV[i]);
+      var bw=Math.max(Math.floor(cW/n)-2,3);
+      ctx.strokeStyle='#e5e7eb';ctx.lineWidth=0.5;
+      [0,0.5,1].forEach(function(t){
+        var y=pT+cH*(1-t);
+        ctx.beginPath();ctx.moveTo(pL,y);ctx.lineTo(W-pR,y);ctx.stroke();
+        ctx.fillStyle='#9ca3af';ctx.font='9px sans-serif';ctx.textAlign='right';
+        ctx.fillText(Math.round(maxV*t),pL-3,y+3);
+      });
+      for(var i=0;i<n;i++){
+        var x=pL+Math.floor(cW/n)*i+Math.floor((Math.floor(cW/n)-bw)/2);
+        var dH=Math.round(dirV[i]/maxV*cH),oH=Math.round(otaV[i]/maxV*cH);
+        ctx.fillStyle='#93c5fd';ctx.fillRect(x,pT+cH-dH,bw,dH);
+        ctx.fillStyle='#2563eb';ctx.fillRect(x,pT+cH-dH-oH,bw,oH);
+        if(i%3===0||i===n-1){ctx.fillStyle='#9ca3af';ctx.font='8px sans-serif';ctx.textAlign='center';ctx.fillText(labels[i],x+bw/2,H-4);}
+      }
+      var lx=W-pR+6;
+      ctx.fillStyle='#2563eb';ctx.fillRect(lx,pT,8,8);
+      ctx.fillStyle='#374151';ctx.font='9px sans-serif';ctx.textAlign='left';ctx.fillText('OTA',lx+10,pT+8);
+      ctx.fillStyle='#93c5fd';ctx.fillRect(lx,pT+14,8,8);ctx.fillText('直販',lx+10,pT+22);
+      ctx.fillStyle='#374151';ctx.font='10px sans-serif';ctx.textAlign='left';ctx.fillText('OTA / 直販 推移（万円）',pL,14);
+    }
+
+    // 折れ線グラフ
+    function _tfdDrawLine(canvasId,labels,values,title,color){
+      var canvas=document.getElementById(canvasId);
+      if(!canvas) return;
+      var W=canvas.parentElement?Math.max(canvas.parentElement.offsetWidth-24,200):400;
+      canvas.width=W;
+      var H=canvas.height||120;
+      var ctx=canvas.getContext('2d');
+      ctx.clearRect(0,0,W,H);
+      var pL=50,pR=10,pT=22,pB=24,n=labels.length;
+      var valid=values.filter(function(v){return v!=null;});
+      if(!valid.length){ctx.fillStyle='#9ca3af';ctx.font='11px sans-serif';ctx.textAlign='center';ctx.fillText('データなし',W/2,H/2);return;}
+      var maxV=Math.max.apply(null,valid),minV=Math.min.apply(null,valid);
+      if(maxV===minV){maxV+=1;minV=Math.max(0,minV-1);}
+      var cW=W-pL-pR,cH=H-pT-pB;
+      ctx.strokeStyle='#e5e7eb';ctx.lineWidth=0.5;
+      [0,0.5,1].forEach(function(t){
+        var y=pT+cH*(1-t);
+        ctx.beginPath();ctx.moveTo(pL,y);ctx.lineTo(W-pR,y);ctx.stroke();
+        var v=minV+(maxV-minV)*t;
+        ctx.fillStyle='#9ca3af';ctx.font='9px sans-serif';ctx.textAlign='right';
+        ctx.fillText(v>=100?Math.round(v):v.toFixed(1),pL-3,y+3);
+      });
+      ctx.strokeStyle=color;ctx.lineWidth=2;ctx.beginPath();
+      var started=false;
+      for(var i=0;i<n;i++){
+        if(values[i]==null){started=false;continue;}
+        var x=pL+(n>1?(cW/(n-1))*i:cW/2);
+        var y=pT+cH*(1-(values[i]-minV)/(maxV-minV));
+        if(!started){ctx.moveTo(x,y);started=true;}else ctx.lineTo(x,y);
+      }
+      ctx.stroke();
+      ctx.fillStyle=color;
+      for(var i=0;i<n;i++){
+        if(values[i]==null) continue;
+        var x=pL+(n>1?(cW/(n-1))*i:cW/2);
+        var y=pT+cH*(1-(values[i]-minV)/(maxV-minV));
+        ctx.beginPath();ctx.arc(x,y,3,0,2*Math.PI);ctx.fill();
+      }
+      ctx.fillStyle='#9ca3af';ctx.font='8px sans-serif';ctx.textAlign='center';
+      labels.forEach(function(l,i){
+        if(i%3===0||i===n-1){var x=pL+(n>1?(cW/(n-1))*i:cW/2);ctx.fillText(l,x,H-4);}
+      });
+      ctx.fillStyle='#374151';ctx.font='10px sans-serif';ctx.textAlign='left';ctx.fillText(title,pL,14);
     }
 
     // ── クロスリンク ───────────────────────────────────────────────────────
@@ -17131,5 +17357,272 @@ window.addEventListener('load', function() {
     <button class="rs-chat-send-btn" id="rs-chat-send">&#36865;&#20449;</button>
   </div>
 </div>
+
+<script>
+// ── 競合価格モニター v2 (plan-level) ────────────────────
+(function(){
+  var OWN_C  = ['#1e3a5f','#2a7a6e','#c9a84c','#7b4ea0'];
+  var COMP_C = ['#e57373','#f4a261','#4fc3f7','#a5d6a7','#ce93d8','#ffcc80','#80cbc4','#ef9a9a'];
+  var AREA_MAP    = {'宮若':['脇田温泉','宮若市','若宮IC周辺','宗像市'],'阿蘇':['阿蘇'],'九重':['九重'],'大分':['大分'],'箱根':['箱根']};
+  var AREA_LABELS = {'宮若':'宮若エリア','阿蘇':'阿蘇エリア','九重':'九重エリア','大分':'大分エリア','箱根':'箱根エリア'};
+  var CAT_CATS    = {'hotel':['旅館','ホテル'],'golf':['ゴルフ']};
+  var TITLE_ALL   = {'hotel':'施設別 平均価格推移（1泊2名・税込）','golf':'施設別 平均プレーフィー推移（セルフ・1名）'};
+  var TITLE_FAC   = {'hotel':'プラン別 価格推移（1泊2名・税込）',  'golf':'プラン別 プレーフィー推移（セルフ・1名）'};
+
+  var _pArea='宮若',_pCat='hotel',_pDays=30,_pFac='';
+  var _chart=null,_chartLoaded=false,_inited=false;
+
+  function getData(){ return (typeof PRICE_DATA!=='undefined')?PRICE_DATA:[]; }
+
+  function filterBase(){
+    var areas=AREA_MAP[_pArea]||[],cats=CAT_CATS[_pCat]||[],cut='';
+    if(_pDays>0){var d=new Date();d.setDate(d.getDate()-_pDays);cut=d.toISOString().slice(0,10);}
+    return getData().filter(function(r){
+      return areas.indexOf(r.area)>=0 && cats.indexOf(r.category)>=0 && r.price && (!cut||r.date>=cut);
+    });
+  }
+
+  // 施設 select 更新
+  function updateFacSelect(rows){
+    var sel=document.getElementById('pmon-fac-sel'); if(!sel) return;
+    var fm={};
+    rows.forEach(function(r){if(!fm[r.facility])fm[r.facility]=r.kind;});
+    var own=[],cmp=[];
+    Object.keys(fm).sort().forEach(function(n){if(fm[n]==='自社')own.push(n);else cmp.push(n);});
+    var opts='<option value="">── 全施設 ──</option>';
+    if(own.length){opts+='<optgroup label="自社">';own.forEach(function(n){opts+='<option value="'+n+'"'+(n===_pFac?' selected':'')+'>'+n+'</option>';});opts+='</optgroup>';}
+    if(cmp.length){opts+='<optgroup label="競合">';cmp.forEach(function(n){opts+='<option value="'+n+'"'+(n===_pFac?' selected':'')+'>'+n+'</option>';});opts+='</optgroup>';}
+    sel.innerHTML=opts;
+  }
+
+  // ── 全施設モード: 施設×日付の平均 ──
+  function buildFacDS(rows){
+    var fm={},km={};
+    rows.forEach(function(r){
+      if(!fm[r.facility]){fm[r.facility]={};km[r.facility]=r.kind;}
+      if(!fm[r.facility][r.date])fm[r.facility][r.date]=[];
+      fm[r.facility][r.date].push(r.price);
+    });
+    var dates=Array.from(new Set(rows.map(function(r){return r.date;}))).sort();
+    var own=Object.keys(fm).filter(function(n){return km[n]==='自社';}).sort();
+    var cmp=Object.keys(fm).filter(function(n){return km[n]==='競合';}).sort();
+    var ds=own.concat(cmp).map(function(name){
+      var isOwn=km[name]==='自社',idx=isOwn?own.indexOf(name):cmp.indexOf(name);
+      var c=isOwn?OWN_C[idx%OWN_C.length]:COMP_C[idx%COMP_C.length];
+      return {label:name,_isOwn:isOwn,_km:km,
+        data:dates.map(function(d){
+          var ps=fm[name][d]; return ps?Math.round(ps.reduce(function(s,v){return s+v;},0)/ps.length):null;
+        }),
+        _meta:dates.map(function(d){
+          var ps=fm[name][d]; return ps?{avg:Math.round(ps.reduce(function(s,v){return s+v;},0)/ps.length),count:ps.length}:null;
+        }),
+        borderColor:c,backgroundColor:c+'22',
+        borderWidth:isOwn?3:1.5,borderDash:isOwn?[]:[4,3],
+        pointRadius:isOwn?5:3,pointHoverRadius:8,tension:0.3,spanGaps:true};
+    });
+    return {labels:dates,datasets:ds,own:own,cmp:cmp,km:km};
+  }
+
+  // ── 施設ドリルダウン: プラン×日付 ──
+  function buildPlanDS(rows){
+    var facRows=rows.filter(function(r){return r.facility===_pFac;});
+    var pm={};
+    facRows.forEach(function(r){
+      if(!pm[r.plan])pm[r.plan]={};
+      pm[r.plan][r.date]=r.price;
+    });
+    var dates=Array.from(new Set(facRows.map(function(r){return r.date;}))).sort();
+    var plans=Object.keys(pm);
+    var last=dates[dates.length-1]||'';
+    plans.sort(function(a,b){return (pm[a][last]||0)-(pm[b][last]||0);});
+    var ds=plans.map(function(plan,i){
+      var c=COMP_C[i%COMP_C.length];
+      return {label:plan,_isOwn:false,
+        data:dates.map(function(d){return pm[plan][d]||null;}),
+        _meta:dates.map(function(d){return pm[plan][d]?{price:pm[plan][d]}:null;}),
+        borderColor:c,backgroundColor:c+'22',
+        borderWidth:1.5,borderDash:[],
+        pointRadius:4,pointHoverRadius:8,tension:0.2,spanGaps:false};
+    });
+    return {labels:dates,datasets:ds,own:[],cmp:plans,km:{}};
+  }
+
+  function renderLegend(b){
+    var el=document.getElementById('pmon-legend'); if(!el) return;
+    var names=(_pFac?b.cmp:b.own.concat(b.cmp));
+    el.innerHTML=names.map(function(name,i){
+      var isOwn=!_pFac&&b.km[name]==='自社';
+      var idx=isOwn?b.own.indexOf(name):(_pFac?i:b.cmp.indexOf(name));
+      var c=isOwn?OWN_C[idx%OWN_C.length]:COMP_C[(_pFac?i:idx)%COMP_C.length];
+      return '<div class="pmon-legend-item"><div class="pmon-legend-dot" style="background:'+c+'"></div>'
+        +'<span'+(isOwn?' style="font-weight:700"':'')+'>'+name+(isOwn?' ★':'')+'</span></div>';
+    }).join('');
+  }
+
+  function renderChartPmon(b){
+    var cv=document.getElementById('pmon-chart-canvas'); if(!cv||typeof Chart==='undefined') return;
+    if(_chart){_chart.destroy();_chart=null;}
+    if(!b.labels.length){cv.style.display='none';return;} cv.style.display='';
+    _chart=new Chart(cv,{type:'line',data:{labels:b.labels,datasets:b.datasets},options:{
+      responsive:true,interaction:{mode:'nearest',intersect:true},
+      plugins:{legend:{display:false},tooltip:{callbacks:{label:function(ctx){
+        var v=ctx.parsed.y; if(v==null) return null;
+        var pd=ctx.dataset._meta&&ctx.dataset._meta[ctx.dataIndex];
+        var lines=[ctx.dataset.label+': ¥'+v.toLocaleString()];
+        if(pd&&pd.count) lines.push('  プラン数: '+pd.count+'件');
+        return lines;
+      }}}},
+      scales:{
+        x:{ticks:{maxRotation:45,font:{size:11}}},
+        y:{ticks:{font:{size:11},callback:function(v){return '¥'+v.toLocaleString();}}}
+      }
+    }});
+  }
+
+  // ── テーブル: 全施設モード ──
+  function renderTableAll(rows){
+    var byFac={};
+    rows.forEach(function(r){
+      if(!byFac[r.facility])byFac[r.facility]={kind:r.kind,area:r.area,dates:{},source:r.source,url:r.url};
+      var b=byFac[r.facility];
+      if(!b.dates[r.date])b.dates[r.date]=[];
+      b.dates[r.date].push(r.price);
+    });
+    var ownMins=[];
+    Object.keys(byFac).forEach(function(n){
+      if(byFac[n].kind==='自社'){
+        var allP=[];Object.values(byFac[n].dates).forEach(function(ps){allP=allP.concat(ps);});
+        if(allP.length)ownMins.push(Math.min.apply(null,allP));
+      }
+    });
+    var ownMin=ownMins.length?Math.min.apply(null,ownMins):null;
+    var facs=Object.keys(byFac).sort(function(a,b){
+      if(byFac[a].kind!==byFac[b].kind)return byFac[a].kind==='自社'?-1:1; return a.localeCompare(b,'ja');
+    });
+    var el=document.getElementById('pmon-table'); if(!el) return;
+    el.innerHTML='<thead><tr>'
+      +['種別','施設名','エリア','平均価格（最終日）','最安〜最高','プラン数','自社比','収集日'].map(function(t){return '<th>'+t+'</th>';}).join('')
+      +'</tr></thead><tbody>'
+      +facs.map(function(name){
+        var b=byFac[name],isOwn=b.kind==='自社';
+        var dates=Object.keys(b.dates).sort();
+        var lastDate=dates[dates.length-1]||'';
+        var lastPrices=b.dates[lastDate]||[];
+        var allPrices=[]; dates.forEach(function(d){allPrices=allPrices.concat(b.dates[d]);});
+        var avg=lastPrices.length?Math.round(lastPrices.reduce(function(s,v){return s+v;},0)/lastPrices.length):0;
+        var mn=allPrices.length?Math.min.apply(null,allPrices):0;
+        var mx=allPrices.length?Math.max.apply(null,allPrices):0;
+        var planCnt=allPrices.length;
+        var diff=(!isOwn&&avg&&ownMin!==null)?avg-ownMin:null;
+        var dt='—',dc='';
+        if(diff!==null){if(diff>0){dt='+¥'+diff.toLocaleString();dc='pmon-diff-up';}else if(diff<0){dt='-¥'+Math.abs(diff).toLocaleString();dc='pmon-diff-dn';}else{dt='同価格';}}
+        return '<tr class="'+(isOwn?'pmon-own-row':'')+'" style="cursor:pointer" data-drill="1" data-name="'+encodeURIComponent(name)+'">'
+          +'<td>'+b.kind+'</td><td>'+name+'</td><td>'+(b.area||'—')+'</td>'
+          +'<td>¥'+(avg?avg.toLocaleString():'—')+'</td>'
+          +'<td style="font-size:11px;color:#6b7280;">¥'+mn.toLocaleString()+' 〜 ¥'+mx.toLocaleString()+'</td>'
+          +'<td style="text-align:center">'+planCnt+'</td>'
+          +'<td class="'+dc+'">'+(isOwn?'基準':dt)+'</td>'
+          +'<td>'+lastDate+'</td>'
+          +'</tr>';
+      }).join('')+'</tbody>';
+    var note=document.getElementById('pmon-table-note'); if(note) note.textContent='行をクリックするとプラン別詳細を表示します';
+  }
+
+  // ── テーブル: 施設ドリルダウン ──
+  function renderTableFac(rows){
+    var facRows=rows.filter(function(r){return r.facility===_pFac;});
+    var pm={};
+    facRows.forEach(function(r){
+      if(!pm[r.plan])pm[r.plan]=[];
+      pm[r.plan].push({date:r.date,price:r.price});
+    });
+    var plans=Object.keys(pm).sort();
+    var el=document.getElementById('pmon-table'); if(!el) return;
+    el.innerHTML='<thead><tr>'
+      +['プラン名','最新価格','前回価格','前回比','収集日'].map(function(t){return '<th>'+t+'</th>';}).join('')
+      +'</tr></thead><tbody>'
+      +plans.map(function(plan){
+        var entries=pm[plan].sort(function(a,b){return a.date<b.date?-1:1;});
+        var last=entries[entries.length-1];
+        var prev=entries.length>1?entries[entries.length-2]:null;
+        var diff=prev?last.price-prev.price:null;
+        var dt='—',dc='',arrow='';
+        if(diff!==null){
+          if(diff>0){dt='+¥'+diff.toLocaleString();dc='pmon-diff-up';arrow=' ▲';}
+          else if(diff<0){dt='-¥'+Math.abs(diff).toLocaleString();dc='pmon-diff-dn';arrow=' ▼';}
+          else{dt='変動なし';}
+        }
+        return '<tr>'
+          +'<td style="font-size:12px;">'+plan+'</td>'
+          +'<td>¥'+last.price.toLocaleString()+'</td>'
+          +'<td>'+(prev?'¥'+prev.price.toLocaleString():'—')+'</td>'
+          +'<td class="'+dc+'">'+(diff!==null?dt+arrow:'初回収集')+'</td>'
+          +'<td>'+last.date+'</td>'
+          +'</tr>';
+      }).join('')+'</tbody>';
+    var note=document.getElementById('pmon-table-note'); if(note) note.textContent='';
+  }
+
+  function renderAll(){
+    var rows=filterBase();
+    updateFacSelect(rows);
+    var b=_pFac?buildPlanDS(rows):buildFacDS(rows);
+    renderLegend(b);
+    renderChartPmon(b);
+    if(_pFac) renderTableFac(rows); else renderTableAll(rows);
+    // サブタイトル・チャートタイトル更新
+    var sub=document.getElementById('pmon-subtitle');
+    if(sub)sub.textContent=(AREA_LABELS[_pArea]||_pArea)+' '+(_pFac?_pFac:(_pCat==='hotel'?'ホテル・旅館':'ゴルフ場'))+' 平均価格時系列（プラン別）';
+    var th=document.getElementById('pmon-chart-title');
+    if(th)th.textContent=_pFac?TITLE_FAC[_pCat]:TITLE_ALL[_pCat];
+    // 戻るボタン
+    var bk=document.getElementById('pmon-back-btn');
+    if(bk)bk.style.display=_pFac?'':'none';
+    // 最終収集日
+    var pd=getData();
+    if(pd.length){var latest=pd.map(function(r){return r.date;}).sort().pop();var el=document.getElementById('pmon-last-updated');if(el)el.textContent='最終収集: '+latest;}
+  }
+
+
+
+  function loadChartJS(cb){
+    if(typeof Chart!=='undefined'){cb();return;}
+    if(_chartLoaded){cb();return;}
+    var s=document.createElement('script');
+    s.src='https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js';
+    s.onload=function(){_chartLoaded=true;cb();};
+    s.onerror=function(){cb();};
+    document.head.appendChild(s);
+  }
+
+  function initPmon(){
+    if(_inited)return; _inited=true;
+    var asel=document.getElementById('pmon-area-sel');
+    if(asel)asel.addEventListener('change',function(){_pArea=this.value;_pFac='';renderAll();});
+    document.querySelectorAll('.pmon-cat-btn').forEach(function(btn){
+      btn.addEventListener('click',function(){
+        document.querySelectorAll('.pmon-cat-btn').forEach(function(b){b.classList.remove('active');});
+        btn.classList.add('active');_pCat=btn.dataset.cat;_pFac='';renderAll();
+      });
+    });
+    var fsel=document.getElementById('pmon-fac-sel');
+    if(fsel)fsel.addEventListener('change',function(){_pFac=this.value;renderAll();});
+    var rs=document.getElementById('pmon-range');
+    if(rs)rs.addEventListener('change',function(){_pDays=parseInt(this.value);renderAll();});
+    var bk=document.getElementById('pmon-back-btn');
+    if(bk)bk.addEventListener('click',function(){_pFac='';var s=document.getElementById('pmon-fac-sel');if(s)s.value='';renderAll();});
+    var tbl=document.getElementById('pmon-table');
+    if(tbl)tbl.addEventListener('click',function(e){
+      var tr=e.target.closest('tr[data-drill]');
+      if(!tr) return;
+      _pFac=decodeURIComponent(tr.getAttribute('data-name'));
+      var s=document.getElementById('pmon-fac-sel');if(s)s.value=_pFac;
+      renderAll();
+    });
+  }
+
+  window._openPriceTab=function(){loadChartJS(function(){initPmon();renderAll();});};
+})();
+</script>
 </body>
 </html>
