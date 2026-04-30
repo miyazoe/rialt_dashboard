@@ -36,6 +36,42 @@ function doGet(e) {
     if (e.parameter.budget_save) return saveBudgetFacility_(e, cb);
     if (e.parameter.budget_save_row) return saveBudgetRow_(e, cb);
 
+    // ── get_cache=1: KPI+PL週次キャッシュ取得 ──
+    if (e.parameter.get_cache) {
+      var cacheData = getCache_();
+      return cb ? jsonpResponse(cacheData, cb) : jsonResponse(cacheData);
+    }
+    // ── collect_pl=1: 手動収集（1ヶ月分） ──
+    if (e.parameter.collect_pl) {
+      var ymCollect = e.parameter.ym || getCurrentMonth();
+      var collectResult = collectAndCache_(ymCollect);
+      var collectOk = { status: 'ok', collected: collectResult };
+      return cb ? jsonpResponse(collectOk, cb) : jsonResponse(collectOk);
+    }
+    // ── collect_all=1: 全既知月を一括収集（初回セットアップ用） ──
+    if (e.parameter.collect_all) {
+      var allResults = [];
+      Object.keys(PL_SHEETS_).forEach(function(ym) {
+        try { allResults.push(collectAndCache_(ym)); } catch(e) { allResults.push({ ym: ym, error: e.message }); }
+      });
+      return jsonResponse({ status: 'ok', results: allResults });
+    }
+    // ── setup_trigger=1: 週次トリガー登録 ──
+    if (e.parameter.setup_trigger) {
+      setupWeeklyTrigger_();
+      return jsonResponse({ status: 'ok', trigger: 'weekly_monday_0930' });
+    }
+    // ── add_pl_sheet=1: 新月PLシートを登録（ym=YYYY-MM&id=SSID） ──
+    if (e.parameter.add_pl_sheet) {
+      var ymAdd = e.parameter.ym || '', idAdd = e.parameter.id || '';
+      if (ymAdd && idAdd) {
+        var propsAdd = PropertiesService.getScriptProperties();
+        var disc = JSON.parse(propsAdd.getProperty('DISCOVERED_PL_SHEETS') || '{}');
+        disc[ymAdd] = idAdd; propsAdd.setProperty('DISCOVERED_PL_SHEETS', JSON.stringify(disc));
+      }
+      return jsonResponse({ status: 'ok', ym: ymAdd, id: idAdd });
+    }
+
     // ── ir=1: 株価・財務・アナリスト・ニュースを返す ──
     if (e.parameter.ir) {
       return fetchIRData(cb);
@@ -517,4 +553,197 @@ function saveBudgetRow_(e, cb) {
     var errResult = { status: 'error', error: err.message };
     return cb ? jsonpResponse(errResult, cb) : jsonResponse(errResult);
   }
+}
+
+// ══════════════════════════════════════════════════════════════════
+//  週次PL自動収集  v1 (2026-04-30)
+// ══════════════════════════════════════════════════════════════════
+
+// ── 月別PLスプレッドシートID（2025-07〜）──────────────────────────
+const PL_SHEETS_ = {
+  '2026-03': '1-mZ8lCJFIBuFRxed_ZSi2IkAWoZFsKhguyYl-rJvOkE',
+  '2026-02': '1QzPD4kulw7WEsTCzkQ99ZRoDTe4TX5Hhoh8JSozLWik',
+  '2026-01': '1HTAoqB-VZwDZhW8TAI2GgJgvYi_m4DLbPMmoRjVNOx4',
+  '2025-12': '16_9OSPom0C0yAS29ZCkhyPMYvzAmJq911bhBBFHlI-I',
+  '2025-11': '1lIoCED6WOQ-HPKS1e0scjSoif_UAlz8a8GrPhOVGZCo',
+  '2025-10': '1jezU8VVKvscRTHEfKVXbloALZoHWYnGFvk51D-KGSMc',
+  '2025-09': '1gFdYhNxWdAK886PYWFmqzNwfkTKapPYKLD-kRAoM9yI',
+  '2025-08': '1pcjjwo-oB5hEBjgwHdJlc7LQYvsdNLSVwZVGBTbf578',
+  '2025-07': '18jimGRE7E7wlLwoNet_vUUl_9DD6YrG0_vxNnpEs00U',
+};
+
+// ── PL列マッピング (0-indexed, B=1) ─────────────────────────────
+// IはPL合計列のためスキップ。Jの前で+1ずれる
+const PL_FAC_COLS_ = {
+  '九重久織亭':  2,  // C
+  '九重虎乃湯':  3,  // D (PLシートの「九重虎の湯」と同一施設)
+  '宮若虎の湯':  4,  // E
+  '小塚久の葉':  5,  // F
+  '仙石原久の葉':6,  // G
+  '古民家煉り':  7,  // H
+  'Tsmart':      9,  // J (Iは合計列でスキップ)
+  '若宮コース':  12, // M
+  '大分コース':  13, // N
+};
+// ── PL行マッピング (0-indexed, row9=index8) ─────────────────────
+const PL_ROWS_ = { rev_a: 8, gp_a: 11, lc_a: 12, op_a: 17, op_rate: 18 };
+
+// ── PLスプレッドシートのセル値を数値化 ──
+function toPlNum_(rows, rowIdx, colIdx) {
+  if (!rows[rowIdx]) return null;
+  var v = rows[rowIdx][colIdx];
+  if (v === '' || v == null) return null;
+  var n = typeof v === 'number' ? v : parseFloat(String(v).replace(/[¥,\s]/g, ''));
+  return isNaN(n) ? null : n;
+}
+
+// ── 未知月のPLシートをPropertiesServiceから探す ──
+function resolvePLSheetId_(ym) {
+  var id = PL_SHEETS_[ym];
+  if (id) return id;
+  var props = PropertiesService.getScriptProperties();
+  var disc = JSON.parse(props.getProperty('DISCOVERED_PL_SHEETS') || '{}');
+  return disc[ym] || null;
+}
+
+// ── 月PLスプレッドシートを解析してPLデータを返す ──
+function parsePLSheet_(ym) {
+  var ssId = resolvePLSheetId_(ym);
+  if (!ssId) return null;
+  try {
+    var ss = SpreadsheetApp.openById(ssId);
+    var monthNum = parseInt(ym.split('-')[1], 10);
+    // 「TGR全体PL」を含むシートを探す
+    var targetSheet = null;
+    var sheets = ss.getSheets();
+    for (var i = 0; i < sheets.length; i++) {
+      var sn = sheets[i].getName();
+      if (sn.indexOf('TGR全体PL') >= 0) { targetSheet = sheets[i]; break; }
+    }
+    if (!targetSheet) targetSheet = sheets[0];
+    var rows = targetSheet.getDataRange().getValues();
+    var result = {};
+    Object.keys(PL_FAC_COLS_).forEach(function(facName) {
+      var col = PL_FAC_COLS_[facName];
+      var rev_a = toPlNum_(rows, PL_ROWS_.rev_a, col);
+      var gp_a  = toPlNum_(rows, PL_ROWS_.gp_a,  col);
+      var lc_a  = toPlNum_(rows, PL_ROWS_.lc_a,  col);
+      var op_a  = toPlNum_(rows, PL_ROWS_.op_a,  col);
+      var op_rt = toPlNum_(rows, PL_ROWS_.op_rate, col);
+      if (rev_a != null || gp_a != null) {
+        result[facName] = {
+          rev_a:  rev_a,
+          gp_a:   gp_a,
+          lc_a:   lc_a,
+          op_a:   op_a,
+          op_rate: op_rt != null ? (Math.abs(op_rt) <= 1 ? op_rt : op_rt / 100) : null,
+          gp_rate: (rev_a != null && rev_a > 0 && gp_a != null) ? Math.round(gp_a / rev_a * 10000) / 10000 : null,
+        };
+      }
+    });
+    return Object.keys(result).length > 0 ? result : null;
+  } catch(e) {
+    Logger.log('parsePLSheet_ error ' + ym + ': ' + e.message);
+    return null;
+  }
+}
+
+// ── 1ヶ月分のKPIを全施設から収集 ──
+function collectKPI_(ym) {
+  var result = {};
+  FACILITIES.forEach(function(facility) {
+    try {
+      var ss = SpreadsheetApp.openById(facility.id);
+      var sheet = ss.getSheetByName(monthToSheetName(ym));
+      if (!sheet) return;
+      var data = parseSheet(sheet, facility.name, facility.type);
+      var mo = data.monthly || {};
+      var rec = {
+        rev_a: mo.rev_actual > 0 ? mo.rev_actual : null,
+        rev_b: mo.rev_budget  > 0 ? mo.rev_budget  : null,
+        pax_a: mo.pax_actual  > 0 ? mo.pax_actual  : null,
+        pax_b: mo.pax_budget  > 0 ? mo.pax_budget  : null,
+        adr_a: mo.adr         > 0 ? mo.adr          : null,
+        adr_b: mo.adr_b       > 0 ? mo.adr_b        : null,
+        occ_a: mo.occupancy   > 0 ? mo.occupancy / 100 : null,
+        occ_b: mo.occ_b != null   ? (mo.occ_b > 1 ? mo.occ_b / 100 : mo.occ_b) : null,
+        rvp_a: mo.revpar      > 0 ? mo.revpar        : null,
+        rvp_b: mo.rvp_b       > 0 ? mo.rvp_b         : null,
+        spd_a: (mo.pax_actual > 0 && mo.rev_actual > 0) ? Math.round(mo.rev_actual / mo.pax_actual) : null,
+        spd_b: mo.spd_b       > 0 ? mo.spd_b         : null,
+        type:  facility.type,
+      };
+      if (Object.values(rec).some(function(v){ return v != null && v !== facility.type; }))
+        result[facility.name] = rec;
+    } catch(e) {
+      Logger.log('collectKPI_ ' + facility.name + ' ' + ym + ': ' + e.message);
+    }
+  });
+  return result;
+}
+
+// ── 1ヶ月分を収集してPropertiesServiceに保存 ──
+function collectAndCache_(ym) {
+  var props = PropertiesService.getScriptProperties();
+  var kpiData = collectKPI_(ym);
+  var plData  = parsePLSheet_(ym);
+  var meta = JSON.parse(props.getProperty('WEEKLY_CACHE_META') || '{}');
+  meta[ym] = new Date().toISOString();
+  props.setProperty('WEEKLY_CACHE_META', JSON.stringify(meta));
+  if (Object.keys(kpiData).length > 0)
+    props.setProperty('CACHE_KPI_' + ym, JSON.stringify(kpiData));
+  if (plData && Object.keys(plData).length > 0)
+    props.setProperty('CACHE_PL_' + ym, JSON.stringify(plData));
+  return { ym: ym, kpi: Object.keys(kpiData).length, pl: plData ? Object.keys(plData).length : 0 };
+}
+
+// ── キャッシュ全件取得 ──
+function getCache_() {
+  var props = PropertiesService.getScriptProperties();
+  var meta  = JSON.parse(props.getProperty('WEEKLY_CACHE_META') || '{}');
+  var result = { cache: true, generated: new Date().toISOString(), months: {} };
+  Object.keys(meta).sort().forEach(function(ym) {
+    var kpiStr = props.getProperty('CACHE_KPI_' + ym);
+    var plStr  = props.getProperty('CACHE_PL_'  + ym);
+    if (kpiStr || plStr) {
+      result.months[ym] = {
+        updated: meta[ym],
+        kpi: kpiStr ? JSON.parse(kpiStr) : {},
+        pl:  plStr  ? JSON.parse(plStr)  : {},
+      };
+    }
+  });
+  return result;
+}
+
+// ── 週次自動収集（Time-Driven Trigger から呼ばれる） ──
+function weeklyCollect_() {
+  var now  = new Date();
+  var cur  = now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0');
+  var prev = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+  var prv  = prev.getFullYear() + '-' + String(prev.getMonth() + 1).padStart(2, '0');
+  var pp   = new Date(now.getFullYear(), now.getMonth() - 2, 1);
+  var prv2 = pp.getFullYear() + '-' + String(pp.getMonth() + 1).padStart(2, '0');
+  [cur, prv, prv2].forEach(function(ym) {
+    try {
+      var r = collectAndCache_(ym);
+      Logger.log('weeklyCollect_ ' + ym + ': KPI=' + r.kpi + ' PL=' + r.pl);
+    } catch(e) {
+      Logger.log('weeklyCollect_ error ' + ym + ': ' + e.message);
+    }
+  });
+}
+
+// ── 毎週月曜9:30トリガーを登録（一度だけ実行） ──
+function setupWeeklyTrigger_() {
+  ScriptApp.getProjectTriggers().forEach(function(t) {
+    if (t.getHandlerFunction() === 'weeklyCollect_') ScriptApp.deleteTrigger(t);
+  });
+  ScriptApp.newTrigger('weeklyCollect_')
+    .timeBased()
+    .onWeekDay(ScriptApp.WeekDay.MONDAY)
+    .atHour(9)
+    .nearMinute(30)
+    .create();
+  Logger.log('setupWeeklyTrigger_: registered weeklyCollect_ @ Monday 09:30');
 }

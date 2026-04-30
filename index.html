@@ -10857,6 +10857,58 @@ document.getElementById('import-btn').addEventListener('click', openPasteDialog)
 
   var _inited = false, _currentMonth = null, _viewMode = 'single', _currentFac = null;
   var _gasCache = {};
+  var _gasPL = {}; // PLデータキャッシュ { 'YYYY-MM': { 'gas施設名': { gp_a,op_a,lc_a,rev_a } } }
+
+  // ── GASキャッシュ自動取得（TGRタブ開時に呼ばれる） ──
+  function autoFetchGasCache_(manual) {
+    var cbName = '_gasCb_' + Date.now();
+    var script = document.createElement('script');
+    var done = false;
+    var timer = setTimeout(function() {
+      if (done) return; done = true;
+      delete window[cbName];
+      if (script.parentNode) script.parentNode.removeChild(script);
+      if (manual) showToast('GASキャッシュのタイムアウト（20秒）', 'error');
+    }, 20000);
+    window[cbName] = function(data) {
+      if (done) return; done = true;
+      clearTimeout(timer);
+      delete window[cbName];
+      if (script.parentNode) script.parentNode.removeChild(script);
+      if (!data || !data.cache) {
+        if (manual) showToast('キャッシュデータが見つかりません', 'error');
+        return;
+      }
+      var months = data.months || {}, loaded = 0;
+      Object.keys(months).forEach(function(ym) {
+        var m = months[ym];
+        if (m.kpi && Object.keys(m.kpi).length > 0) {
+          window.GAS_MONTHLY = window.GAS_MONTHLY || {};
+          window.GAS_MONTHLY[ym] = Object.assign(window.GAS_MONTHLY[ym] || {}, m.kpi);
+          loaded++;
+        }
+        if (m.pl && Object.keys(m.pl).length > 0)
+          _gasPL[ym] = Object.assign(_gasPL[ym] || {}, m.pl);
+      });
+      if (manual) showToast('GASキャッシュ取得完了 (' + loaded + 'ヶ月)', 'success');
+      if (_inited) {
+        var sel = document.getElementById('resort-month-sel');
+        if (sel) {
+          var cur = sel.value, avail = availMonths();
+          while (sel.firstChild) sel.removeChild(sel.firstChild);
+          avail.forEach(function(mo) {
+            var o = document.createElement('option');
+            o.value = mo; o.textContent = ymLabel(mo); sel.appendChild(o);
+          });
+          sel.value = avail.indexOf(cur) >= 0 ? cur : avail[0];
+          _currentMonth = sel.value;
+        }
+        showL1();
+      }
+    };
+    script.src = GAS_URL + '?get_cache=1&callback=' + cbName;
+    document.head.appendChild(script);
+  }
 
   // GAS施設名取得（PL名 → GAS名）
   function facGasName(plName) {
@@ -10898,6 +10950,14 @@ document.getElementById('import-btn').addEventListener('click', openPasteDialog)
       if (occ4rvp != null) ret.rvp_b = Math.round(ret.adr_b * occ4rvp);
     }
     // spd_b: GASのspd_bは稼働率比率値のため使用不可
+    // PLデータ補完（_gasPLから荒利・営業利益・人件費）
+    var plRec = _gasPL[ym] && (_gasPL[ym][gn] || _gasPL[ym][facPlName]);
+    if (plRec) {
+      if (ret.rev_a == null && plRec.rev_a != null) ret.rev_a = plRec.rev_a;
+      if (ret.gp_a == null && plRec.gp_a != null)  ret.gp_a  = plRec.gp_a;
+      if (ret.op_a == null && plRec.op_a != null)  ret.op_a  = plRec.op_a;
+      if (ret.lc_a == null && plRec.lc_a != null)  ret.lc_a  = plRec.lc_a;
+    }
     return ret;
   }
 
@@ -11155,6 +11215,15 @@ document.getElementById('import-btn').addEventListener('click', openPasteDialog)
       });
     });
     document.getElementById('resort-back-btn').addEventListener('click', showL1);
+    // "GASデータ"ボタンを"今すぐ更新"に変更してautoFetchGasCache_に紐付け
+    var _gasImportBtn = document.getElementById('resort-gas-import-btn');
+    if (_gasImportBtn) {
+      _gasImportBtn.textContent = '🔄 今すぐ更新';
+      _gasImportBtn.title = 'GASキャッシュからKPI+PLデータを取得';
+      var _newBtn = _gasImportBtn.cloneNode(true);
+      _gasImportBtn.parentNode.replaceChild(_newBtn, _gasImportBtn);
+      _newBtn.addEventListener('click', function() { autoFetchGasCache_(true); });
+    }
     initDrilldown();
     document.getElementById('resort-gas-fetch-btn').addEventListener('click', function() {
       if (!_currentFac || !_currentMonth) return;
@@ -11180,6 +11249,8 @@ document.getElementById('import-btn').addEventListener('click', openPasteDialog)
     showL1();
     initTgrSubTabs();
     renderTgrKpiBanner();
+    // TGRタブ初回表示時にGASキャッシュを自動取得（バックグラウンド）
+    setTimeout(function() { autoFetchGasCache_(false); }, 500);
   }
 
   // ── Layer 1 ──────────────────────────────────────────────────────
