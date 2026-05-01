@@ -27,7 +27,7 @@ function doGet(e) {
 
     // ── budget_ping: 診断（スプレッドシートアクセスなし） ──
     if (e.parameter.budget_ping) {
-      var pingResult = { status: 'ok', ping: true, version: 87, ts: new Date().toISOString() };
+      var pingResult = { status: 'ok', ping: true, version: 100, ts: new Date().toISOString() };
       return cb ? jsonpResponse(pingResult, cb) : jsonResponse(pingResult);
     }
 
@@ -40,6 +40,31 @@ function doGet(e) {
     if (e.parameter.get_cache) {
       var cacheData = getCache_();
       return cb ? jsonpResponse(cacheData, cb) : jsonResponse(cacheData);
+    }
+    // ── get_pl_full=1: 月別フルPLデータ（resort_table.js代替）──
+    if (e.parameter.get_pl_full) {
+      var ymFull = e.parameter.ym || getCurrentMonth();
+      var fullCached = getPLFullCache_(ymFull);
+      if (!fullCached) {
+        var freshFull = parsePLSheetFull_(ymFull);
+        if (freshFull) { setPLFullCache_(ymFull, freshFull); fullCached = freshFull; }
+      }
+      var fullResult = { ym: ymFull, facs: fullCached || {}, generated: new Date().toISOString() };
+      return cb ? jsonpResponse(fullResult, cb) : jsonResponse(fullResult);
+    }
+    // ── pl_check=1: rev_b確認用軽量エンドポイント ──
+    if (e.parameter.pl_check) {
+      var ymCheck = e.parameter.ym || '2026-03';
+      var plKey = 'CACHE_PL_' + ymCheck;
+      var props = PropertiesService.getScriptProperties();
+      var plRaw = props.getProperty(plKey);
+      var plData = plRaw ? JSON.parse(plRaw) : {};
+      var summary = {};
+      Object.keys(plData).forEach(function(fac) {
+        summary[fac] = { rev_a: plData[fac].rev_a, rev_b: plData[fac].rev_b };
+      });
+      var res = { ym: ymCheck, pl: summary };
+      return cb ? jsonpResponse(res, cb) : jsonResponse(res);
     }
     // ── collect_pl=1: 手動収集（1ヶ月分） ──
     if (e.parameter.collect_pl) {
@@ -613,7 +638,6 @@ function parsePLSheet_(ym) {
   if (!ssId) return null;
   try {
     var ss = SpreadsheetApp.openById(ssId);
-    var monthNum = parseInt(ym.split('-')[1], 10);
     // 「TGR全体PL」を含むシートを探す
     var targetSheet = null;
     var sheets = ss.getSheets();
@@ -633,20 +657,132 @@ function parsePLSheet_(ym) {
       var op_rt = toPlNum_(rows, PL_ROWS_.op_rate, col);
       if (rev_a != null || gp_a != null) {
         result[facName] = {
-          rev_a:  rev_a,
-          gp_a:   gp_a,
-          lc_a:   lc_a,
-          op_a:   op_a,
+          rev_a:   rev_a,
+          gp_a:    gp_a,
+          lc_a:    lc_a,
+          op_a:    op_a,
           op_rate: op_rt != null ? (Math.abs(op_rt) <= 1 ? op_rt : op_rt / 100) : null,
           gp_rate: (rev_a != null && rev_a > 0 && gp_a != null) ? Math.round(gp_a / rev_a * 10000) / 10000 : null,
         };
       }
     });
+    // 月度達成状況シートから予算データ(rev_b/gp_b/lc_b/op_b)を読んでマージ
+    var budData = parseBudgetFromMonthlySheet_(ss);
+    if (budData) {
+      Object.keys(budData).forEach(function(facName) {
+        var bud = budData[facName];
+        if (!result[facName]) result[facName] = {};
+        Object.keys(bud).forEach(function(field) {
+          if (bud[field] != null) result[facName][field] = bud[field];
+        });
+      });
+    }
     return Object.keys(result).length > 0 ? result : null;
   } catch(e) {
     Logger.log('parsePLSheet_ error ' + ym + ': ' + e.message);
     return null;
   }
+}
+
+// ── 月度達成状況シートから予算データを読む（全シートを走査してマージ） ──
+function parseBudgetFromMonthlySheet_(ss) {
+  try {
+    var sheets = ss.getSheets();
+    var result = {};
+    sheets.forEach(function(sh) {
+      if (sh.getName().indexOf('対予算') < 0) return;
+      var shResult = parseSingleBudgetSheet_(sh);
+      Object.keys(shResult).forEach(function(facName) {
+        if (!result[facName]) result[facName] = {};
+        var src = shResult[facName];
+        Object.keys(src).forEach(function(f) { if (src[f] != null) result[facName][f] = src[f]; });
+      });
+    });
+    return Object.keys(result).length > 0 ? result : null;
+  } catch(e) {
+    Logger.log('parseBudgetFromMonthlySheet_ error: ' + e.message);
+    return null;
+  }
+}
+
+// ── 単一の月度達成状況シートを解析して { 施設名: { rev_b, gp_b, lc_b, op_b } } を返す ──
+function parseSingleBudgetSheet_(sh) {
+  var result = {};
+  try {
+    var shName = sh.getName();
+    var isGolf   = shName.indexOf('ゴルフ') >= 0;
+    var isRyokan = shName.indexOf('旅館') >= 0;
+
+    // シート種別に応じて対象施設を絞る（混入防止）
+    var RYOKAN_FACS = ['九重久織亭', '九重虎乃湯', '宮若虎の湯', '小塚久の葉', '仙石原久の葉', '古民家煉り', 'Tsmart'];
+    var GOLF_FACS   = ['若宮コース', '大分コース', '阿蘇コース'];
+    // ゴルフ対予算シートの固定列マッピング (0-indexed)
+    var GOLF_COL_MAP_ = { '若宮コース': 3, '大分コース': 4, '阿蘇コース': 5 };
+    var targetFacs = isGolf ? GOLF_FACS : (isRyokan ? RYOKAN_FACS : Object.keys(PL_FAC_COLS_));
+
+    var rows = sh.getDataRange().getValues();
+
+    // 区分列（'予算'/'実績' が入っている列）を特定
+    var kubunCol = -1;
+    for (var ri = 3; ri < Math.min(rows.length, 30); ri++) {
+      for (var ci = 0; ci < Math.min(rows[ri].length, 5); ci++) {
+        var v = String(rows[ri][ci] || '').trim();
+        if (v === '予算' || v === '実績') { kubunCol = ci; break; }
+      }
+      if (kubunCol >= 0) break;
+    }
+    if (kubunCol < 0) return result;
+    var itemCol = kubunCol > 0 ? kubunCol - 1 : 0;
+
+    // 施設列を特定: ヘッダー行で施設名を探す（優先）
+    // ※ 施設名が複数列に重複する場合があるため、最初に見つかった列（低インデックス）を採用する
+    var facColMap = {};
+    for (var ri = 0; ri < Math.min(rows.length, 10); ri++) {
+      var found = 0;
+      targetFacs.forEach(function(fn) {
+        if (facColMap[fn] != null) { found++; return; } // 既に確定済みならスキップ
+        for (var ci = kubunCol + 1; ci < rows[ri].length; ci++) {
+          if (String(rows[ri][ci] || '').trim() === fn) { facColMap[fn] = ci; found++; break; }
+        }
+      });
+      if (found >= targetFacs.length) break; // 全施設確定でloop終了
+    }
+    // ヘッダー未検出施設のフォールバック（シート種別で分岐）
+    targetFacs.forEach(function(fn) {
+      if (facColMap[fn] != null) return;
+      if (isGolf && GOLF_COL_MAP_[fn] != null) {
+        facColMap[fn] = GOLF_COL_MAP_[fn];
+      } else if (!isGolf && PL_FAC_COLS_[fn] != null) {
+        facColMap[fn] = PL_FAC_COLS_[fn] + 1;
+      }
+    });
+
+    // 対象項目
+    var ITEMS_ = { '売上高合計': 'rev_b', '売上総利益': 'gp_b', '人件費': 'lc_b', '営業利益': 'op_b' };
+
+    // 予算行を走査
+    var lastItem = '';
+    for (var ri = 0; ri < rows.length; ri++) {
+      var item  = String(rows[ri][itemCol]  || '').trim();
+      var kubun = String(rows[ri][kubunCol] || '').trim();
+      if (item) lastItem = item;
+      if (kubun !== '予算') continue;
+      var field = ITEMS_[item || lastItem];
+      if (!field) continue;
+      Object.keys(facColMap).forEach(function(facName) {
+        var col = facColMap[facName];
+        if (col == null) return;
+        var val = toPlNum_(rows, ri, col);
+        if (val != null && val !== 0) {
+          if (!result[facName]) result[facName] = {};
+          result[facName][field] = val;
+        }
+      });
+    }
+  } catch(e) {
+    Logger.log('parseSingleBudgetSheet_ ' + sh.getName() + ': ' + e.message);
+  }
+  return result;
 }
 
 // ── 1ヶ月分のKPIを全施設から収集 ──
@@ -747,4 +883,174 @@ function setupWeeklyTrigger_() {
     .nearMinute(30)
     .create();
   Logger.log('setupWeeklyTrigger_: registered weeklyCollect_ @ Monday 09:30');
+}
+
+// ══════════════════════════════════════════════════════════════════
+//  フルPLデータ取得（resort_table.js代替）  v1 (2026-05-01)
+// ══════════════════════════════════════════════════════════════════
+
+// ── PropertiesServiceキャッシュ（フルPL、24時間有効） ──
+function getPLFullCache_(ym) {
+  try {
+    var raw = PropertiesService.getScriptProperties().getProperty('CACHE_PL_FULL_' + ym);
+    if (!raw) return null;
+    var obj = JSON.parse(raw);
+    if (obj.ts && (Date.now() - obj.ts) < 86400000) return obj.data;
+  } catch(e) {}
+  return null;
+}
+function setPLFullCache_(ym, data) {
+  try {
+    PropertiesService.getScriptProperties()
+      .setProperty('CACHE_PL_FULL_' + ym, JSON.stringify({ ts: Date.now(), data: data }));
+  } catch(e) { Logger.log('setPLFullCache_ error: ' + e.message); }
+}
+
+// ── TGR全体PLシートから全施設・全項目の実績データをスキャン ──
+function parsePLSheetFull_(ym) {
+  var ssId = resolvePLSheetId_(ym);
+  if (!ssId) return null;
+  try {
+    var ss = SpreadsheetApp.openById(ssId);
+    var sheets = ss.getSheets();
+    // TGR全体PLシートを探す
+    var plSheet = null;
+    for (var i = 0; i < sheets.length; i++) {
+      if (sheets[i].getName().indexOf('TGR全体PL') >= 0) { plSheet = sheets[i]; break; }
+    }
+    if (!plSheet) plSheet = sheets[0];
+    var rows = plSheet.getDataRange().getValues();
+
+    var result = {};
+    var SKIP_SET = {'': 1, '区分': 1, '実績': 1, '予算': 1, '見込み': 1, '合計': 1,
+                    '摘要': 1, '月度': 1, '前月比': 1, '対予算': 1, '差異': 1, '科目': 1, '項目': 1};
+
+    for (var ri = 0; ri < rows.length; ri++) {
+      var row = rows[ri];
+      if (!row || row.length < 3) continue;
+      // ラベル列 (col1優先、なければcol0) からアイテム名を検出
+      var itemName = null;
+      for (var ci = 0; ci <= 1 && ci < row.length; ci++) {
+        var v = String(row[ci] || '').trim();
+        if (v.length >= 2 && !SKIP_SET[v] && !/^\d/.test(v)) { itemName = v; break; }
+      }
+      if (!itemName) continue;
+
+      // PL_FAC_COLS_の各施設列から値を取得
+      Object.keys(PL_FAC_COLS_).forEach(function(facName) {
+        var col = PL_FAC_COLS_[facName];
+        if (col >= row.length) return;
+        var rawVal = row[col];
+        if (rawVal === '' || rawVal === null || rawVal === undefined) return;
+        var n = typeof rawVal === 'number' ? rawVal
+              : parseFloat(String(rawVal).replace(/[¥,\s\t]/g, ''));
+        if (isNaN(n)) return;
+        if (!result[facName]) result[facName] = {};
+        var key = itemName + '_実績';
+        if (!(key in result[facName])) result[facName][key] = n;
+      });
+    }
+
+    // 予算データを対予算シートから全項目取得
+    sheets.forEach(function(sh) {
+      if (sh.getName().indexOf('対予算') < 0) return;
+      try {
+        var budResult = parseBudgetSheetAllItems_(sh);
+        Object.keys(budResult).forEach(function(facName) {
+          if (!result[facName]) result[facName] = {};
+          Object.keys(budResult[facName]).forEach(function(field) {
+            if (!(field in result[facName])) result[facName][field] = budResult[facName][field];
+          });
+        });
+      } catch(e2) { Logger.log('parseBudgetSheetAllItems_ error: ' + e2.message); }
+    });
+
+    // KPIデータ（稼働率/ADR/RevPAR等）をFACILITIESから収集してマージ
+    var kpiData = collectKPI_(ym);
+    Object.keys(kpiData).forEach(function(facName) {
+      var k = kpiData[facName];
+      if (!result[facName]) result[facName] = {};
+      var r = result[facName];
+      if (k.occ_a != null) r['客室稼働率_実績'] = Math.round(k.occ_a * 1000) / 10;
+      if (k.occ_b != null) r['稼働率_予算']     = Math.round(k.occ_b * 1000) / 10;
+      if (k.adr_a != null) r['ADR_実績']         = k.adr_a;
+      if (k.adr_b != null) r['ADR_予算']         = k.adr_b;
+      if (k.rvp_a != null) r['RevPAR_実績']      = k.rvp_a;
+      if (k.rvp_b != null) r['RevPAR_予算']      = k.rvp_b;
+      if (k.pax_a != null) r['販売客室数_実績']  = k.pax_a;
+      if (k.pax_b != null) r['来場客数_予算']    = k.pax_b;
+      if (k.spd_a != null) r['客単価_実績']      = k.spd_a;
+      if (k.spd_b != null) r['客単価_予算']      = k.spd_b;
+    });
+
+    return Object.keys(result).length > 0 ? result : null;
+  } catch(e) {
+    Logger.log('parsePLSheetFull_ error ' + ym + ': ' + e.message);
+    return null;
+  }
+}
+
+// ── 予算シート（対予算）から全項目の予算値を取得 ──
+function parseBudgetSheetAllItems_(sh) {
+  var result = {};
+  var shName = sh.getName();
+  var isGolf = shName.indexOf('ゴルフ') >= 0;
+  var RYOKAN_FACS = ['九重久織亭', '九重虎乃湯', '宮若虎の湯', '小塚久の葉', '仙石原久の葉', '古民家煉り', 'Tsmart'];
+  var GOLF_FACS = ['若宮コース', '大分コース', '阿蘇コース'];
+  var GOLF_COL_MAP_ = { '若宮コース': 3, '大分コース': 4, '阿蘇コース': 5 };
+  var targetFacs = isGolf ? GOLF_FACS : RYOKAN_FACS;
+
+  var rows = sh.getDataRange().getValues();
+
+  // kubunCol検出
+  var kubunCol = -1;
+  for (var ri = 3; ri < Math.min(rows.length, 30); ri++) {
+    for (var ci = 0; ci < Math.min(rows[ri].length, 5); ci++) {
+      var v = String(rows[ri][ci] || '').trim();
+      if (v === '予算' || v === '実績') { kubunCol = ci; break; }
+    }
+    if (kubunCol >= 0) break;
+  }
+  if (kubunCol < 0) return result;
+  var itemCol = kubunCol > 0 ? kubunCol - 1 : 0;
+
+  // 施設列マップ
+  var facColMap = {};
+  for (var ri = 0; ri < Math.min(rows.length, 10); ri++) {
+    var found = 0;
+    targetFacs.forEach(function(fn) {
+      if (facColMap[fn] != null) { found++; return; }
+      for (var ci = kubunCol + 1; ci < rows[ri].length; ci++) {
+        if (String(rows[ri][ci] || '').trim() === fn) { facColMap[fn] = ci; found++; break; }
+      }
+    });
+    if (found >= targetFacs.length) break;
+  }
+  targetFacs.forEach(function(fn) {
+    if (facColMap[fn] != null) return;
+    if (isGolf && GOLF_COL_MAP_[fn] != null) facColMap[fn] = GOLF_COL_MAP_[fn];
+    else if (!isGolf && PL_FAC_COLS_[fn] != null) facColMap[fn] = PL_FAC_COLS_[fn] + 1;
+  });
+
+  // 予算行を全走査して全項目取得
+  var lastItem = '';
+  for (var ri = 0; ri < rows.length; ri++) {
+    var item  = String(rows[ri][itemCol]  || '').trim();
+    var kubun = String(rows[ri][kubunCol] || '').trim();
+    if (item) lastItem = item;
+    if (kubun !== '予算') continue;
+    var itemKey = item || lastItem;
+    if (!itemKey) continue;
+    Object.keys(facColMap).forEach(function(facName) {
+      var col = facColMap[facName];
+      if (col == null) return;
+      var val = toPlNum_(rows, ri, col);
+      if (val != null && val !== 0) {
+        if (!result[facName]) result[facName] = {};
+        var field = itemKey + '_予算';
+        if (!(field in result[facName])) result[facName][field] = val;
+      }
+    });
+  }
+  return result;
 }

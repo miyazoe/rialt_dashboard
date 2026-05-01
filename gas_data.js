@@ -12,97 +12,109 @@ Object.assign(window.GAS_MONTHLY["2026-05"] = window.GAS_MONTHLY["2026-05"] || {
   }
 });
 // [GAS:2026-05:END]
-// [GAS:2026-04:2026/04/09 14:34:START]
+// [GAS:2026-04:2026/04/30 20:27:START]
 window.GAS_MONTHLY = window.GAS_MONTHLY || {};
 Object.assign(window.GAS_MONTHLY["2026-04"] = window.GAS_MONTHLY["2026-04"] || {}, {
   "宮若虎の湯": {
-    "pax_a": 752,
+    "pax_a": 2259,
     "pax_b": null,
-    "adr_a": 46383,
+    "adr_a": 46253,
     "adr_b": 41580000,
-    "occ_a": 0.212,
+    "occ_a": 0.6890000000000001,
     "occ_b": null,
-    "rvp_a": 9833,
+    "rvp_a": 31868,
     "rvp_b": 924,
-    "spd_a": 17208,
+    "spd_a": 18577,
     "spd_b": 0.8
   },
   "古民家煉り": {
-    "pax_a": 68,
+    "pax_a": 207,
     "pax_b": null,
-    "adr_a": 74326,
+    "adr_a": 73608,
     "adr_b": 4158000,
-    "occ_a": 0.17800000000000002,
+    "occ_a": 0.556,
     "occ_b": null,
-    "rvp_a": 13230,
+    "rvp_a": 40926,
     "rvp_b": 99,
-    "spd_a": 34254,
+    "spd_a": 35041,
     "spd_b": 0.55
   },
   "Tsmart": {
-    "pax_a": 382,
+    "pax_a": 1426,
     "pax_b": 1865.0000000000007,
-    "adr_a": 7714,
+    "adr_a": 7686,
     "adr_b": 11188800,
-    "occ_a": 0.159,
+    "occ_a": 0.5820000000000001,
     "occ_b": null,
-    "rvp_a": 1227,
+    "rvp_a": 4473,
     "rvp_b": 1554,
-    "spd_a": 7095,
+    "spd_a": 6898,
     "spd_b": 0.6774193548387096
   },
   "九重久織亭": {
-    "pax_a": 130,
+    "pax_a": 337,
     "pax_b": null,
-    "adr_a": 72872,
+    "adr_a": 75574,
     "adr_b": 18111600,
-    "occ_a": 0.17800000000000002,
+    "occ_a": 0.485,
     "occ_b": null,
-    "rvp_a": 12971,
+    "rvp_a": 36653,
     "rvp_b": 162,
-    "spd_a": 26756,
+    "spd_a": 28694,
     "spd_b": 0.6
   },
-  "九重虎の湯": {
-    "pax_a": 522,
+  "九重虎乃湯": {
+    "pax_a": 1508,
     "pax_b": null,
-    "adr_a": 17940,
+    "adr_a": 17614,
     "adr_b": 17136000,
-    "occ_a": 0.166,
+    "occ_a": 0.5670000000000001,
     "occ_b": null,
-    "rvp_a": 2978,
+    "rvp_a": 9987,
     "rvp_b": 765,
-    "spd_a": 5848,
+    "spd_a": 6872,
     "spd_b": 0.75
   },
   "仙石原久の葉": {
-    "pax_a": 111,
+    "pax_a": 310,
     "pax_b": null,
-    "adr_a": 44149,
+    "adr_a": 43546,
     "adr_b": 9142875,
-    "occ_a": 0.204,
+    "occ_a": 0.563,
     "occ_b": null,
-    "rvp_a": 9006,
+    "rvp_a": 24516,
     "rvp_b": 203,
-    "spd_a": 21871,
+    "spd_a": 21413,
     "spd_b": 0.7518518518518519
   },
   "小塚久の葉": {
-    "pax_a": 127,
+    "pax_a": 320,
     "pax_b": null,
-    "adr_a": 35364,
+    "adr_a": 37142,
     "adr_b": 7350000,
-    "occ_a": null,
+    "occ_a": 4.433,
     "occ_b": null,
-    "rvp_a": null,
+    "rvp_a": 164650,
     "rvp_b": 168,
-    "spd_a": 14963,
+    "spd_a": 15484,
     "spd_b": 0.7
+  },
+  "阿蘇ホテル": {
+    "pax_a": null,
+    "pax_b": 1329,
+    "adr_a": 41997,
+    "adr_b": 17145267,
+    "occ_a": 0.452,
+    "occ_b": null,
+    "rvp_a": 18983,
+    "rvp_b": 654,
+    "spd_a": null,
+    "spd_b": 0.7266666666666667
   }
 });
 // [GAS:2026-04:END]
 
-// [GAS:2026-03:2026/04/09 14:34:START]
+// [GAS:2026-03:2026/04/30 20:27:START]
 window.GAS_MONTHLY = window.GAS_MONTHLY || {};
 Object.assign(window.GAS_MONTHLY["2026-03"] = window.GAS_MONTHLY["2026-03"] || {}, {
   "宮若虎の湯": {
@@ -153,7 +165,7 @@ Object.assign(window.GAS_MONTHLY["2026-03"] = window.GAS_MONTHLY["2026-03"] || {
     "spd_a": 27407,
     "spd_b": 0.5483870967741935
   },
-  "九重虎の湯": {
+  "九重虎乃湯": {
     "pax_a": 2435,
     "pax_b": null,
     "adr_a": 20486,
@@ -204,7 +216,7 @@ Object.assign(window.GAS_MONTHLY["2026-03"] = window.GAS_MONTHLY["2026-03"] || {
 });
 // [GAS:2026-03:END]
 
-// [GAS:2026-02:2026/04/09 14:34:START]
+// [GAS:2026-02:2026/04/30 20:27:START]
 window.GAS_MONTHLY = window.GAS_MONTHLY || {};
 Object.assign(window.GAS_MONTHLY["2026-02"] = window.GAS_MONTHLY["2026-02"] || {}, {
   "宮若虎の湯": {
@@ -255,7 +267,7 @@ Object.assign(window.GAS_MONTHLY["2026-02"] = window.GAS_MONTHLY["2026-02"] || {
     "spd_a": 25963,
     "spd_b": 0.6507936507936508
   },
-  "九重虎の湯": {
+  "九重虎乃湯": {
     "pax_a": 1791,
     "pax_b": null,
     "adr_a": 17709,
@@ -306,7 +318,7 @@ Object.assign(window.GAS_MONTHLY["2026-02"] = window.GAS_MONTHLY["2026-02"] || {
 });
 // [GAS:2026-02:END]
 
-// [GAS:2026-01:2026/04/09 14:34:START]
+// [GAS:2026-01:2026/04/30 20:27:START]
 window.GAS_MONTHLY = window.GAS_MONTHLY || {};
 Object.assign(window.GAS_MONTHLY["2026-01"] = window.GAS_MONTHLY["2026-01"] || {}, {
   "宮若虎の湯": {
@@ -357,7 +369,7 @@ Object.assign(window.GAS_MONTHLY["2026-01"] = window.GAS_MONTHLY["2026-01"] || {
     "spd_a": 28023,
     "spd_b": 0.6487455197132617
   },
-  "九重虎の湯": {
+  "九重虎乃湯": {
     "pax_a": 1551,
     "pax_b": null,
     "adr_a": 20063,
@@ -408,7 +420,7 @@ Object.assign(window.GAS_MONTHLY["2026-01"] = window.GAS_MONTHLY["2026-01"] || {
 });
 // [GAS:2026-01:END]
 
-// [GAS:2025-12:2026/04/09 14:34:START]
+// [GAS:2025-12:2026/04/30 20:27:START]
 window.GAS_MONTHLY = window.GAS_MONTHLY || {};
 Object.assign(window.GAS_MONTHLY["2025-12"] = window.GAS_MONTHLY["2025-12"] || {}, {
   "宮若虎の湯": {
@@ -459,7 +471,7 @@ Object.assign(window.GAS_MONTHLY["2025-12"] = window.GAS_MONTHLY["2025-12"] || {
     "spd_a": 28002,
     "spd_b": 0.6487455197132617
   },
-  "九重虎の湯": {
+  "九重虎乃湯": {
     "pax_a": 1422,
     "pax_b": null,
     "adr_a": 20473,
@@ -510,7 +522,7 @@ Object.assign(window.GAS_MONTHLY["2025-12"] = window.GAS_MONTHLY["2025-12"] || {
 });
 // [GAS:2025-12:END]
 
-// [GAS:2025-11:2026/04/09 14:34:START]
+// [GAS:2025-11:2026/04/30 20:27:START]
 window.GAS_MONTHLY = window.GAS_MONTHLY || {};
 Object.assign(window.GAS_MONTHLY["2025-11"] = window.GAS_MONTHLY["2025-11"] || {}, {
   "宮若虎の湯": {
@@ -561,7 +573,7 @@ Object.assign(window.GAS_MONTHLY["2025-11"] = window.GAS_MONTHLY["2025-11"] || {
     "spd_a": 28604,
     "spd_b": 0.7518518518518519
   },
-  "九重虎の湯": {
+  "九重虎乃湯": {
     "pax_a": 1832,
     "pax_b": null,
     "adr_a": 22922,
@@ -612,7 +624,7 @@ Object.assign(window.GAS_MONTHLY["2025-11"] = window.GAS_MONTHLY["2025-11"] || {
 });
 // [GAS:2025-11:END]
 
-// [GAS:2025-10:2026/04/09 14:34:START]
+// [GAS:2025-10:2026/04/30 20:27:START]
 window.GAS_MONTHLY = window.GAS_MONTHLY || {};
 Object.assign(window.GAS_MONTHLY["2025-10"] = window.GAS_MONTHLY["2025-10"] || {}, {
   "宮若虎の湯": {
@@ -663,7 +675,7 @@ Object.assign(window.GAS_MONTHLY["2025-10"] = window.GAS_MONTHLY["2025-10"] || {
     "spd_a": 26328,
     "spd_b": 0.7491039426523297
   },
-  "九重虎の湯": {
+  "九重虎乃湯": {
     "pax_a": 2114,
     "pax_b": null,
     "adr_a": 20344,
@@ -714,7 +726,7 @@ Object.assign(window.GAS_MONTHLY["2025-10"] = window.GAS_MONTHLY["2025-10"] || {
 });
 // [GAS:2025-10:END]
 
-// [GAS:2025-09:2026/04/09 14:34:START]
+// [GAS:2025-09:2026/04/30 20:27:START]
 window.GAS_MONTHLY = window.GAS_MONTHLY || {};
 Object.assign(window.GAS_MONTHLY["2025-09"] = window.GAS_MONTHLY["2025-09"] || {}, {
   "宮若虎の湯": {
@@ -765,7 +777,7 @@ Object.assign(window.GAS_MONTHLY["2025-09"] = window.GAS_MONTHLY["2025-09"] || {
     "spd_a": 25097,
     "spd_b": 0.6
   },
-  "九重虎の湯": {
+  "九重虎乃湯": {
     "pax_a": 1630,
     "pax_b": null,
     "adr_a": 18822,
@@ -816,7 +828,7 @@ Object.assign(window.GAS_MONTHLY["2025-09"] = window.GAS_MONTHLY["2025-09"] || {
 });
 // [GAS:2025-09:END]
 
-// [GAS:2025-08:2026/04/09 14:34:START]
+// [GAS:2025-08:2026/04/30 20:27:START]
 window.GAS_MONTHLY = window.GAS_MONTHLY || {};
 Object.assign(window.GAS_MONTHLY["2025-08"] = window.GAS_MONTHLY["2025-08"] || {}, {
   "宮若虎の湯": {
@@ -867,7 +879,7 @@ Object.assign(window.GAS_MONTHLY["2025-08"] = window.GAS_MONTHLY["2025-08"] || {
     "spd_a": 26815,
     "spd_b": 0.6487455197132617
   },
-  "九重虎の湯": {
+  "九重虎乃湯": {
     "pax_a": 2730,
     "pax_b": null,
     "adr_a": 25008,
@@ -918,7 +930,7 @@ Object.assign(window.GAS_MONTHLY["2025-08"] = window.GAS_MONTHLY["2025-08"] || {
 });
 // [GAS:2025-08:END]
 
-// [GAS:2025-07:2026/04/09 14:34:START]
+// [GAS:2025-07:2026/04/30 20:27:START]
 window.GAS_MONTHLY = window.GAS_MONTHLY || {};
 Object.assign(window.GAS_MONTHLY["2025-07"] = window.GAS_MONTHLY["2025-07"] || {}, {
   "宮若虎の湯": {
@@ -969,7 +981,7 @@ Object.assign(window.GAS_MONTHLY["2025-07"] = window.GAS_MONTHLY["2025-07"] || {
     "spd_a": 25542,
     "spd_b": 0.4731182795698925
   },
-  "九重虎の湯": {
+  "九重虎乃湯": {
     "pax_a": 1502,
     "pax_b": 1885,
     "adr_a": 19913,
@@ -1020,7 +1032,7 @@ Object.assign(window.GAS_MONTHLY["2025-07"] = window.GAS_MONTHLY["2025-07"] || {
 });
 // [GAS:2025-07:END]
 
-// [GAS:2025-06:2026/04/09 14:34:START]
+// [GAS:2025-06:2026/04/30 20:27:START]
 window.GAS_MONTHLY = window.GAS_MONTHLY || {};
 Object.assign(window.GAS_MONTHLY["2025-06"] = window.GAS_MONTHLY["2025-06"] || {}, {
   "宮若虎の湯": {
@@ -1071,7 +1083,7 @@ Object.assign(window.GAS_MONTHLY["2025-06"] = window.GAS_MONTHLY["2025-06"] || {
     "spd_a": 23436,
     "spd_b": 0.6777777777777778
   },
-  "九重虎の湯": {
+  "九重虎乃湯": {
     "pax_a": 1370,
     "pax_b": 1942,
     "adr_a": 16688,
@@ -1122,7 +1134,7 @@ Object.assign(window.GAS_MONTHLY["2025-06"] = window.GAS_MONTHLY["2025-06"] || {
 });
 // [GAS:2025-06:END]
 
-// [GAS:2025-05:2026/04/09 14:34:START]
+// [GAS:2025-05:2026/04/30 20:27:START]
 window.GAS_MONTHLY = window.GAS_MONTHLY || {};
 Object.assign(window.GAS_MONTHLY["2025-05"] = window.GAS_MONTHLY["2025-05"] || {}, {
   "宮若虎の湯": {
@@ -1173,7 +1185,7 @@ Object.assign(window.GAS_MONTHLY["2025-05"] = window.GAS_MONTHLY["2025-05"] || {
     "spd_a": 29150,
     "spd_b": 0.6989247311827957
   },
-  "九重虎の湯": {
+  "九重虎乃湯": {
     "pax_a": 2006,
     "pax_b": 1980.0000000000005,
     "adr_a": 17353,
@@ -1224,7 +1236,7 @@ Object.assign(window.GAS_MONTHLY["2025-05"] = window.GAS_MONTHLY["2025-05"] || {
 });
 // [GAS:2025-05:END]
 
-// [GAS:2025-04:2026/04/09 14:34:START]
+// [GAS:2025-04:2026/04/30 20:27:START]
 window.GAS_MONTHLY = window.GAS_MONTHLY || {};
 Object.assign(window.GAS_MONTHLY["2025-04"] = window.GAS_MONTHLY["2025-04"] || {}, {
   "宮若虎の湯": {
@@ -1275,7 +1287,7 @@ Object.assign(window.GAS_MONTHLY["2025-04"] = window.GAS_MONTHLY["2025-04"] || {
     "spd_a": 27018,
     "spd_b": 0.7222222222222222
   },
-  "九重虎の湯": {
+  "九重虎乃湯": {
     "pax_a": 1909,
     "pax_b": 1992,
     "adr_a": 16170,
@@ -1326,7 +1338,7 @@ Object.assign(window.GAS_MONTHLY["2025-04"] = window.GAS_MONTHLY["2025-04"] || {
 });
 // [GAS:2025-04:END]
 
-// [GAS:2025-03:2026/04/09 14:34:START]
+// [GAS:2025-03:2026/04/30 20:27:START]
 window.GAS_MONTHLY = window.GAS_MONTHLY || {};
 Object.assign(window.GAS_MONTHLY["2025-03"] = window.GAS_MONTHLY["2025-03"] || {}, {
   "宮若虎の湯": {
@@ -1365,7 +1377,7 @@ Object.assign(window.GAS_MONTHLY["2025-03"] = window.GAS_MONTHLY["2025-03"] || {
     "spd_a": 26753,
     "spd_b": 0.7813620071684588
   },
-  "九重虎の湯": {
+  "九重虎乃湯": {
     "pax_a": 1765,
     "pax_b": 1916,
     "adr_a": 17920,
@@ -1416,7 +1428,7 @@ Object.assign(window.GAS_MONTHLY["2025-03"] = window.GAS_MONTHLY["2025-03"] || {
 });
 // [GAS:2025-03:END]
 
-// [GAS:2025-02:2026/04/09 14:34:START]
+// [GAS:2025-02:2026/04/30 20:27:START]
 window.GAS_MONTHLY = window.GAS_MONTHLY || {};
 Object.assign(window.GAS_MONTHLY["2025-02"] = window.GAS_MONTHLY["2025-02"] || {}, {
   "宮若虎の湯": {
@@ -1455,7 +1467,7 @@ Object.assign(window.GAS_MONTHLY["2025-02"] = window.GAS_MONTHLY["2025-02"] || {
     "spd_a": 23288,
     "spd_b": 0.7698412698412699
   },
-  "九重虎の湯": {
+  "九重虎乃湯": {
     "pax_a": 1436,
     "pax_b": 1665,
     "adr_a": 17729,
@@ -1516,7 +1528,7 @@ Object.assign(window.GAS_MONTHLY["2025-02"] = window.GAS_MONTHLY["2025-02"] || {
 });
 // [GAS:2025-02:END]
 
-// [GAS:2025-01:2026/04/09 14:34:START]
+// [GAS:2025-01:2026/04/30 20:27:START]
 window.GAS_MONTHLY = window.GAS_MONTHLY || {};
 Object.assign(window.GAS_MONTHLY["2025-01"] = window.GAS_MONTHLY["2025-01"] || {}, {
   "宮若虎の湯": {
@@ -1555,7 +1567,7 @@ Object.assign(window.GAS_MONTHLY["2025-01"] = window.GAS_MONTHLY["2025-01"] || {
     "spd_a": 27447,
     "spd_b": 0.7491039426523297
   },
-  "九重虎の湯": {
+  "九重虎乃湯": {
     "pax_a": 1804,
     "pax_b": 2283.4,
     "adr_a": 15594,
@@ -1616,7 +1628,7 @@ Object.assign(window.GAS_MONTHLY["2025-01"] = window.GAS_MONTHLY["2025-01"] || {
 });
 // [GAS:2025-01:END]
 
-// [GAS:2024-12:2026/04/09 14:34:START]
+// [GAS:2024-12:2026/04/30 20:27:START]
 window.GAS_MONTHLY = window.GAS_MONTHLY || {};
 Object.assign(window.GAS_MONTHLY["2024-12"] = window.GAS_MONTHLY["2024-12"] || {}, {
   "宮若虎の湯": {
@@ -1655,7 +1667,7 @@ Object.assign(window.GAS_MONTHLY["2024-12"] = window.GAS_MONTHLY["2024-12"] || {
     "spd_a": 29039,
     "spd_b": 0.8315412186379928
   },
-  "九重虎の湯": {
+  "九重虎乃湯": {
     "pax_a": 1523,
     "pax_b": 2082,
     "adr_a": 15910,
@@ -1736,7 +1748,7 @@ Object.assign(window.GAS_MONTHLY["2024-12"] = window.GAS_MONTHLY["2024-12"] || {
 });
 // [GAS:2024-12:END]
 
-// [GAS:2024-11:2026/04/09 14:34:START]
+// [GAS:2024-11:2026/04/30 20:27:START]
 window.GAS_MONTHLY = window.GAS_MONTHLY || {};
 Object.assign(window.GAS_MONTHLY["2024-11"] = window.GAS_MONTHLY["2024-11"] || {}, {
   "宮若虎の湯": {
@@ -1775,7 +1787,7 @@ Object.assign(window.GAS_MONTHLY["2024-11"] = window.GAS_MONTHLY["2024-11"] || {
     "spd_a": 30047,
     "spd_b": 0.8888888888888888
   },
-  "九重虎の湯": {
+  "九重虎乃湯": {
     "pax_a": 2144,
     "pax_b": 1463,
     "adr_a": 16007,
@@ -1856,7 +1868,7 @@ Object.assign(window.GAS_MONTHLY["2024-11"] = window.GAS_MONTHLY["2024-11"] || {
 });
 // [GAS:2024-11:END]
 
-// [GAS:2024-10:2026/04/09 14:34:START]
+// [GAS:2024-10:2026/04/30 20:27:START]
 window.GAS_MONTHLY = window.GAS_MONTHLY || {};
 Object.assign(window.GAS_MONTHLY["2024-10"] = window.GAS_MONTHLY["2024-10"] || {}, {
   "宮若虎の湯": {
@@ -1895,7 +1907,7 @@ Object.assign(window.GAS_MONTHLY["2024-10"] = window.GAS_MONTHLY["2024-10"] || {
     "spd_a": 27899,
     "spd_b": 0.8387096774193549
   },
-  "九重虎の湯": {
+  "九重虎乃湯": {
     "pax_a": 2022,
     "pax_b": 2063.6000000000004,
     "adr_a": 14153,
@@ -1976,7 +1988,7 @@ Object.assign(window.GAS_MONTHLY["2024-10"] = window.GAS_MONTHLY["2024-10"] || {
 });
 // [GAS:2024-10:END]
 
-// [GAS:2024-09:2026/04/09 14:34:START]
+// [GAS:2024-09:2026/04/30 20:27:START]
 window.GAS_MONTHLY = window.GAS_MONTHLY || {};
 Object.assign(window.GAS_MONTHLY["2024-09"] = window.GAS_MONTHLY["2024-09"] || {}, {
   "宮若虎の湯": {
@@ -2015,7 +2027,7 @@ Object.assign(window.GAS_MONTHLY["2024-09"] = window.GAS_MONTHLY["2024-09"] || {
     "spd_a": 28327,
     "spd_b": 0.7518518518518519
   },
-  "九重虎の湯": {
+  "九重虎乃湯": {
     "pax_a": 1688,
     "pax_b": 2212,
     "adr_a": 14733,
@@ -2096,7 +2108,7 @@ Object.assign(window.GAS_MONTHLY["2024-09"] = window.GAS_MONTHLY["2024-09"] || {
 });
 // [GAS:2024-09:END]
 
-// [GAS:2024-08:2026/04/09 14:34:START]
+// [GAS:2024-08:2026/04/30 20:27:START]
 window.GAS_MONTHLY = window.GAS_MONTHLY || {};
 Object.assign(window.GAS_MONTHLY["2024-08"] = window.GAS_MONTHLY["2024-08"] || {}, {
   "宮若虎の湯": {
@@ -2135,7 +2147,7 @@ Object.assign(window.GAS_MONTHLY["2024-08"] = window.GAS_MONTHLY["2024-08"] || {
     "spd_a": 30786,
     "spd_b": 0.72
   },
-  "九重虎の湯": {
+  "九重虎乃湯": {
     "pax_a": 2100.3,
     "pax_b": 2346,
     "adr_a": 19155,
@@ -2216,7 +2228,7 @@ Object.assign(window.GAS_MONTHLY["2024-08"] = window.GAS_MONTHLY["2024-08"] || {
 });
 // [GAS:2024-08:END]
 
-// [GAS:2024-07:2026/04/09 14:34:START]
+// [GAS:2024-07:2026/04/30 20:27:START]
 window.GAS_MONTHLY = window.GAS_MONTHLY || {};
 Object.assign(window.GAS_MONTHLY["2024-07"] = window.GAS_MONTHLY["2024-07"] || {}, {
   "宮若虎の湯": {
@@ -2255,7 +2267,7 @@ Object.assign(window.GAS_MONTHLY["2024-07"] = window.GAS_MONTHLY["2024-07"] || {
     "spd_a": 28344,
     "spd_b": 0.71
   },
-  "九重虎の湯": {
+  "九重虎乃湯": {
     "pax_a": 1723,
     "pax_b": 1973,
     "adr_a": 14973,
@@ -2324,7 +2336,7 @@ Object.assign(window.GAS_MONTHLY["2024-07"] = window.GAS_MONTHLY["2024-07"] || {
 });
 // [GAS:2024-07:END]
 
-// [GAS:2024-06:2026/04/09 14:34:START]
+// [GAS:2024-06:2026/04/30 20:27:START]
 window.GAS_MONTHLY = window.GAS_MONTHLY || {};
 Object.assign(window.GAS_MONTHLY["2024-06"] = window.GAS_MONTHLY["2024-06"] || {}, {
   "宮若虎の湯": {
@@ -2375,7 +2387,7 @@ Object.assign(window.GAS_MONTHLY["2024-06"] = window.GAS_MONTHLY["2024-06"] || {
     "spd_a": 27986,
     "spd_b": 0.6888888888888889
   },
-  "九重虎の湯": {
+  "九重虎乃湯": {
     "pax_a": 1551,
     "pax_b": 1463,
     "adr_a": 14669,
@@ -2456,7 +2468,7 @@ Object.assign(window.GAS_MONTHLY["2024-06"] = window.GAS_MONTHLY["2024-06"] || {
 });
 // [GAS:2024-06:END]
 
-// [GAS:2024-05:2026/04/09 14:34:START]
+// [GAS:2024-05:2026/04/30 20:27:START]
 window.GAS_MONTHLY = window.GAS_MONTHLY || {};
 Object.assign(window.GAS_MONTHLY["2024-05"] = window.GAS_MONTHLY["2024-05"] || {}, {
   "宮若虎の湯": {
@@ -2495,7 +2507,7 @@ Object.assign(window.GAS_MONTHLY["2024-05"] = window.GAS_MONTHLY["2024-05"] || {
     "spd_a": 29778,
     "spd_b": 0.7419354838709677
   },
-  "九重虎の湯": {
+  "九重虎乃湯": {
     "pax_a": 2095,
     "pax_b": 1790.8000000000004,
     "adr_a": 15576,
@@ -2576,7 +2588,7 @@ Object.assign(window.GAS_MONTHLY["2024-05"] = window.GAS_MONTHLY["2024-05"] || {
 });
 // [GAS:2024-05:END]
 
-// [GAS:2024-04:2026/04/09 14:34:START]
+// [GAS:2024-04:2026/04/30 20:27:START]
 window.GAS_MONTHLY = window.GAS_MONTHLY || {};
 Object.assign(window.GAS_MONTHLY["2024-04"] = window.GAS_MONTHLY["2024-04"] || {}, {
   "宮若虎の湯": {
@@ -2615,7 +2627,7 @@ Object.assign(window.GAS_MONTHLY["2024-04"] = window.GAS_MONTHLY["2024-04"] || {
     "spd_a": 28352,
     "spd_b": 0.669
   },
-  "九重虎の湯": {
+  "九重虎乃湯": {
     "pax_a": 1760,
     "pax_b": 1630.1999999999998,
     "adr_a": 15650,
@@ -2696,7 +2708,7 @@ Object.assign(window.GAS_MONTHLY["2024-04"] = window.GAS_MONTHLY["2024-04"] || {
 });
 // [GAS:2024-04:END]
 
-// [GAS:2024-03:2026/04/09 14:34:START]
+// [GAS:2024-03:2026/04/30 20:27:START]
 window.GAS_MONTHLY = window.GAS_MONTHLY || {};
 Object.assign(window.GAS_MONTHLY["2024-03"] = window.GAS_MONTHLY["2024-03"] || {}, {
   "宮若虎の湯": {
@@ -2735,7 +2747,7 @@ Object.assign(window.GAS_MONTHLY["2024-03"] = window.GAS_MONTHLY["2024-03"] || {
     "spd_a": 28866,
     "spd_b": 0.7526881720430108
   },
-  "九重虎の湯": {
+  "九重虎乃湯": {
     "pax_a": 2134,
     "pax_b": 1700.5999999999997,
     "adr_a": 15936,
@@ -2816,7 +2828,7 @@ Object.assign(window.GAS_MONTHLY["2024-03"] = window.GAS_MONTHLY["2024-03"] || {
 });
 // [GAS:2024-03:END]
 
-// [GAS:2024-02:2026/04/09 14:34:START]
+// [GAS:2024-02:2026/04/30 20:27:START]
 window.GAS_MONTHLY = window.GAS_MONTHLY || {};
 Object.assign(window.GAS_MONTHLY["2024-02"] = window.GAS_MONTHLY["2024-02"] || {}, {
   "宮若虎の湯": {
@@ -2855,7 +2867,7 @@ Object.assign(window.GAS_MONTHLY["2024-02"] = window.GAS_MONTHLY["2024-02"] || {
     "spd_a": 26634,
     "spd_b": 0.7394636015325671
   },
-  "九重虎の湯": {
+  "九重虎乃湯": {
     "pax_a": 1623,
     "pax_b": 1751.1999999999991,
     "adr_a": 17041,
@@ -2894,7 +2906,7 @@ Object.assign(window.GAS_MONTHLY["2024-02"] = window.GAS_MONTHLY["2024-02"] || {
 });
 // [GAS:2024-02:END]
 
-// [GAS:2024-01:2026/04/09 14:34:START]
+// [GAS:2024-01:2026/04/30 20:27:START]
 window.GAS_MONTHLY = window.GAS_MONTHLY || {};
 Object.assign(window.GAS_MONTHLY["2024-01"] = window.GAS_MONTHLY["2024-01"] || {}, {
   "宮若虎の湯": {
@@ -2933,7 +2945,7 @@ Object.assign(window.GAS_MONTHLY["2024-01"] = window.GAS_MONTHLY["2024-01"] || {
     "spd_a": 27660,
     "spd_b": 0.7526881720430108
   },
-  "九重虎の湯": {
+  "九重虎乃湯": {
     "pax_a": 1776,
     "pax_b": 1683.0000000000007,
     "adr_a": 16398,
@@ -2972,7 +2984,7 @@ Object.assign(window.GAS_MONTHLY["2024-01"] = window.GAS_MONTHLY["2024-01"] || {
 });
 // [GAS:2024-01:END]
 
-// [GAS:2023-12:2026/04/09 14:34:START]
+// [GAS:2023-12:2026/04/30 20:27:START]
 window.GAS_MONTHLY = window.GAS_MONTHLY || {};
 Object.assign(window.GAS_MONTHLY["2023-12"] = window.GAS_MONTHLY["2023-12"] || {}, {
   "宮若虎の湯": {
@@ -3023,7 +3035,7 @@ Object.assign(window.GAS_MONTHLY["2023-12"] = window.GAS_MONTHLY["2023-12"] || {
     "spd_a": 27590,
     "spd_b": 0.8
   },
-  "九重虎の湯": {
+  "九重虎乃湯": {
     "pax_a": 1813,
     "pax_b": 1764.3999999999996,
     "adr_a": 17497,
@@ -3062,7 +3074,7 @@ Object.assign(window.GAS_MONTHLY["2023-12"] = window.GAS_MONTHLY["2023-12"] || {
 });
 // [GAS:2023-12:END]
 
-// [GAS:2023-11:2026/04/09 14:34:START]
+// [GAS:2023-11:2026/04/30 20:27:START]
 window.GAS_MONTHLY = window.GAS_MONTHLY || {};
 Object.assign(window.GAS_MONTHLY["2023-11"] = window.GAS_MONTHLY["2023-11"] || {}, {
   "宮若虎の湯": {
@@ -3113,7 +3125,7 @@ Object.assign(window.GAS_MONTHLY["2023-11"] = window.GAS_MONTHLY["2023-11"] || {
     "spd_a": 25856,
     "spd_b": 0.8518518518518519
   },
-  "九重虎の湯": {
+  "九重虎乃湯": {
     "pax_a": 2194,
     "pax_b": 1896.4000000000005,
     "adr_a": 14535,
@@ -3152,7 +3164,7 @@ Object.assign(window.GAS_MONTHLY["2023-11"] = window.GAS_MONTHLY["2023-11"] || {
 });
 // [GAS:2023-11:END]
 
-// [GAS:2023-10:2026/04/09 14:34:START]
+// [GAS:2023-10:2026/04/30 20:27:START]
 window.GAS_MONTHLY = window.GAS_MONTHLY || {};
 Object.assign(window.GAS_MONTHLY["2023-10"] = window.GAS_MONTHLY["2023-10"] || {}, {
   "宮若虎の湯": {
@@ -3203,7 +3215,7 @@ Object.assign(window.GAS_MONTHLY["2023-10"] = window.GAS_MONTHLY["2023-10"] || {
     "spd_a": 24463,
     "spd_b": 0.823
   },
-  "九重虎の湯": {
+  "九重虎乃湯": {
     "pax_a": 2275,
     "pax_b": 1951.4000000000003,
     "adr_a": 13821,
@@ -3242,7 +3254,7 @@ Object.assign(window.GAS_MONTHLY["2023-10"] = window.GAS_MONTHLY["2023-10"] || {
 });
 // [GAS:2023-10:END]
 
-// [GAS:2023-09:2026/04/09 14:34:START]
+// [GAS:2023-09:2026/04/30 20:27:START]
 window.GAS_MONTHLY = window.GAS_MONTHLY || {};
 Object.assign(window.GAS_MONTHLY["2023-09"] = window.GAS_MONTHLY["2023-09"] || {}, {
   "宮若虎の湯": {
@@ -3293,7 +3305,7 @@ Object.assign(window.GAS_MONTHLY["2023-09"] = window.GAS_MONTHLY["2023-09"] || {
     "spd_a": 24657,
     "spd_b": 0.677
   },
-  "九重虎の湯": {
+  "九重虎乃湯": {
     "pax_a": 1897,
     "pax_b": 1628.0000000000002,
     "adr_a": 14289,
@@ -3332,7 +3344,7 @@ Object.assign(window.GAS_MONTHLY["2023-09"] = window.GAS_MONTHLY["2023-09"] || {
 });
 // [GAS:2023-09:END]
 
-// [GAS:2023-08:2026/04/09 14:34:START]
+// [GAS:2023-08:2026/04/30 20:27:START]
 window.GAS_MONTHLY = window.GAS_MONTHLY || {};
 Object.assign(window.GAS_MONTHLY["2023-08"] = window.GAS_MONTHLY["2023-08"] || {}, {
   "宮若虎の湯": {
@@ -3383,7 +3395,7 @@ Object.assign(window.GAS_MONTHLY["2023-08"] = window.GAS_MONTHLY["2023-08"] || {
     "spd_a": 28092,
     "spd_b": 0.75
   },
-  "九重虎の湯": {
+  "九重虎乃湯": {
     "pax_a": 2448,
     "pax_b": 2087.7999999999997,
     "adr_a": 17250,
@@ -3422,7 +3434,7 @@ Object.assign(window.GAS_MONTHLY["2023-08"] = window.GAS_MONTHLY["2023-08"] || {
 });
 // [GAS:2023-08:END]
 
-// [GAS:2023-07:2026/04/09 14:34:START]
+// [GAS:2023-07:2026/04/30 20:27:START]
 window.GAS_MONTHLY = window.GAS_MONTHLY || {};
 Object.assign(window.GAS_MONTHLY["2023-07"] = window.GAS_MONTHLY["2023-07"] || {}, {
   "宮若虎の湯": {
@@ -3473,7 +3485,7 @@ Object.assign(window.GAS_MONTHLY["2023-07"] = window.GAS_MONTHLY["2023-07"] || {
     "spd_a": 25753,
     "spd_b": 0.7
   },
-  "九重虎の湯": {
+  "九重虎乃湯": {
     "pax_a": 2071,
     "pax_b": 1669.7999999999995,
     "adr_a": 13805,
@@ -3512,7 +3524,7 @@ Object.assign(window.GAS_MONTHLY["2023-07"] = window.GAS_MONTHLY["2023-07"] || {
 });
 // [GAS:2023-07:END]
 
-// [GAS:2023-06:2026/04/09 14:34:START]
+// [GAS:2023-06:2026/04/30 20:27:START]
 window.GAS_MONTHLY = window.GAS_MONTHLY || {};
 Object.assign(window.GAS_MONTHLY["2023-06"] = window.GAS_MONTHLY["2023-06"] || {}, {
   "宮若虎の湯": {
@@ -3563,7 +3575,7 @@ Object.assign(window.GAS_MONTHLY["2023-06"] = window.GAS_MONTHLY["2023-06"] || {
     "spd_a": 23993,
     "spd_b": 0.5814814814814815
   },
-  "九重虎の湯": {
+  "九重虎乃湯": {
     "pax_a": 1744,
     "pax_b": 1741,
     "adr_a": 11757,
@@ -3624,7 +3636,7 @@ Object.assign(window.GAS_MONTHLY["2023-06"] = window.GAS_MONTHLY["2023-06"] || {
 });
 // [GAS:2023-06:END]
 
-// [GAS:2023-05:2026/04/09 14:34:START]
+// [GAS:2023-05:2026/04/30 20:27:START]
 window.GAS_MONTHLY = window.GAS_MONTHLY || {};
 Object.assign(window.GAS_MONTHLY["2023-05"] = window.GAS_MONTHLY["2023-05"] || {}, {
   "宮若虎の湯": {
@@ -3675,7 +3687,7 @@ Object.assign(window.GAS_MONTHLY["2023-05"] = window.GAS_MONTHLY["2023-05"] || {
     "spd_a": 26715,
     "spd_b": 0.6164874551971327
   },
-  "九重虎の湯": {
+  "九重虎乃湯": {
     "pax_a": 2079,
     "pax_b": 1795.2000000000003,
     "adr_a": 13126,

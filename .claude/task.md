@@ -20,13 +20,15 @@
 
 | ファイル | 役割 | サイズ目安 |
 |---|---|---|
-| `index.html` | メインアプリ本体（HTML + CSS + JS） | ~19万文字 |
+| `index.html` | メインアプリ本体（HTML + CSS + JS） | ~80万文字（797,019文字 / 2026-04-24時点） |
 | `data.js` | 週次TOP報告データ（`window.DASHBOARD_DATA`） | 週次追記 |
 | `rialt_data.js` | RIALT月次PLデータ（`window.RIALT_DATA`） | ~17MB |
 | `resort_table.js` | TGR月次PLフラットテーブル（`window.RESORT_TABLE`） | ~1MB |
 | `generate_rialt.py` | CP932 CSV → rialt_data.js 生成スクリプト | — |
 | `tools/generate_resort_table.py` | TGR xlsx → resort_table.js 生成スクリプト | — |
-| `tools/resort_gas.gs` | GAS Web App — 全施設日別売上集約エンドポイント | — |
+| `tools/resort_gas.gs` | GAS Web App — 全施設日別売上集約エンドポイント（v93） | — |
+| `inbound_budget.js` | インバウンド予算データ FY2026（`window.INBOUND_BUDGET`） | — |
+| `inbound_budget_2025.js` | インバウンド予算データ FY2025（`window.INBOUND_BUDGET_2025`、月+12シフト済み） | — |
 | `notebooklm_prompt.md` | NotebookLM用プロンプト集（Prompt1 / Prompt2） | — |
 | `data/tgr/` | TGR月次xlsxソースファイル（2024.xlsx + YYYYMM.xlsx） | — |
 | `news/generate_news_data.py` | Excel → news_data.js 生成スクリプト | — |
@@ -172,7 +174,12 @@ window.RIALT_DATA = {
 | `dashboard_read_v1` | 既読管理 |
 | `dashboard_settings_v2` | 設定（フォントサイズ・表示件数・インターバル） |
 | `rialt_theme_v1` | RIALTテーマ設定 |
-| `gemini_api_key_v1` | Gemini APIキー |
+| `gemini_api_key_v1` | Gemini APIキー（Settings保存。`window.GEMINI_API_KEY`でもフォールバック可） |
+| `ir_history_v1` | IR日次スナップショット（最大90日分） |
+| `ir_ai_cache_v1_adv` / `_beg` | IR AI分析キャッシュ（永続） |
+| `rs_ai_cache_tgr` / `_tours` / `_news` | 各タブAI分析キャッシュ（永続） |
+| `rs_chat_tgr` / `_tours` / `_news` / `_ir` | チャット履歴 |
+| `inbound_budget_override_v1` | インバウンド予算ローカル編集データ |
 
 ---
 
@@ -221,6 +228,22 @@ window.RIALT_DATA = {
 | 2026-04-09 | TOURS: 誤字「旱行会社」→「旅行会社」全4箇所修正 | — |
 | 2026-04-09 | TOURS 月別・旅行会社別サマリ: 月度内の旅行会社を売上合計の降順で並び替え | — |
 | 2026-04-09 | TOURS 明細タブ: 月度フィルタを「年月（YYYY年M月）」に変更（calSortKey ベース） | — |
+| 2026-04-10 | チャットドック（全タブ共通・タブ別独立履歴・コンテキスト自動添付）新規追加 | — |
+| 2026-04-10 | 右サイドAIサイドバー（TGR/TOURS/NEWS共通・collapsed/expanded・フローティングボタン）新規追加 | — |
+| 2026-04-10 | Pythonパッチ由来HTMLエンティティ修正 | — |
+| 2026-04-19 | TOURSタブ: ホテル別・旅行会社別売上ランキング追加 + エリアフィルター | — |
+| 2026-04-19 | TOURSタブ: ランキング3つを横並びに + Canvasフォント修正 | — |
+| 2026-04-20 | TOURSタブ: 予算達成KPIカード + ランキング予算ライン + 予算保守ボタン | — |
+| 2026-04-21 | GAS v61: Google News RSS除去（GASサーバーからタイムアウト）→ 株価のみv8/chartに統一 | — |
+| 2026-04-21 | GAS IR: 外部サイトスクレイピング全廃（minkabu/finance.yahoo等はGASIPブロック）→ v8/chartのみ | — |
+| 2026-04-22 | 予算KPI修正 + 予算ボタン位置調整 + 数字表記をカンマ区切りに統一 | — |
+| 2026-04-23 | CLAUDE.mdファイル編集ルール更新（EEXIST回避手順をPowershell/Serena方式に統一） | — |
+| 2026-04-24 | index.html先頭に`window.GEMINI_API_KEY = 'PASTE_YOUR_KEY_HERE'`プレースホルダー追加（GitHub Pages対応） | — |
+| 2026-04-24 | TOURS CSS修復（RIALTテーマブロック削除の巻き添えで消失していた.tours-*全クラスを復元） | — |
+| 2026-04-24 | 予算保守: 全施設一括保存→差分保存に変更（`_bmDirtyCells`/`_bmDirtyADR`で変更セルのみGAS呼び出し） | — |
+| 2026-04-24 | 予算保守CSS: `.bm-*`独自カラー → RSデザイントークン（`var(--rs-*)`）に統一 | — |
+| 2026-04-24 | GAS v93: `saveBudgetRow_()`追加（`?budget_save_row`エンドポイント・1セル単位保存） | — |
+| 2026-04-24 | FY2025インバウンド予算データ追加（`inbound_budget_2025.js` / 7施設 / 月+12シフト済み） | — |
 
 ---
 
@@ -254,7 +277,7 @@ window.RIALT_DATA = {
 - **Layer 1: 月次PLランキング**（達成率ワースト順・色分け）
 - **Layer 2: 施設別ドリルダウン**（KPIカード + GAS日別チャート + 売上内訳）
 - GAS Web App デプロイ済み（組織内アクセス制限、JSONP対応）
-  - URL: `https://script.google.com/a/macros/retail-ai.jp/s/AKfycbwggw9i2KD2JzxcXSSFayAxAYMT1HUJ5MpLklrY-NRJjiT8hdhNSnhx4Dn8MQbuNiemSg/exec`
+  - URL: `https://script.google.com/a/macros/retail-ai.jp/s/AKfycbwT4eHF5q--bGyD22l5WnmM6115C2hImYIXj-dHN92fragEWvG-au4LgGh7GqgAZdmXfw/exec`（v93）
 
 #### 既知の課題・残タスク
 | 優先度 | 課題 | 対処方針 |
@@ -262,26 +285,22 @@ window.RIALT_DATA = {
 | 高 | ゴルフ3施設のPLデータが全て0 | resort_table.js に大分/若宮/阿蘇コースのxlsxデータが入っていない可能性 → 要調査 |
 | 低 | `?tgr` URL制御（TGRタブのみ表示） | 未実装 |
 
-#### GAS IR機能（株価・ニュース）
+#### GAS IR機能（株価）
 
 | パラメータ | 処理 | 状態 |
 |---|---|---|
-| `?ir=1` | `buildIRData()` 呼び出し → 株価・チャート・ニュース・バリュエーション返却（JSONP対応） | ✅ デプロイ済み（v17） |
+| `?ir=1` | `fetchIRData()` 呼び出し → 5社株価比較返却（JSONP対応） | ✅ デプロイ済み（v93） |
 
-**buildIRData() 取得項目（v17）:**
+**fetchIRData() 取得項目（v61〜v93）:**
 | フィールド | ソース | 状態 |
 |---|---|---|
 | `price` | Yahoo Finance v8/chart | ✅ 動作 |
-| `chart` | Yahoo Finance v8/chart | ✅ 動作 |
-| `news` | Google News RSS「トライアルホールディングス」（最大10件） | ✅ v17実装済み |
-| `valuation` | Yahoo Finance v10/quoteSummary + v7/quote fallback | ⚠️ 141A.T データ空の可能性あり |
-| `financial` | Yahoo Finance v10/quoteSummary + v7/quote fallback | ⚠️ 141A.T データ空の可能性あり |
-| `analysts` | Yahoo Finance v10/quoteSummary | ⚠️ 141A.T データ空の可能性あり |
+| `news` | — | ❌ 常に`[]`（GASサーバーからRSSはタイムアウト） |
+| `valuation` / `financial` / `analysts` | — | ❌ 常にnull（v8/chartでは取得不可） |
 
-- ticker は `'141A.T'`（TRIAL Holdings）にハードコード
-- v17よりv10/quoteSummary（modules: price,defaultKeyStatistics,financialData）+ v7/quote フォールバックに変更
-- Google News RSSに変更（ニュース最大10件取得可能）
-- valuation/financial/analysts が空の場合はYahoo Finance側の141A.T対応制限による
+- 5社比較: トライアル(141A.T)・PPIH(7532.T)・ユニクロ/FR(9983.T)・コスモス薬品(3349.T)・イオン(8267.T)
+- **外部サイトスクレイピング全廃**: minkabu/finance.yahoo等はGASサーバーIPがブロックされている（2026-04-21確認済み）
+- `UrlFetchApp.fetchAll()` で5リクエスト並列
 
 #### データ構造（完成済み）
 

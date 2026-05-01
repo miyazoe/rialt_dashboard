@@ -5032,9 +5032,9 @@ body {
     <span class="tours-status-lbl" id="tours-status">&#8212;</span>
     <button class="tours-refresh-btn" id="tours-budget-btn" style="background:#f59e0b;color:#fff;font-size:10px;padding:3px 10px;margin-left:8px;" title="インバウンド予算保守">📋 予算保守</button>
   </div>
-  <div class="tours-kpi-row" id="tours-kpi-row"></div>
   <!-- サブタブナビ -->
   <div class="tours-sub-nav">
+    <button class="tours-sub-btn" data-tours-sub="fac">&#x1F3E8; &#26045;&#35373;&#21029;</button>
     <button class="tours-sub-btn active" data-tours-sub="dashboard">&#x1F4CA; &#12480;&#12483;&#12471;&#12517;&#12508;&#12540;&#12489;</button>
     <button class="tours-sub-btn" data-tours-sub="country">&#x1F30D; &#22269;&#21029;</button>
     <button class="tours-sub-btn" data-tours-sub="agency">&#x1F3E2; &#26053;&#34892;&#20250;&#31038;&#21029;</button>
@@ -5045,6 +5045,7 @@ body {
   </div>
   <!-- ダッシュボード -->
   <div class="tours-screen active" id="tours-screen-dashboard" style="overflow:auto;padding:12px;background:#f4f6f9;">
+    <div class="tours-kpi-row" id="tours-kpi-row"></div>
     <div class="tours-dash-grid">
       <div class="tours-dash-card">
         <div class="tours-dash-title">&#x1F4B0; &#22770;&#19978;&#65288;&#21512;&#35336;&#65289; &#26376;&#21029;&#25512;&#31227;</div>
@@ -5086,6 +5087,9 @@ body {
     <div id="tours-chart-tooltip" class="tours-chart-tooltip"></div>
   </div>
   <!-- 国別分析 -->
+  <div class="tours-screen" id="tours-screen-fac" style="overflow:auto;padding:12px;background:#f4f6f9;">
+    <div id="tfac-table"></div>
+  </div>
   <div class="tours-screen" id="tours-screen-country" style="overflow:auto;padding:12px;background:#f4f6f9;">
     <div id="tours-country-content">
       <div style="display:flex;gap:12px;margin-bottom:12px;" id="tours-country-cards"></div>
@@ -10858,6 +10862,79 @@ document.getElementById('import-btn').addEventListener('click', openPasteDialog)
   var _inited = false, _currentMonth = null, _viewMode = 'single', _currentFac = null;
   var _gasCache = {};
   var _gasPL = {}; // PLデータキャッシュ { 'YYYY-MM': { 'gas施設名': { gp_a,op_a,lc_a,rev_a } } }
+  var _gasPLFull = {}; // フルPLデータキャッシュ { 'YYYY-MM': { '施設名': { '科目_実績': N, ... } } }
+
+  // ── GASフルPLデータをRESORTTABLEに注入 ──────────────────────────────────
+  function _injectPlFullToResortTable(ym, facs) {
+    var parts = ym.match(/(\d{4})-(\d{2})/);
+    if (!parts) return;
+    var year = parseInt(parts[1]), month = parseInt(parts[2]);
+    window.RESORT_TABLE = window.RESORT_TABLE || {};
+    window.RESORT_TABLE.rows = window.RESORT_TABLE.rows || [];
+    Object.keys(facs).forEach(function(facName) {
+      var existing = null;
+      for (var i = 0; i < window.RESORT_TABLE.rows.length; i++) {
+        var r = window.RESORT_TABLE.rows[i];
+        if (r.facility === facName && r.year === year && r.month === month) { existing = r; break; }
+      }
+      if (existing) {
+        Object.keys(facs[facName]).forEach(function(field) {
+          if (!(field in existing)) existing[field] = facs[facName][field];
+        });
+      } else {
+        var newRow = { year: year, month: month, facility: facName, source: 'gas' };
+        Object.keys(facs[facName]).forEach(function(f) { newRow[f] = facs[facName][f]; });
+        window.RESORT_TABLE.rows.push(newRow);
+      }
+    });
+  }
+
+  // ── GASフルPLをJSONPで取得してRESORTTABLEに注入（stale-while-revalidate）──
+  function fetchGasPlFull_(ym, onDone) {
+    // キャッシュがあれば即座に表示
+    var cacheAge = Infinity;
+    try {
+      var cached = JSON.parse(localStorage.getItem('tgr_pl_full_' + ym) || 'null');
+      if (cached && cached.ts && cached.facs) {
+        cacheAge = Date.now() - cached.ts;
+        if (cacheAge < 86400000) {
+          _gasPLFull[ym] = cached.facs;
+          _injectPlFullToResortTable(ym, cached.facs);
+          if (onDone) { onDone(); onDone = null; }
+          // 1時間以内なら再フェッチしない
+          if (cacheAge < 3600000) return;
+        }
+      }
+    } catch(e) {}
+    // GASからバックグラウンドでフェッチ（キャッシュがない or 1時間超）
+    var cb = '_gasPlFull_' + Date.now();
+    var s = document.createElement('script');
+    var done = false;
+    var timer = setTimeout(function() {
+      if (done) return; done = true;
+      delete window[cb]; if (s.parentNode) s.parentNode.removeChild(s);
+      if (onDone) onDone();
+    }, 45000);
+    window[cb] = function(data) {
+      if (done) return; done = true;
+      clearTimeout(timer);
+      delete window[cb]; if (s.parentNode) s.parentNode.removeChild(s);
+      if (data && data.facs && Object.keys(data.facs).length > 0) {
+        _gasPLFull[ym] = data.facs;
+        _injectPlFullToResortTable(ym, data.facs);
+        try { localStorage.setItem('tgr_pl_full_' + ym, JSON.stringify({ ts: Date.now(), facs: data.facs })); } catch(e) {}
+        showL1();
+      }
+      if (onDone) onDone();
+    };
+    s.onerror = function() {
+      if (done) return; done = true; clearTimeout(timer);
+      delete window[cb]; if (s.parentNode) s.parentNode.removeChild(s);
+      if (onDone) onDone();
+    };
+    s.src = GAS_URL + '?get_pl_full=1&ym=' + ym + '&callback=' + cb + '&t=' + Date.now();
+    document.head.appendChild(s);
+  }
 
   // ── GASキャッシュ自動取得（TGRタブ開時に呼ばれる） ──
   function autoFetchGasCache_(manual) {
@@ -10890,6 +10967,7 @@ document.getElementById('import-btn').addEventListener('click', openPasteDialog)
         if (m.pl && Object.keys(m.pl).length > 0)
           _gasPL[ym] = Object.assign(_gasPL[ym] || {}, m.pl);
       });
+      try { localStorage.setItem('tgr_gas_cache_v1', JSON.stringify({ ts: Date.now(), months: months })); } catch(e) {}
       if (manual) showToast('GASキャッシュ取得完了 (' + loaded + 'ヶ月)', 'success');
       if (_inited) {
         var sel = document.getElementById('resort-month-sel');
@@ -10922,9 +11000,13 @@ document.getElementById('import-btn').addEventListener('click', openPasteDialog)
     var plRec = _gasPL[ym] && (_gasPL[ym][gn] || _gasPL[ym][facPlName]);
     if (plRec) {
       if (ret.rev_a == null && plRec.rev_a != null) ret.rev_a = plRec.rev_a;
-      if (ret.gp_a == null && plRec.gp_a != null)  ret.gp_a  = plRec.gp_a;
-      if (ret.op_a == null && plRec.op_a != null)  ret.op_a  = plRec.op_a;
-      if (ret.lc_a == null && plRec.lc_a != null)  ret.lc_a  = plRec.lc_a;
+      if (ret.gp_a  == null && plRec.gp_a  != null) ret.gp_a  = plRec.gp_a;
+      if (ret.op_a  == null && plRec.op_a  != null) ret.op_a  = plRec.op_a;
+      if (ret.lc_a  == null && plRec.lc_a  != null) ret.lc_a  = plRec.lc_a;
+      if (ret.rev_b == null && plRec.rev_b != null) ret.rev_b = plRec.rev_b;
+      if (ret.gp_b  == null && plRec.gp_b  != null) ret.gp_b  = plRec.gp_b;
+      if (ret.lc_b  == null && plRec.lc_b  != null) ret.lc_b  = plRec.lc_b;
+      if (ret.op_b  == null && plRec.op_b  != null) ret.op_b  = plRec.op_b;
     }
     if (!window.GAS_MONTHLY) return ret;
     var gm = window.GAS_MONTHLY[ym] && window.GAS_MONTHLY[ym][gn];
@@ -11246,7 +11328,44 @@ document.getElementById('import-btn').addEventListener('click', openPasteDialog)
         if (cacheInfo) cacheInfo.textContent = '取得失敗（GAS接続エラー）';
       });
     });
+    // localStorageキャッシュを即座に反映（GASを待たずに表示）
+    (function() {
+      try {
+        var _lsGasCache = JSON.parse(localStorage.getItem('tgr_gas_cache_v1') || 'null');
+        if (_lsGasCache && _lsGasCache.ts && (Date.now() - _lsGasCache.ts) < 86400000 && _lsGasCache.months) {
+          Object.keys(_lsGasCache.months).forEach(function(ym) {
+            var m = _lsGasCache.months[ym];
+            if (m.kpi && Object.keys(m.kpi).length > 0) {
+              window.GAS_MONTHLY = window.GAS_MONTHLY || {};
+              window.GAS_MONTHLY[ym] = Object.assign(window.GAS_MONTHLY[ym] || {}, m.kpi);
+            }
+            if (m.pl && Object.keys(m.pl).length > 0)
+              _gasPL[ym] = Object.assign(_gasPL[ym] || {}, m.pl);
+          });
+        }
+      } catch(e) {}
+    })();
+    // フルPLキャッシュをlocalStorageから即座に反映
+    (function() {
+      var ymList = availMonths().slice(0, 6);
+      ymList.forEach(function(ym) {
+        try {
+          var c = JSON.parse(localStorage.getItem('tgr_pl_full_' + ym) || 'null');
+          if (c && c.ts && (Date.now() - c.ts) < 86400000 && c.facs) {
+            _gasPLFull[ym] = c.facs;
+            _injectPlFullToResortTable(ym, c.facs);
+          }
+        } catch(e) {}
+      });
+    })();
     showL1();
+    // 直近3ヶ月のフルPLを自動取得（stale-while-revalidate: キャッシュ表示後にバックグラウンド更新）
+    (function() {
+      var ymList = availMonths().slice(0, 3);
+      ymList.forEach(function(ym, idx) {
+        setTimeout(function() { fetchGasPlFull_(ym); }, 2000 + idx * 5000);
+      });
+    })();
     initTgrSubTabs();
     renderTgrKpiBanner();
     // TGRタブ初回表示時にGASキャッシュを自動取得（バックグラウンド）
@@ -13655,7 +13774,7 @@ document.getElementById('import-btn').addEventListener('click', openPasteDialog)
           btn.classList.add('active');
           var screen = document.getElementById('tours-screen-' + btn.dataset.toursSub);
           if (screen) screen.classList.add('active');
-          if (btn.dataset.toursSub === 'budget') { renderBudgetScreen(); } else if (btn.dataset.toursSub === 'price') { if(window._openPriceTab) window._openPriceTab(); } else { renderTours(); }
+          if (btn.dataset.toursSub === 'budget') { renderBudgetScreen(); } else if (btn.dataset.toursSub === 'price') { if(window._openPriceTab) window._openPriceTab(); } else if (btn.dataset.toursSub === 'fac') { renderToursFac(); } else { renderTours(); }
         });
       });
     }
@@ -14969,6 +15088,133 @@ document.getElementById('import-btn').addEventListener('click', openPasteDialog)
     }
 
     // ── クロスリンク ───────────────────────────────────────────────────────
+
+    // -- Facility summary tab ---
+    var _TFAC_FACS = [
+      { pl: '九重久織亭',   type: 'ryokan' },
+      { pl: 'ロッジ虎の湯', type: 'ryokan' },
+      { pl: '宮若虎の湯',   type: 'ryokan' },
+      { pl: '小塚久の葉',   type: 'ryokan' },
+      { pl: '仙石原久の葉', type: 'ryokan' },
+      { pl: '古民家煉り',   type: 'ryokan' },
+      { pl: 'TSMART',       type: 'ryokan' },
+      { pl: '若宮コース',   type: 'golf' },
+      { pl: '大分コース',   type: 'golf' },
+      { pl: '阿蘇コース',   type: 'golf' },
+    ];
+    var _TFAC_GOLF_MAP = {
+      '若宮コース': 'WAKAMIYAコース',
+      '大分コース': 'OITAコース',
+      '阿蘇コース': 'ASOコース'
+    };
+    function _tfacGetBudgetAnnual(plName) {
+      var ib = window.INBOUND_BUDGET;
+      if (!ib || !ib.facilities) return null;
+      var fd = ib.facilities[plName] || ib.facilities[_TFAC_GOLF_MAP[plName]];
+      if (!fd || !fd.monthly) return null;
+      return Object.values(fd.monthly).reduce(function(s, m) { return s + (m.budget || 0); }, 0);
+    }
+    function _tfacMatchFacMap(plName) {
+      var fm = _tfdState.facMap;
+      if (!fm) return null;
+      if (fm[plName]) return fm[plName];
+      var keys = Object.keys(fm);
+      var k = keys.find(function(k) { return k.toLowerCase() === plName.toLowerCase(); });
+      if (k) return fm[k];
+      k = keys.find(function(k) { return k.includes(plName) || plName.includes(k); });
+      return k ? fm[k] : null;
+    }
+    var _TFAC_GA_MAP = {
+      '九重久織亭':   '大分久織亭',
+      'ロッジ虎の湯': '阿蘇キャニオンテラスロッジ',
+      '若宮コース':   'WAKAMIYAコース',
+      '大分コース':   'OITAコース',
+      '阿蘇コース':   'ASOコース'
+    };
+    function _tfacGetGA(plName) {
+      var gd = window.GA_MONTHLY;
+      if (!gd || !gd.byFacility) return null;
+      var mapped = _TFAC_GA_MAP[plName] || plName;
+      if (gd.byFacility[mapped]) return gd.byFacility[mapped];
+      var keys = Object.keys(gd.byFacility);
+      var k = keys.find(function(k) { return k === plName || k.includes(plName) || plName.includes(k); });
+      return k ? gd.byFacility[k] : null;
+    }
+    function renderToursFac() {
+      if (!_tfdState.facMap && _toursData) { _tfdBuildFacMap(); }
+      var el = document.getElementById('tfac-table');
+      if (!el) return;
+      var lYM = _tfdState.latestYM || '';
+      var fyLabel = '', fyStart = '', fyEnd = '';
+      if (lYM) {
+        var lm = parseInt(lYM.slice(5)), ly = parseInt(lYM.slice(0, 4));
+        var fy = lm >= 7 ? ly : ly - 1;
+        fyLabel = fy + '年度'; fyStart = fy + '-07'; fyEnd = (fy + 1) + '-06';
+      }
+      var gaMonths = (window.GA_MONTHLY && window.GA_MONTHLY.months) ? window.GA_MONTHLY.months : [];
+      var gaLYM = gaMonths.length ? gaMonths[gaMonths.length - 1] : '';
+      function fmtY(v) { return v != null ? '\u00a5' + Math.round(v).toLocaleString() : '\u2014'; }
+      function fmtN(v) { return v != null ? Number(v).toLocaleString() : '\u2014'; }
+      function fmtP(v) { return v != null ? (v * 100).toFixed(1) + '%' : '\u2014'; }
+      var html = '<div style="background:#fff;border-radius:8px;border:1px solid #e2e8f0;overflow:hidden;">';
+      html += '<div style="padding:10px 14px;border-bottom:1px solid #e2e8f0;display:flex;align-items:center;gap:10px;">';
+      html += '<span style="font-size:13px;font-weight:700;color:#1e3a5f;">&#x1F3E8; 施設別サマリー</span>';
+      html += '<span style="font-size:11px;color:#9ca3af;">' + (fyLabel || '—') + ' 累計　TOURS基準月: ' + (lYM || '—') + '　GA最新月: ' + (gaLYM || '—') + '</span>';
+      html += '</div>';
+      html += '<div style="overflow-x:auto;"><table style="width:100%;border-collapse:collapse;font-size:12px;">';
+      html += '<thead><tr style="background:#f8fafc;">';
+      var cols = [
+        { h: '施設名', a: 'left' },
+        { h: '種別', a: 'left' },
+        { h: 'インバウンド予算（年度）', a: 'right' },
+        { h: 'インバウンド売上', a: 'right' },
+        { h: '予算達成率', a: 'right' },
+        { h: 'ツアーズ売上（年度累計）', a: 'right' },
+        { h: 'FIT売上', a: 'right' },
+        { h: 'HPアクセス（最新月）', a: 'right' },
+        { h: 'UU（最新月）', a: 'right' },
+        { h: 'CV率（最新月）', a: 'right' }
+      ];
+      cols.forEach(function(c) {
+        html += '<th style="padding:7px 10px;text-align:' + c.a + ';font-weight:600;color:#374151;border-bottom:2px solid #e2e8f0;font-size:11px;white-space:nowrap;">' + c.h + '</th>';
+      });
+      html += '</tr></thead><tbody>';
+      var lastType = null;
+      _TFAC_FACS.forEach(function(fac, idx) {
+        if (lastType && fac.type !== lastType) {
+          html += '<tr style="background:#f0f4f8;"><td colspan="10" style="padding:4px 10px;font-size:10px;font-weight:700;color:#6b7280;">― ゴルフ ―</td></tr>';
+        }
+        lastType = fac.type;
+        var bg = idx % 2 === 0 ? '#ffffff' : '#fafafa';
+        var ibBudget = _tfacGetBudgetAnnual(fac.pl);
+        var facMapData = _tfacMatchFacMap(fac.pl);
+        var toursSales = null;
+        if (facMapData && fyStart) {
+          toursSales = 0; var found = false;
+          Object.keys(facMapData.monthly).forEach(function(ym) {
+            if (ym >= fyStart && ym <= fyEnd) { toursSales += facMapData.monthly[ym] || 0; found = true; }
+          });
+          if (!found) toursSales = null;
+        }
+        var gaFd = _tfacGetGA(fac.pl);
+        var gaD = gaFd && gaLYM ? gaFd[gaLYM] : null;
+        html += '<tr style="border-bottom:1px solid #f1f5f9;background:' + bg + ';">';
+        html += '<td style="padding:8px 10px;font-weight:600;color:#1e3a5f;">' + fac.pl + '</td>';
+        html += '<td style="padding:8px 10px;color:#6b7280;">' + (fac.type === 'golf' ? '&#x26F3; ゴルフ' : '&#x1F3E8; 旅館') + '</td>';
+        html += '<td style="padding:8px 10px;text-align:right;">' + fmtY(ibBudget) + '</td>';
+        html += '<td style="padding:8px 10px;text-align:right;color:#9ca3af;">—</td>';
+        html += '<td style="padding:8px 10px;text-align:right;color:#9ca3af;">—</td>';
+        html += '<td style="padding:8px 10px;text-align:right;">' + fmtY(toursSales) + '</td>';
+        html += '<td style="padding:8px 10px;text-align:right;color:#9ca3af;">—</td>';
+        html += '<td style="padding:8px 10px;text-align:right;">' + fmtN(gaD ? gaD.sessions : null) + '</td>';
+        html += '<td style="padding:8px 10px;text-align:right;">' + fmtN(gaD ? gaD.users : null) + '</td>';
+        html += '<td style="padding:8px 10px;text-align:right;">' + fmtP(gaD ? gaD.convRate : null) + '</td>';
+        html += '</tr>';
+      });
+      html += '</tbody></table></div></div>';
+      el.innerHTML = html;
+    }
+
     function handleJumpFilter(filter) {
       if (!filter) return;
       if (filter.agency) {

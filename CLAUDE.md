@@ -233,7 +233,7 @@ window.RESORT_TABLE = {
 
 ### GAS Web App
 - **デプロイURL**: `https://script.google.com/a/macros/retail-ai.jp/s/AKfycbwT4eHF5q--bGyD22l5WnmM6115C2hImYIXj-dHN92fragEWvG-au4LgGh7GqgAZdmXfw/exec`
-- **現在のバージョン**: v94（2026/05/01）
+- **現在のバージョン**: v105（2026/05/01）
 - **ルーティング**:
   - `?budget_ping=1` → 診断エンドポイント（スプレッドシートアクセスなし）
   - `?budget_get=1&fy=YYYY` → 予算データ取得（JSONP対応）
@@ -241,6 +241,13 @@ window.RESORT_TABLE = {
   - `?budget_save_row=1&fy=YYYY&fac=NAME&month=YYYY-MM&adr=N&KOR=N&TWN=N&HKG=N&CHA=N&EUR=N` → 1セル（施設×月）保存（JSONP対応）
   - `?ir=1[&callback=xxx]` → `fetchIRData()` 呼び出し（5社比較データ、JSONP対応）
   - `?facility=xxx&month=YYYY-MM` → TGR施設日別売上データ
+  - `?get_cache=1` → 月次PLキャッシュ取得（JSONP対応）
+  - `?collect_pl=1&ym=YYYY-MM` → 1ヶ月分PLキャッシュ手動再構築
+  - `?collect_all=1` → 全既知月PLキャッシュ一括再構築（初回セットアップ・修正後再適用用）
+  - `?pl_check=1&ym=YYYY-MM` → PropertiesServiceのrev_a/rev_b確認（検証用）
+  - `?setup_trigger=1` → 週次トリガー登録
+  - `?add_pl_sheet=1&ym=YYYY-MM&id=SSID` → 新月PLシートID登録
+  - `?get_pl_full=1&ym=YYYY-MM` → 月別フルPLデータ（TGR全体PL全行+予算+KPI、resort_table.js代替、JSONP対応）
   - その他 → 月次集約データ
 - **予算スプレッドシート**: `13X7r8VZkODGbIalBNQ15QarjhloR-FI-6D5f3uLErP0`（ツアーズインバウンド予算）
   - シート名: `FY{年度}` （例: FY2026）
@@ -533,6 +540,8 @@ window.RESORT_TABLE = {
 | `rs_chat_news` | NEWS チャット履歴 |
 | `rs_chat_ir` | IR チャット履歴 |
 | `inbound_budget_override_v1` | インバウンド予算ローカル編集データ |
+| `tgr_gas_cache_v1` | TGR GASキャッシュ（KPI+PLデータ、24時間有効）起動時即座反映用 |
+| `tgr_pl_full_YYYY-MM` | TGRフルPLキャッシュ（resort_table.js代替、24時間有効）月別 |
 
 ---
 
