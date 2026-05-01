@@ -11265,56 +11265,66 @@ document.getElementById('import-btn').addEventListener('click', openPasteDialog)
   function renderL1(ym, mode) {
     var ryFacs = RESORT_FACS.filter(function(f) { return f.type === 'ryokan'; });
     var gfFacs = RESORT_FACS.filter(function(f) { return f.type === 'golf'; });
-    function sortW(rows) {
-      return rows.slice().sort(function(a, b) {
-        if (a.noData && b.noData) return 0; if (a.noData) return 1; if (b.noData) return -1;
-        if (a.rate == null && b.rate == null) return 0;
-        if (a.rate == null) return 1; if (b.rate == null) return -1;
-        return a.rate - b.rate;
-      });
+    // 施設順はRESORT_FACSの定義順を維持（達成率ソートを廃止）
+    var ryRows = ryFacs.map(function(f) { return calcRow(f, ym, mode); });
+    var gfRows = gfFacs.map(function(f) { return calcRow(f, ym, mode); });
+    // 合計行ビルダー: resort_table.jsにある月はそこから取得、ない月は個別行から集計
+    function buildAgg(rows, tableKey, label, type) {
+      var fromTbl = calcRow({ pl: tableKey, label: label, type: type }, ym, mode);
+      var valid = rows.filter(function(r) { return !r.noData; });
+      if (!valid.length) return fromTbl;
+      function sumR(k) { var t=0,h=false; valid.forEach(function(r){if(r[k]!=null){t+=r[k];h=true;}}); return h?t:null; }
+      if (!fromTbl.noData) {
+        var base = fromTbl;
+        if (type === 'ryokan') {
+          if (base.occ_a == null) { var oW=0,oR=0; valid.forEach(function(r){var rm=r.fac.rooms||0;if(r.occ_a!=null&&rm>0){oW+=r.occ_a*rm;oR+=rm;}}); if(oR>0)base.occ_a=oW/oR; }
+          if (base.adr_a == null) { var aW=0,aP=0; valid.forEach(function(r){if(r.adr_a!=null&&r.pax_a>0){aW+=r.adr_a*r.pax_a;aP+=r.pax_a;}}); if(aP>0)base.adr_a=Math.round(aW/aP); }
+          if (base.rvp_a == null && base.adr_a && base.occ_a) base.rvp_a = Math.round(base.adr_a*base.occ_a);
+          if (base.pax_a == null) { var pTbl=sumR('pax_a'); if(pTbl!=null)base.pax_a=pTbl; }
+          if (base.spd_a == null && base.rev_a && base.pax_a > 0) base.spd_a = Math.round(base.rev_a/base.pax_a);
+        }
+        return base;
+      }
+      // resort_table.jsになし: 個別行から集計
+      var rev_a=sumR('rev_a'),rev_b=sumR('rev_b'),gp_a=sumR('gp_a'),op_a=sumR('op_a'),op_b=sumR('op_b');
+      var lc_a=sumR('lc_a'),lc_b=sumR('lc_b'),pax_a=sumR('pax_a'),pax_b=sumR('pax_b');
+      var rate=(rev_b&&rev_a!=null)?rev_a/rev_b*100:null;
+      var gp_rt=(rev_a&&gp_a!=null)?gp_a/rev_a*100:null;
+      var op_rt=(rev_a&&op_a!=null)?op_a/rev_a*100:null;
+      var lc_rt=(rev_a&&lc_a!=null)?lc_a/rev_a*100:null;
+      var facL=type==='ryokan'?ryFacs:gfFacs;
+      var pyTot=0,pyH=false; facL.forEach(function(f){var pr=calcRow(f,prevYM(ym),'single');if(!pr.noData&&pr.rev_a!=null){pyTot+=pr.rev_a;pyH=true;}});
+      var yoy=(pyH&&pyTot>0&&rev_a!=null)?rev_a/pyTot*100:null;
+      var occ_a=null,adr_a=null,rvp_a=null,spd_a=null;
+      if (type==='ryokan') {
+        var oW2=0,oR2=0; valid.forEach(function(r){var rm=r.fac.rooms||0;if(r.occ_a!=null&&rm>0){oW2+=r.occ_a*rm;oR2+=rm;}}); if(oR2>0)occ_a=oW2/oR2;
+        var aW2=0,aP2=0; valid.forEach(function(r){if(r.adr_a!=null&&r.pax_a>0){aW2+=r.adr_a*r.pax_a;aP2+=r.pax_a;}}); if(aP2>0)adr_a=Math.round(aW2/aP2);
+        if(adr_a&&occ_a)rvp_a=Math.round(adr_a*occ_a);
+        if(rev_a!=null&&pax_a>0)spd_a=Math.round(rev_a/pax_a);
+      }
+      return { fac:{pl:tableKey,label:label,type:type}, noData:false,
+               rev_a:rev_a,rev_b:rev_b,gp_a:gp_a,op_a:op_a,op_b:op_b,lc_a:lc_a,lc_b:lc_b,lc_rt:lc_rt,
+               rate:rate,yoy:yoy,gp_rt:gp_rt,op_rt:op_rt,
+               occ_a:occ_a,occ_b:null,adr_a:adr_a,adr_b:null,rvp_a:rvp_a,rvp_b:null,
+               pax_a:pax_a,pax_b:pax_b,spd_a:spd_a,spd_b:null };
     }
-    var ryRows = sortW(ryFacs.map(function(f) { return calcRow(f, ym, mode); }));
-    var gfRows = sortW(gfFacs.map(function(f) { return calcRow(f, ym, mode); }));
-    var ryAgg  = calcRow({ pl: '旅館事業合計', type: 'ryokan', label: '旅館合計' }, ym, mode);
-    // 旅館合計の稼働率/ADR/RevPARがnullなら個別施設から加重平均で計算
-    (function fillRyAgg() {
-      if (ryAgg.noData) return;
-      var valid = ryRows.filter(function(r) { return !r.noData; });
-      if (!valid.length) return;
-      // 稼働率: 客室数加重平均
-      if (ryAgg.occ_a == null) {
-        var occSum = 0, roomSum = 0;
-        valid.forEach(function(r) {
-          var rooms = r.fac.rooms || 0;
-          if (r.occ_a != null && rooms > 0) { occSum += r.occ_a * rooms; roomSum += rooms; }
-        });
-        if (roomSum > 0) ryAgg.occ_a = occSum / roomSum;
-      }
-      // ADR: 販売客室数加重平均
-      if (ryAgg.adr_a == null) {
-        var adrSum = 0, paxSum = 0;
-        valid.forEach(function(r) {
-          if (r.adr_a != null && r.pax_a != null && r.pax_a > 0) { adrSum += r.adr_a * r.pax_a; paxSum += r.pax_a; }
-        });
-        if (paxSum > 0) ryAgg.adr_a = Math.round(adrSum / paxSum);
-      }
-      // RevPAR: ADR × 稼働率
-      if (ryAgg.rvp_a == null && ryAgg.adr_a != null && ryAgg.occ_a != null) {
-        ryAgg.rvp_a = Math.round(ryAgg.adr_a * ryAgg.occ_a);
-      }
-      // 来場者数(販売客室数): 合算
-      if (ryAgg.pax_a == null) {
-        var pTotal = 0, hasPax = false;
-        valid.forEach(function(r) { if (r.pax_a != null) { pTotal += r.pax_a; hasPax = true; } });
-        if (hasPax) ryAgg.pax_a = pTotal;
-      }
-      // 客単価: 売上 / 来場者数
-      if (ryAgg.spd_a == null && ryAgg.rev_a != null && ryAgg.pax_a > 0) {
-        ryAgg.spd_a = Math.round(ryAgg.rev_a / ryAgg.pax_a);
-      }
+    var ryAgg = buildAgg(ryRows, '旅館事業合計', '旅館合計', 'ryokan');
+    var gfAgg = buildAgg(gfRows, 'ゴルフ事業合計', 'ゴルフ合計', 'golf');
+    // TGR全体: resort_table.jsにあればそこから、なければ ryAgg+gfAgg から計算
+    var tgrRow = (function() {
+      var t = calcRow({ pl: 'TGR全体', type: 'total', label: 'TGR 全体' }, ym, mode);
+      if (!t.noData) return t;
+      if (ryAgg.noData && gfAgg.noData) return { fac:{pl:'TGR全体',label:'TGR 全体'}, noData:true };
+      function cSum(k){var t2=0,h=false;[ryAgg,gfAgg].forEach(function(r){if(!r.noData&&r[k]!=null){t2+=r[k];h=true;}});return h?t2:null;}
+      var rv=cSum('rev_a'),rb=cSum('rev_b'),gp=cSum('gp_a'),op=cSum('op_a'),ob=cSum('op_b'),lc=cSum('lc_a');
+      var rate2=(rb&&rv!=null)?rv/rb*100:null,gpR=(rv&&gp!=null)?gp/rv*100:null,opR=(rv&&op!=null)?op/rv*100:null;
+      var pyT=0,pyH2=false; RESORT_FACS.forEach(function(f){var pr=calcRow(f,prevYM(ym),'single');if(!pr.noData&&pr.rev_a!=null){pyT+=pr.rev_a;pyH2=true;}});
+      var yoy2=(pyH2&&pyT>0&&rv!=null)?rv/pyT*100:null;
+      return { fac:{pl:'TGR全体',label:'TGR 全体'}, noData:false,
+               rev_a:rv,rev_b:rb,gp_a:gp,op_a:op,op_b:ob,lc_a:lc,
+               rate:rate2,yoy:yoy2,gp_rt:gpR,op_rt:opR,
+               occ_a:null,occ_b:null,adr_a:null,adr_b:null,rvp_a:null,rvp_b:null };
     })();
-    var gfAgg  = calcRow({ pl: 'ゴルフ事業合計', type: 'golf', label: 'ゴルフ合計' }, ym, mode);
-    var tgrRow = calcRow({ pl: 'TGR全体', type: 'total', label: 'TGR 全体' }, ym, mode);
     var p = ym.split('-'), yr = +p[0], mo = +p[1];
     var fy = mo >= 7 ? yr : yr - 1;
     var periodLabel = mode === 'ytd'

@@ -584,6 +584,7 @@ const PL_FAC_COLS_ = {
   'Tsmart':      9,  // J (Iは合計列でスキップ)
   '若宮コース':  12, // M
   '大分コース':  13, // N
+  '阿蘇コース':  14, // O (若宮M, 大分N の次)
 };
 // ── PL行マッピング (0-indexed, row9=index8) ─────────────────────
 const PL_ROWS_ = { rev_a: 8, gp_a: 11, lc_a: 12, op_a: 17, op_rate: 18 };
