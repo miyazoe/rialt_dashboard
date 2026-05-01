@@ -10917,8 +10917,16 @@ document.getElementById('import-btn').addEventListener('click', openPasteDialog)
   }
   // GAS月次データでnull指標を補完
   function suppFromGas(facPlName, ym, ret) {
-    if (!window.GAS_MONTHLY) return ret;
     var gn = facGasName(facPlName);
+    // PLデータ補完（_gasPLから荒利・営業利益・人件費）— KPIなし施設（ゴルフ等）でも補完するため先行実行
+    var plRec = _gasPL[ym] && (_gasPL[ym][gn] || _gasPL[ym][facPlName]);
+    if (plRec) {
+      if (ret.rev_a == null && plRec.rev_a != null) ret.rev_a = plRec.rev_a;
+      if (ret.gp_a == null && plRec.gp_a != null)  ret.gp_a  = plRec.gp_a;
+      if (ret.op_a == null && plRec.op_a != null)  ret.op_a  = plRec.op_a;
+      if (ret.lc_a == null && plRec.lc_a != null)  ret.lc_a  = plRec.lc_a;
+    }
+    if (!window.GAS_MONTHLY) return ret;
     var gm = window.GAS_MONTHLY[ym] && window.GAS_MONTHLY[ym][gn];
     if (!gm) return ret;
     if (ret.rev_a == null && gm.rev_a != null) ret.rev_a = gm.rev_a;
@@ -10950,14 +10958,6 @@ document.getElementById('import-btn').addEventListener('click', openPasteDialog)
       if (occ4rvp != null) ret.rvp_b = Math.round(ret.adr_b * occ4rvp);
     }
     // spd_b: GASのspd_bは稼働率比率値のため使用不可
-    // PLデータ補完（_gasPLから荒利・営業利益・人件費）
-    var plRec = _gasPL[ym] && (_gasPL[ym][gn] || _gasPL[ym][facPlName]);
-    if (plRec) {
-      if (ret.rev_a == null && plRec.rev_a != null) ret.rev_a = plRec.rev_a;
-      if (ret.gp_a == null && plRec.gp_a != null)  ret.gp_a  = plRec.gp_a;
-      if (ret.op_a == null && plRec.op_a != null)  ret.op_a  = plRec.op_a;
-      if (ret.lc_a == null && plRec.lc_a != null)  ret.lc_a  = plRec.lc_a;
-    }
     return ret;
   }
 
