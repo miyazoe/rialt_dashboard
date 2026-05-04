@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
@@ -15090,6 +15090,7 @@ document.getElementById('import-btn').addEventListener('click', openPasteDialog)
     // ── クロスリンク ───────────────────────────────────────────────────────
 
     // -- Facility summary tab ---
+    var _tfacGaMonth = null;
     var _TFAC_FACS = [
       { pl: '九重久織亭',   type: 'ryokan' },
       { pl: 'ロッジ虎の湯', type: 'ryokan' },
@@ -15125,11 +15126,9 @@ document.getElementById('import-btn').addEventListener('click', openPasteDialog)
       return k ? fm[k] : null;
     }
     var _TFAC_GA_MAP = {
-      '九重久織亭':   '大分久織亭',
-      'ロッジ虎の湯': '阿蘇キャニオンテラスロッジ',
-      '若宮コース':   'WAKAMIYAコース',
-      '大分コース':   'OITAコース',
-      '阿蘇コース':   'ASOコース'
+      '若宮コース': 'WAKAMIYAコース',
+      '大分コース': 'OITAコース',
+      '阿蘇コース': 'ASOコース'
     };
     function _tfacGetGA(plName) {
       var gd = window.GA_MONTHLY;
@@ -15152,14 +15151,21 @@ document.getElementById('import-btn').addEventListener('click', openPasteDialog)
         fyLabel = fy + '年度'; fyStart = fy + '-07'; fyEnd = (fy + 1) + '-06';
       }
       var gaMonths = (window.GA_MONTHLY && window.GA_MONTHLY.months) ? window.GA_MONTHLY.months : [];
-      var gaLYM = gaMonths.length ? gaMonths[gaMonths.length - 1] : '';
+      var _now = new Date(), _curYM = _now.getFullYear() + '-' + String(_now.getMonth()+1).padStart(2,'0');
+      var _gaAvailMonths = gaMonths.filter(function(m){ return m < _curYM; });
+      var gaLYM = (_tfacGaMonth && _gaAvailMonths.indexOf(_tfacGaMonth) >= 0) ? _tfacGaMonth : (_gaAvailMonths.length ? _gaAvailMonths[_gaAvailMonths.length-1] : '');
       function fmtY(v) { return v != null ? '\u00a5' + Math.round(v).toLocaleString() : '\u2014'; }
       function fmtN(v) { return v != null ? Number(v).toLocaleString() : '\u2014'; }
       function fmtP(v) { return v != null ? (v * 100).toFixed(1) + '%' : '\u2014'; }
       var html = '<div style="background:#fff;border-radius:8px;border:1px solid #e2e8f0;overflow:hidden;">';
       html += '<div style="padding:10px 14px;border-bottom:1px solid #e2e8f0;display:flex;align-items:center;gap:10px;">';
       html += '<span style="font-size:13px;font-weight:700;color:#1e3a5f;">&#x1F3E8; 施設別サマリー</span>';
-      html += '<span style="font-size:11px;color:#9ca3af;">' + (fyLabel || '—') + ' 累計　TOURS基準月: ' + (lYM || '—') + '　GA最新月: ' + (gaLYM || '—') + '</span>';
+      html += '<span style="font-size:11px;color:#9ca3af;">' + (fyLabel || '—') + ' 累計　TOURS基準月: ' + (lYM || '—') + '</span>';
+      html += '<label style="font-size:11px;color:#6b7280;margin-left:8px;">GA月:</label>';
+      html += '<select id="tfac-ga-month-sel" style="font-size:11px;padding:2px 4px;border:1px solid #d1d5db;border-radius:4px;background:#fff;cursor:pointer;" onchange="(function(v){_tfacGaMonth=v;renderToursFac();})(this.value)">';
+      var _selMonths = _gaAvailMonths.slice().reverse();
+      _selMonths.forEach(function(m){ html += '<option value="' + m + '"' + (m===gaLYM?' selected':'') + '>' + m + '</option>'; });
+      html += '</select>';
       html += '</div>';
       html += '<div style="overflow-x:auto;"><table style="width:100%;border-collapse:collapse;font-size:12px;">';
       html += '<thead><tr style="background:#f8fafc;">';
@@ -17962,3 +17968,4 @@ window.addEventListener('load', function() {
 </script>
 </body>
 </html>
+
